@@ -1,0 +1,67 @@
+.overlay {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	z-index: 1000;
+}
+.modal {
+	color: white;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: linear-gradient(rgb(2, 16, 28), rgb(2, 16, 25));
+	background-size: cover;
+	padding: 50px;
+	z-index: 1000;
+	width: 56em;
+  	height: 34em;
+  	border-radius: 1.5em;
+	box-sizing: content-box;
+  border-width: 8px;
+  border-style: solid;
+  border-image: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  border-image-slice: 1;
+	box-shadow: rgba(0,0,0,0.35) 0em 0.3em 0.9em;
+	display: flex;
+	flex-direction: column;
+	padding: 1.5em;
+	font-family: 'Cormorant', serif;
+	user-select:none;
+	-webkit-user-select:none;
+}
+
+.modal .title{
+  display: inline-block;
+  text-align: center;
+  margin-top: -2.5em;
+  font-size: 1rem;
+}
+
+.modal .body {
+  flex: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.9rem;
+  text-align: center;
+}
+.modal .body p {
+  margin: 5px;
+
+}
+
+.modal .body .paragraph {
+  margin: auto;
+
+}
+.arabText {
+	font-weight: 300;
+}
+.engText {
+	font-weight: 500;
+}
