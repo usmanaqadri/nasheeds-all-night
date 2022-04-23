@@ -5,6 +5,8 @@
 .title {
   font-size: 2.5em;
   font-family: 'Cormorant', serif;
+  user-select:none;
+  -webkit-user-select:none;
 }
 
 .nasheedBoard {
