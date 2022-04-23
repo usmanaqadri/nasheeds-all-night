@@ -39,18 +39,18 @@ const Modal = ({open, onClose, text}) => {
 			<div onClick = {onClose} className="overlay" />
 			<div className="modal">
 				<div className="title">
-					<h1>{arabTitle}<br/>{engTitle}</h1>
+					<h1 className="arabText">{arabTitle}<br/>{engTitle}</h1>
 				</div>
 				<div className="body">
 					<div className="paragraph">
-						<p>{arab[counter]}</p>
-						<p><em>{rom[counter]}</em></p>
-						<p>{eng[counter]}</p>	
+						<p className="arabText">{arab[counter]}</p>
+						<p className="engText"><em>{rom[counter]}</em></p>
+						<p className="engText">{eng[counter]}</p>	
 					</div>
 					<div className="paragraph">
-						<p>{arab[counter+1]}</p>
-						<p><em>{rom[counter+1]}</em></p>
-						<p>{eng[counter+1]}</p>	
+						<p className="arabText">{arab[counter+1]}</p>
+						<p className="engText"><em>{rom[counter+1]}</em></p>
+						<p className="engText">{eng[counter+1]}</p>	
 					</div>		
 				</div>
 				

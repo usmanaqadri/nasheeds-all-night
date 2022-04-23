@@ -26,7 +26,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      {nasheeds.length !== 0 && <NasheedBoard nasheeds = {nasheeds} onClick={handleClick}/>}
+      <NasheedBoard nasheeds = {nasheeds} onClick={handleClick}/>
       {isOpen && <Modal open={isOpen} onClose={handleClose} text={nasheeds[nasheedId]}/> }
     </div>
   );
