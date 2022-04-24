@@ -58,11 +58,17 @@ import yanabiRom from './nasheeds/yanabi_rom.txt'
 import yarabbiArab from './nasheeds/yarabbi_arb.txt'
 import yarabbiEng from './nasheeds/yarabbi_eng.txt'
 import yarabbiRom from './nasheeds/yarabbi_rom.txt'
+import faslonArab from './nasheeds/faslon_arb.txt'
+import faslonEng from './nasheeds/faslon_eng.txt'
+import faslonRom from './nasheeds/faslon_rom.txt'
+import iduArab from './nasheeds/idu_arb.txt'
+import iduEng from './nasheeds/idu_eng.txt'
+import iduRom from './nasheeds/idu_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
-ishrabArab, ishrabEng, ishrabRom, lamyatiArab, lamyatiEng, lamyatiRom, hamdArab, hamdEng, hamdRom,
-madadArab, madadEng, madadRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
+faslonArab,faslonEng,faslonRom, iduArab, iduEng, iduRom, ishrabArab, ishrabEng, ishrabRom, lamyatiArab, lamyatiEng, lamyatiRom, 
+hamdArab, hamdEng, hamdRom, madadArab, madadEng, madadRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
 muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom,
 salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom,
 yaalimanArab, yaalimanEng, yaalimanRom, ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom,
@@ -76,26 +82,22 @@ for (let i = 0; i < urls.length; i+=3){
  export const generateNasheed = async () => {
 	let nasheed = [];
 		await Promise.all(newUrls.map(async (nash, index) =>{
-			await fetch(nash[0]).then((response) => response.text())
-				.then((result) => {
-					const linesArr = result.split("\n")
-					nasheed.push({arabTitle: linesArr[0]})
-					nasheed[index].arab = linesArr.slice(1)
-				})
-			await fetch(nash[1]).then((response) => response.text())
-				.then((result) => {
-					const linesArr = result.split("\n")
-					nasheed[index].eng = linesArr
-				})
-			await fetch(nash[2]).then((response) => response.text())
-				.then((result) => {
-					const linesArr = result.split("\n")
-					nasheed[index].engTitle = linesArr[0]
-					nasheed[index].rom = linesArr.slice(1)
-				})
-			}
+				await fetch(nash[0]).then((response) => response.text())
+					.then((result) => {
+						const linesArr = result.split("\n")
+						nasheed[index] = {arabTitle: linesArr[0]}
+						nasheed[index].arab = linesArr.slice(1)});
+				await fetch(nash[1]).then((response) => response.text())
+					.then((result) => {
+						const linesArr = result.split("\n")
+						nasheed[index].eng = linesArr});
+				await fetch(nash[2]).then((response) => response.text())
+					.then((result) => {
+						const linesArr = result.split("\n")
+						nasheed[index].engTitle = linesArr[0]
+						nasheed[index].rom = linesArr.slice(1)});
+				}
 			)
 		)
-
 	return {nasheed}
 }
