@@ -10,20 +10,18 @@
 }
 
 .nasheedBoard {
-  position: fixed;
-  top: 30%;
-  right: 50%;
-  margin: 0 auto;
-  width: 75%;
-  transform: translateY(-50%);
-  transform: translateX(50%);
+  /*position: fixed;*/
+  /*top: 20%;*/
+  /*right: 50%;*/
+  margin: 3em auto;
+  width: 80%;
+  /*transform: translateY(-50%);*/
+  /*transform: translateX(50%);*/
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 20px;
-  margin-bottom: auto;
-  margin-top: auto;
   overflow: auto;
 
 }
