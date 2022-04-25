@@ -10,8 +10,8 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  height: 100%;
-  width: 100%;
+  min-height: 100%;
+  min-width: 100%;
   /*overflow: hidden;*/
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
