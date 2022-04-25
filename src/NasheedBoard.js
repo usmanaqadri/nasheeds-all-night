@@ -7,7 +7,7 @@ function NasheedBoard({nasheeds, onClick}) {
 	nasheeds.forEach(element => myNasheeds.push(element.engTitle))
 
 	const nasheedDivs = myNasheeds.map((nasheed, index)=> 
-    <div className="nasheed buttons">
+    <div className="nasheed-buttons" key={index}>
       <button onClick={onClick(index)}  className="button-64"><span className="text">{nasheed}</span></button>
     </div>
     );

@@ -17,9 +17,9 @@
 	background-size: cover;
 	padding: 50px;
 	z-index: 1000;
-	width: 56em;
-  	height: 34em;
-  	border-radius: 1.5em;
+	width: 85vw;
+  height: 85vh;
+  border-radius: 1.5em;
 	box-sizing: content-box;
   border-width: 8px;
   border-style: solid;
@@ -64,4 +64,29 @@
 }
 .engText {
 	font-weight: 500;
+}
+@media (max-width: 650px) {
+	.modal .title {
+		font-size: 0.5rem;
+	}
+	.modal .body {
+		font-size: 1rem;
+	}
+}
+@media (max-height: 550px) {
+	.modal .title {
+		font-size: 0.7rem;
+	}
+	.modal .body {
+		font-size: 1.2rem;
+	}
+}
+
+@media (min-height: 1000px) {
+	.modal .title {
+		font-size: 1.7rem;
+	}
+	.modal .body {
+		font-size: 3.2rem;
+	}
 }
