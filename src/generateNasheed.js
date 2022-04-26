@@ -88,11 +88,14 @@ import yaNabiRom from './nasheeds/ya-nabi_rom.txt'
 import zaheArab from './nasheeds/zahe_arb.txt'
 import zaheEng from './nasheeds/zahe_eng.txt'
 import zaheRom from './nasheeds/zahe_rom.txt'
+import kaabeArab from './nasheeds/kaabe_arb.txt'
+import kaabeEng from './nasheeds/kaabe_eng.txt'
+import kaabeRom from './nasheeds/kaabe_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
 faslonArab,faslonEng,faslonRom, haqiqatArab,haqiqatEng,haqiqatRom,huzurArab, huzurEng, huzurRom, iduArab, iduEng, iduRom, 
-ishrabArab, ishrabEng, ishrabRom, lamyatiArab, lamyatiEng, lamyatiRom, saliqaArab, saliqaEng, saliqaRom, 
+ishrabArab, ishrabEng, ishrabRom, kaabeArab, kaabeEng, kaabeRom, lamyatiArab, lamyatiEng, lamyatiRom, saliqaArab, saliqaEng, saliqaRom, 
 hamdArab, hamdEng, hamdRom, madadArab, madadEng, madadRom, ulfatArab, ulfatEng, ulfatRom, 
 qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
 muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom,
