@@ -91,17 +91,27 @@ import zaheRom from './nasheeds/zahe_rom.txt'
 import kaabeArab from './nasheeds/kaabe_arb.txt'
 import kaabeEng from './nasheeds/kaabe_eng.txt'
 import kaabeRom from './nasheeds/kaabe_rom.txt'
+import jabArab from './nasheeds/jab_arb.txt'
+import jabEng from './nasheeds/jab_eng.txt'
+import jabRom from './nasheeds/jab_rom.txt'
+import rokArab from './nasheeds/rok_arb.txt'
+import rokEng from './nasheeds/rok_eng.txt'
+import rokRom from './nasheeds/rok_rom.txt'
+import nakahinArab from './nasheeds/nakahin_arb.txt'
+import nakahinEng from './nasheeds/nakahin_eng.txt'
+import nakahinRom from './nasheeds/nakahin_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
 faslonArab,faslonEng,faslonRom, haqiqatArab,haqiqatEng,haqiqatRom,huzurArab, huzurEng, huzurRom, iduArab, iduEng, iduRom, 
-ishrabArab, ishrabEng, ishrabRom, kaabeArab, kaabeEng, kaabeRom, lamyatiArab, lamyatiEng, lamyatiRom, saliqaArab, saliqaEng, saliqaRom, 
-hamdArab, hamdEng, hamdRom, madadArab, madadEng, madadRom, ulfatArab, ulfatEng, ulfatRom, 
-qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
-muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom,
-salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom,
-yaalimanArab, yaalimanEng, yaalimanRom, ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, yaNabiArab, yaNabiEng, yaNabiRom,
-yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaheArab,zaheEng,zaheRom, zaminArab, zaminEng, zaminRom,
+ishrabArab, ishrabEng, ishrabRom, jabArab, jabEng,jabRom, kaabeArab, kaabeEng, kaabeRom, lamyatiArab, lamyatiEng, lamyatiRom,
+saliqaArab, saliqaEng, saliqaRom, hamdArab, hamdEng, hamdRom, nakahinArab, nakahinEng, nakahinRom, madadArab, madadEng, madadRom,
+ulfatArab, ulfatEng, ulfatRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
+muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, rokArab, rokEng, rokRom, 
+salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom, salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, 
+talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom, yaalimanArab, yaalimanEng, yaalimanRom, 
+ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, yaNabiArab, yaNabiEng, yaNabiRom, 
+yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaheArab, zaheEng, zaheRom, zaminArab, zaminEng, zaminRom,
 ]
 let newUrls = [];
 for (let i = 0; i < urls.length; i+=3){
