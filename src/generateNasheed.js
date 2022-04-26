@@ -82,6 +82,12 @@ import huzurRom from './nasheeds/huzur_rom.txt'
 import paighamArab from './nasheeds/paigham_arb.txt'
 import paighamEng from './nasheeds/paigham_eng.txt'
 import paighamRom from './nasheeds/paigham_rom.txt'
+import yaNabiArab from './nasheeds/ya-nabi_arb.txt'
+import yaNabiEng from './nasheeds/ya-nabi_eng.txt'
+import yaNabiRom from './nasheeds/ya-nabi_rom.txt'
+import zaheArab from './nasheeds/zahe_arb.txt'
+import zaheEng from './nasheeds/zahe_eng.txt'
+import zaheRom from './nasheeds/zahe_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
@@ -91,8 +97,8 @@ hamdArab, hamdEng, hamdRom, madadArab, madadEng, madadRom, ulfatArab, ulfatEng, 
 qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
 muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom,
 salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom,
-yaalimanArab, yaalimanEng, yaalimanRom, ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom,
-yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaminArab, zaminEng, zaminRom
+yaalimanArab, yaalimanEng, yaalimanRom, ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, yaNabiArab, yaNabiEng, yaNabiRom,
+yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaheArab,zaheEng,zaheRom, zaminArab, zaminEng, zaminRom,
 ]
 let newUrls = [];
 for (let i = 0; i < urls.length; i+=3){
