@@ -1,65 +1,66 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import './Modal.css'
 
-const Modal = ({open, onClose, text}) => {
-	let {arab, arabTitle, engTitle, eng, rom} = text;
-	
+const Modal = ({ open, onClose, text }) => {
+	let { arab, arabTitle, engTitle, eng, rom } = text;
+
 	const [counter, setCounter] = useState(0);
 
 	const handleUserKeyPress = (e) => {
 		if (e.code === "ArrowLeft" || e.type === 'contextmenu') {
-      e.preventDefault();
-      if (counter === 0) setCounter(0)
-      else setCounter(counter -2 )
-    }
-    if (e.code === "ArrowRight" || e.type === 'click') {
-      if (counter===eng.length){
-      	onClose();
-      	setCounter(0);
-      }
-      else {
-      	setCounter(counter + 2)
-      }
-    }
-    if (e.code === "Escape") {
-      setCounter(0);
-      onClose();
-    }
-  }
-  useEffect(() => {
-    window.addEventListener('keydown', handleUserKeyPress);
+			e.preventDefault();
+			if (counter === 0) setCounter(0)
+			else setCounter(counter - 2)
+		}
+		if (e.code === "ArrowRight" || e.type === 'click') {
+			if (counter === eng.length) {
+				onClose();
+				setCounter(0);
+			}
+			else {
+				setCounter(counter + 2)
+			}
+		}
+		if (e.code === "Escape") {
+			setCounter(0);
+			onClose();
+		}
+	}
+	useEffect(() => {
+		window.addEventListener('keydown', handleUserKeyPress);
 
-    return () => {
-      window.removeEventListener('keydown', handleUserKeyPress);
-    };
-  })
+		return () => {
+			window.removeEventListener('keydown', handleUserKeyPress);
+		};
+	})
 
 	if (!open) return null
 	return (
 		<>
-			<div onClick = {onClose} className="overlay" />
-			<div onClick = {handleUserKeyPress} onContextMenu={handleUserKeyPress} className="modal">
+			<div onClick={onClose} className="overlay" />
+			<div onClick={handleUserKeyPress} onContextMenu={handleUserKeyPress} className="modal">
 				<div className="title">
-					<h1 className="arabText">{arabTitle}<br/>{engTitle}</h1>
+					<h1 className="arabText">{arabTitle}<br />{engTitle}</h1>
 				</div>
 				<div className="body">
 					<div className="paragraph">
 						<p className="arabText">{arab[counter]}</p>
 						<p className="engText">
-						<em dangerouslySetInnerHTML={{__html: rom[counter]}}/>
+							<em dangerouslySetInnerHTML={{ __html: rom[counter] }} />
 						</p>
-						<p className="engText">{eng[counter]}</p>	
+						<p className="engText">{eng[counter]}</p>
 					</div>
 					<div className="paragraph">
-						<p className="arabText">{arab[counter+1]}</p>
-						<em dangerouslySetInnerHTML={{__html: rom[counter+1]}}/>
-						<p className="engText">{eng[counter+1]}</p>	
-					</div>		
+						<p className="arabText">{arab[counter + 1]}
+							<em dangerouslySetInnerHTML={{ __html: rom[counter + 1] }} />
+						</p>
+						<p className="engText">{eng[counter + 1]}</p>
+					</div>
 				</div>
-				
+
 			</div>
 		</>
-		
+
 	)
 }
 
