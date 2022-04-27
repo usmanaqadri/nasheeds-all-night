@@ -100,6 +100,9 @@ import rokRom from './nasheeds/rok_rom.txt'
 import nakahinArab from './nasheeds/nakahin_arb.txt'
 import nakahinEng from './nasheeds/nakahin_eng.txt'
 import nakahinRom from './nasheeds/nakahin_rom.txt'
+import kawakibArab from './nasheeds/kawakib_arb.txt'
+import kawakibEng from './nasheeds/kawakib_eng.txt'
+import kawakibRom from './nasheeds/kawakib_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
@@ -108,7 +111,7 @@ ishrabArab, ishrabEng, ishrabRom, jabArab, jabEng,jabRom, kaabeArab, kaabeEng, k
 saliqaArab, saliqaEng, saliqaRom, hamdArab, hamdEng, hamdRom, nakahinArab, nakahinEng, nakahinRom, madadArab, madadEng, madadRom,
 ulfatArab, ulfatEng, ulfatRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
 muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, rokArab, rokEng, rokRom, 
-salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom, salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, 
+salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom, kawakibArab, kawakibEng, kawakibRom, salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, 
 talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom, yaalimanArab, yaalimanEng, yaalimanRom, 
 ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, yaNabiArab, yaNabiEng, yaNabiRom, 
 yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaheArab, zaheEng, zaheRom, zaminArab, zaminEng, zaminRom,
