@@ -51,7 +51,8 @@ const Modal = ({ open, onClose, text }) => {
 						<p className="engText">{eng[counter]}</p>
 					</div>
 					<div className="paragraph">
-						<p className="arabText">{arab[counter + 1]}
+						<p className="arabText">{arab[counter + 1]}</p>
+						<p className='engText'>
 							<em dangerouslySetInnerHTML={{ __html: rom[counter + 1] }} />
 						</p>
 						<p className="engText">{eng[counter + 1]}</p>
