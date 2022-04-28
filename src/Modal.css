@@ -9,7 +9,7 @@
 }
 .modal {
 	color: white;
-	position: fixed;
+	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
@@ -18,13 +18,13 @@
 	padding: 50px;
 	z-index: 1000;
 	width: 80vw;
-  height: 85vh;
-  border-radius: 1.5em;
+  	height: 85vh;
+  	border-radius: 1.5em;
 	box-sizing: content-box;
-  border-width: 8px;
-  border-style: solid;
-  border-image: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-  border-image-slice: 1;
+  	border-width: 8px;
+  	border-style: solid;
+  	border-image: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  	border-image-slice: 1;
 	box-shadow: rgba(0,0,0,0.35) 0em 0.3em 0.9em;
 	display: flex;
 	flex-direction: column;
@@ -38,7 +38,7 @@
   display: inline-block;
   text-align: center;
   margin-top: -2.5em;
-  font-size: 1rem;
+  font-size: calc(13px + (17 -13) * (40vw - 400px)/(800-400));
 }
 
 .modal .body {
@@ -47,8 +47,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 1.9rem;
+  font-size: calc(16px + (17 -16) * (100vw - 400px)/(800-400));
   text-align: center;
+
 }
 .modal .body p {
   margin: 5px;
@@ -66,41 +67,42 @@
 	font-weight: 500;
 }
 @media (max-width: 650px) {
-	.modal .title {
+	/* .modal .title {
 		font-size: 0.6rem;
 	}
 	.modal .body {
 		font-size: 1rem;
-	}
+	} */
 	.modal {
 		height: 60%;
 	}
 }
-@media (max-height: 550px) {
+ @media (max-height: 550px) {
 	.modal .title {
-		font-size: 0.7rem;
+		font-size: calc(16px + (17 -16) * (10vw - 400px)/(800-400));
 	}
 	.modal .body {
-		font-size: 1.2rem;
+		font-size: calc(16px + (17 -16) * (60vw - 400px)/(800-400));
 	}
 
 }
+ 
 
-@media (min-height: 900px) {
+/* @media (min-height: 900px) {
 	.modal .title {
 		font-size: 1.7vw;
 	}
 	.modal .body {
 		font-size: 3.2vw;
 	}
-}
-@media (max-height: 450px) {
-	.modal .title {
+} */
+@media (max-height: 500px) {
+	/* .modal .title {
 		font-size: 2.4vh;
 	}
 	.modal .body {
-		font-size: 4.7vh;
-	}
+		font-size: 4.0vh;
+	} */
 	.modal {
 		height: 80%;
 	}
