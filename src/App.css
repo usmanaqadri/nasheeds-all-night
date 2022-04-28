@@ -12,6 +12,8 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: scroll;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
 .title {
