@@ -76,16 +76,17 @@
 	.modal {
 		height: 60%;
 	}
-}
- @media (max-height: 550px) {
 	.modal .title {
 		font-size: calc(16px + (17 -16) * (10vw - 400px)/(800-400));
 	}
 	.modal .body {
 		font-size: calc(16px + (17 -16) * (60vw - 400px)/(800-400));
 	}
-
 }
+ /* @media (max-height: 550px) {
+	
+
+} */
  
 
 /* @media (min-height: 900px) {
@@ -105,5 +106,11 @@
 	} */
 	.modal {
 		height: 80%;
+	}
+	.modal .title {
+		font-size: calc(16px + (17 -16) * (10vw - 400px)/(800-400));
+	}
+	.modal .body {
+		font-size: calc(16px + (17 -16) * (60vw - 400px)/(800-400));
 	}
 }
