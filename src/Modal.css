@@ -110,6 +110,7 @@
 		padding-bottom: 3rem;
 	}
 	.modal .title {
+		margin-top: -3.0em;
 		font-size: 0.8rem;
 	}
 	.modal .body {
