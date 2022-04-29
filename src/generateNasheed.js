@@ -103,6 +103,12 @@ import nakahinRom from './nasheeds/nakahin_rom.txt'
 import kawakibArab from './nasheeds/kawakib_arb.txt'
 import kawakibEng from './nasheeds/kawakib_eng.txt'
 import kawakibRom from './nasheeds/kawakib_rom.txt'
+import qamarunArab from './nasheeds/qamarun_arb.txt'
+import qamarunEng from './nasheeds/qamarun_eng.txt'
+import qamarunRom from './nasheeds/qamarun_rom.txt'
+import imamArab from './nasheeds/imam_arb.txt'
+import imamEng from './nasheeds/imam_eng.txt'
+import imamRom from './nasheeds/imam_rom.txt'
 
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
@@ -110,10 +116,10 @@ faslonArab,faslonEng,faslonRom, haqiqatArab,haqiqatEng,haqiqatRom,huzurArab, huz
 ishrabArab, ishrabEng, ishrabRom, jabArab, jabEng,jabRom, kaabeArab, kaabeEng, kaabeRom, saliqaArab, saliqaEng, saliqaRom,
 lamyatiArab, lamyatiEng, lamyatiRom, hamdArab, hamdEng, hamdRom, nakahinArab, nakahinEng, nakahinRom, madadArab, madadEng, madadRom,
 ulfatArab, ulfatEng, ulfatRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
-muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, rokArab, rokEng, rokRom, 
+muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, qamarunArab,qamarunEng,qamarunRom, rokArab, rokEng, rokRom, 
 salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom, kawakibArab, kawakibEng, kawakibRom, salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, 
 talalArab, talalEng, talalRom, talamaArab, talamaEng, talamaRom, yaalimanArab, yaalimanEng, yaalimanRom, 
-ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, yaNabiArab, yaNabiEng, yaNabiRom, 
+ya_hadiyArab, ya_hadiyEng, ya_hadiyRom, ya_hananaArab, ya_hananaEng, ya_hananaRom, imamArab, imamEng,imamRom, yaNabiArab, yaNabiEng, yaNabiRom, 
 yanabiArab, yanabiEng, yanabiRom, yarabbiArab, yarabbiEng, yarabbiRom, zaheArab, zaheEng, zaheRom, zaminArab, zaminEng, zaminRom,
 ]
 let newUrls = [];
