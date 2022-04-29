@@ -17,21 +17,16 @@
 }
 
 .title {
-  font-size: calc(32px + (38 -32) * (40vw - 400px)/(1000-400));
+  font-size: 3.7rem;
   font-family: 'Cormorant', serif;
   user-select:none;
   -webkit-user-select:none;
 }
 
 .nasheedBoard {
-  /*position: fixed;*/
-  /*top: 20%;*/
-  /*right: 50%;*/
   margin: 1em auto;
   width: 80vw;
   height: 80vh;
-  /*transform: translateY(-50%);*/
-  /*transform: translateX(50%);*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,7 +46,7 @@
   cursor: pointer;
   display: inline-block;
   font-family: Clarkson,Helvetica,sans-serif;
-  font-size: calc(16px + (17 -16) * (40vw - 400px)/(1000-400));
+  font-size: 1.8rem;
   font-weight: 500;
   letter-spacing: 0;
   line-height: 0.5em;

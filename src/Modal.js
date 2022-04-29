@@ -6,13 +6,34 @@ const Modal = ({ open, onClose, text }) => {
 
 	const [counter, setCounter] = useState(0);
 
+	const handleClick = (e) => {
+		const clickTarget = e.target;
+		const clickTargetWidth = clickTarget.offsetWidth;
+		const xCoordInClickTarget = e.clientX - clickTarget.getBoundingClientRect().left;
+			if (clickTargetWidth / 2 > xCoordInClickTarget) {
+				e.preventDefault();
+				if (counter === 0) setCounter(0)
+				else setCounter(counter - 2)
+			} else {
+				if (counter === eng.length) {
+					onClose();
+					setCounter(0);
+				}
+				else {
+					setCounter(counter + 2)
+				}
+			}
+	}
+	
 	const handleUserKeyPress = (e) => {
-		if (e.code === "ArrowLeft" || e.type === 'contextmenu') {
+	
+		
+		if (e.code === "ArrowLeft") {
 			e.preventDefault();
 			if (counter === 0) setCounter(0)
 			else setCounter(counter - 2)
 		}
-		if (e.code === "ArrowRight" || e.type === 'click') {
+		if (e.code === "ArrowRight") {
 			if (counter === eng.length) {
 				onClose();
 				setCounter(0);
@@ -22,8 +43,8 @@ const Modal = ({ open, onClose, text }) => {
 			}
 		}
 		if (e.code === "Escape") {
-			setCounter(0);
 			onClose();
+			setCounter(0);
 		}
 	}
 	useEffect(() => {
@@ -38,7 +59,7 @@ const Modal = ({ open, onClose, text }) => {
 	return (
 		<>
 			<div onClick={onClose} className="overlay" />
-			<div onClick={handleUserKeyPress} onContextMenu={handleUserKeyPress} className="modal">
+			<div onClick={handleClick} className="modal">
 				<div className="title">
 					<h1 className="arabText">{arabTitle}<br />{engTitle}</h1>
 				</div>
