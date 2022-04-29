@@ -95,13 +95,11 @@
   z-index: 1;
   position: relative;
 }
-/* @media (min-height: 900px) {
-  .title {
-    font-size: 4rem;
+@media screen and (min-width: 1400px){
+	.title {
+    font-size: 3vw;
   }
   .button-64 {
-    font-size: 1.6rem;
-    padding: 1.3em;
-
+    font-size: 1.3vw;
   }
-} */
+}

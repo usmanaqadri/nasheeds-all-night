@@ -37,7 +37,7 @@
 .modal .title{
   display: inline-block;
   text-align: center;
-  margin-top: -2.5em;
+  margin-top: -2em;
   font-size: 1.5rem;
 }
 
@@ -49,6 +49,7 @@
   align-items: center;
   font-size: 2.7rem;
   text-align: center;
+  padding-bottom: 1.5rem;
 
 }
 .modal .body p {
@@ -66,7 +67,7 @@
 .engText {
 	font-weight: 500;
 }
-@media (max-width: 850px) {
+@media screen and (max-width: 850px) {
 	/* .modal .title {
 		font-size: 0.6rem;
 	}
@@ -81,7 +82,6 @@
 	}
 	.modal .body {
 		font-size: 1.7rem;
-		padding-bottom: 1.5rem;
 	}
 }
  /* @media (max-height: 550px) {
@@ -98,7 +98,7 @@
 		font-size: 3.2vw;
 	}
 } */
-@media (max-height: 600px) {
+@media screen and (max-height: 600px) {
 	/* .modal .title {
 		font-size: 2.4vh;
 	}
@@ -114,7 +114,13 @@
 	}
 	.modal .body {
 		font-size: 1.5rem;
-		padding-bottom: 1.5rem;
-		
+	}
+}
+@media screen and (min-width: 1400px){
+	.modal .title {
+		font-size: 1.1vw;
+	}
+	.modal .body {
+		font-size: 2.4vw;
 	}
 }
