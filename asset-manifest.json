@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/nasheeds-all-night/static/css/main.31335a0b.css",
+    "main.css": "/nasheeds-all-night/static/css/main.2bcbdeab.css",
     "main.js": "/nasheeds-all-night/static/js/main.61280837.js",
     "static/media/background.webp": "/nasheeds-all-night/static/media/background.ac244ded209b1364f06e.webp",
     "static/media/ishrab_arb.txt": "/nasheeds-all-night/static/media/ishrab_arb.1200083ef89a8b7f6eed.txt",
@@ -109,11 +109,11 @@
     "static/media/huzur_eng.txt": "/nasheeds-all-night/static/media/huzur_eng.0385f3a2e8aaa94e6900.txt",
     "static/media/saliqa_rom.txt": "/nasheeds-all-night/static/media/saliqa_rom.82ce5aef4c74ddfbec9f.txt",
     "static/media/huzur_rom.txt": "/nasheeds-all-night/static/media/huzur_rom.da8e497c1e07a2ca4859.txt",
-    "main.31335a0b.css.map": "/nasheeds-all-night/static/css/main.31335a0b.css.map",
+    "main.2bcbdeab.css.map": "/nasheeds-all-night/static/css/main.2bcbdeab.css.map",
     "main.61280837.js.map": "/nasheeds-all-night/static/js/main.61280837.js.map"
   },
   "entrypoints": [
-    "static/css/main.31335a0b.css",
+    "static/css/main.2bcbdeab.css",
     "static/js/main.61280837.js"
   ]
 }
