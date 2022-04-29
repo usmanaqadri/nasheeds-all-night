@@ -107,8 +107,8 @@ import kawakibRom from './nasheeds/kawakib_rom.txt'
 let urls = [
 araftuArab, araftuEng, araftuRom, assubhuArab, assubhuEng, assubhuRom, bihayathbutArab, bihayathbutEng, bihayathbutRom,
 faslonArab,faslonEng,faslonRom, haqiqatArab,haqiqatEng,haqiqatRom,huzurArab, huzurEng, huzurRom, iduArab, iduEng, iduRom, 
-ishrabArab, ishrabEng, ishrabRom, jabArab, jabEng,jabRom, kaabeArab, kaabeEng, kaabeRom, lamyatiArab, lamyatiEng, lamyatiRom,
-saliqaArab, saliqaEng, saliqaRom, hamdArab, hamdEng, hamdRom, nakahinArab, nakahinEng, nakahinRom, madadArab, madadEng, madadRom,
+ishrabArab, ishrabEng, ishrabRom, jabArab, jabEng,jabRom, kaabeArab, kaabeEng, kaabeRom, saliqaArab, saliqaEng, saliqaRom,
+lamyatiArab, lamyatiEng, lamyatiRom, hamdArab, hamdEng, hamdRom, nakahinArab, nakahinEng, nakahinRom, madadArab, madadEng, madadRom,
 ulfatArab, ulfatEng, ulfatRom, qadkafaniArab, qadkafaniEng, qadkafaniRom, burdahArab, burdahEng, burdahRom,
 muhammadiyaArab, muhammadiyaEng, muhammadiyaRom, paighamArab, paighamEng, paighamRom, rokArab, rokEng, rokRom, 
 salaamArab, salaamEng, salaamRom, badrArab, badrEng, badrRom, kawakibArab, kawakibEng, kawakibRom, salliyasalaamArab, salliyasalaamEng, salliyasalaamRom, 
