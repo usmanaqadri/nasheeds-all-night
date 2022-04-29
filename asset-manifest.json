@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/nasheeds-all-night/static/css/main.6d6f227b.css",
-    "main.js": "/nasheeds-all-night/static/js/main.32b677cb.js",
+    "main.css": "/nasheeds-all-night/static/css/main.07c61985.css",
+    "main.js": "/nasheeds-all-night/static/js/main.40472856.js",
     "static/media/background.webp": "/nasheeds-all-night/static/media/background.ac244ded209b1364f06e.webp",
     "static/media/ishrab_arb.txt": "/nasheeds-all-night/static/media/ishrab_arb.1200083ef89a8b7f6eed.txt",
     "static/media/madad_arb.txt": "/nasheeds-all-night/static/media/madad_arb.328265dbcebcd6826c18.txt",
@@ -22,6 +22,8 @@
     "static/media/muhammadiya_eng.txt": "/nasheeds-all-night/static/media/muhammadiya_eng.c87d0c886240a0e2ea57.txt",
     "static/media/salatul_badriyya_arb.txt": "/nasheeds-all-night/static/media/salatul_badriyya_arb.057571d2388241c043d1.txt",
     "static/media/kawakib_eng.txt": "/nasheeds-all-night/static/media/kawakib_eng.4a30734475bb7ea60955.txt",
+    "static/media/qamarun_arb.txt": "/nasheeds-all-night/static/media/qamarun_arb.1798cb04a076b90efad2.txt",
+    "static/media/imam_arb.txt": "/nasheeds-all-night/static/media/imam_arb.fddafabe6cf1478d475b.txt",
     "static/media/idu_arb.txt": "/nasheeds-all-night/static/media/idu_arb.5fe5c12e4d1f1c403ec8.txt",
     "static/media/faslon_arb.txt": "/nasheeds-all-night/static/media/faslon_arb.498bd90225e24f43dc1a.txt",
     "static/media/salaam_arb.txt": "/nasheeds-all-night/static/media/salaam_arb.8882d7d7f0d1fae51275.txt",
@@ -52,6 +54,7 @@
     "static/media/yaaliman_arb.txt": "/nasheeds-all-night/static/media/yaaliman_arb.9009527c29906a3d9eae.txt",
     "static/media/idu_eng.txt": "/nasheeds-all-night/static/media/idu_eng.a032fb245e2c268cdc6c.txt",
     "static/media/qadkafani_eng.txt": "/nasheeds-all-night/static/media/qadkafani_eng.d16346cd5fb264bbcb64.txt",
+    "static/media/imam_eng.txt": "/nasheeds-all-night/static/media/imam_eng.2d07bbea058628c2debe.txt",
     "static/media/talal_rom.txt": "/nasheeds-all-night/static/media/talal_rom.e7e829202e2519240071.txt",
     "static/media/rok_arb.txt": "/nasheeds-all-night/static/media/rok_arb.14fea9c1090da28577a8.txt",
     "static/media/bihayathbut_rom.txt": "/nasheeds-all-night/static/media/bihayathbut_rom.c90a2e8ea25eb68a4eed.txt",
@@ -71,10 +74,12 @@
     "index.html": "/nasheeds-all-night/index.html",
     "static/media/zahe_arb.txt": "/nasheeds-all-night/static/media/zahe_arb.b966772a31d7a926b42c.txt",
     "static/media/paigham_arb.txt": "/nasheeds-all-night/static/media/paigham_arb.3d10d6d52b87ae2ebe19.txt",
+    "static/media/qamarun_rom.txt": "/nasheeds-all-night/static/media/qamarun_rom.dab2e077f91004b57548.txt",
     "static/media/yanabi_eng.txt": "/nasheeds-all-night/static/media/yanabi_eng.91019a5642c0b955489f.txt",
     "static/media/paigham_eng.txt": "/nasheeds-all-night/static/media/paigham_eng.7f311cbc8f5fdd148ac2.txt",
     "static/media/zamin_eng.txt": "/nasheeds-all-night/static/media/zamin_eng.6120e73640f8134d4c1e.txt",
     "static/media/assubhu_rom.txt": "/nasheeds-all-night/static/media/assubhu_rom.15ed920d375071c3a3ba.txt",
+    "static/media/imam_rom.txt": "/nasheeds-all-night/static/media/imam_rom.4519783c174fc8b9ef51.txt",
     "static/media/zahe_eng.txt": "/nasheeds-all-night/static/media/zahe_eng.7b6081c47c8dfa974e2a.txt",
     "static/media/rok_rom.txt": "/nasheeds-all-night/static/media/rok_rom.e9fe5f04b2d21baa5c7a.txt",
     "static/media/rok_eng.txt": "/nasheeds-all-night/static/media/rok_eng.c6b501253da4dc087696.txt",
@@ -87,6 +92,7 @@
     "static/media/talama_rom.txt": "/nasheeds-all-night/static/media/talama_rom.c3fe73a52697f18ab9a4.txt",
     "static/media/ya-hanana_rom.txt": "/nasheeds-all-night/static/media/ya-hanana_rom.8d35c1864df01a0faaac.txt",
     "static/media/nakahin_rom.txt": "/nasheeds-all-night/static/media/nakahin_rom.00bcda6095f07fb369f9.txt",
+    "static/media/qamarun_eng.txt": "/nasheeds-all-night/static/media/qamarun_eng.960f645a0b43a0991016.txt",
     "static/media/ya-hadiy_eng.txt": "/nasheeds-all-night/static/media/ya-hadiy_eng.fbe58b5e10f1bfc93413.txt",
     "static/media/zahe_rom.txt": "/nasheeds-all-night/static/media/zahe_rom.7e71e00abe52f8a7f2a4.txt",
     "static/media/haqiqat_rom.txt": "/nasheeds-all-night/static/media/haqiqat_rom.3befdc265289107c6454.txt",
@@ -109,11 +115,11 @@
     "static/media/huzur_eng.txt": "/nasheeds-all-night/static/media/huzur_eng.0385f3a2e8aaa94e6900.txt",
     "static/media/saliqa_rom.txt": "/nasheeds-all-night/static/media/saliqa_rom.82ce5aef4c74ddfbec9f.txt",
     "static/media/huzur_rom.txt": "/nasheeds-all-night/static/media/huzur_rom.da8e497c1e07a2ca4859.txt",
-    "main.6d6f227b.css.map": "/nasheeds-all-night/static/css/main.6d6f227b.css.map",
-    "main.32b677cb.js.map": "/nasheeds-all-night/static/js/main.32b677cb.js.map"
+    "main.07c61985.css.map": "/nasheeds-all-night/static/css/main.07c61985.css.map",
+    "main.40472856.js.map": "/nasheeds-all-night/static/js/main.40472856.js.map"
   },
   "entrypoints": [
-    "static/css/main.6d6f227b.css",
-    "static/js/main.32b677cb.js"
+    "static/css/main.07c61985.css",
+    "static/js/main.40472856.js"
   ]
 }
