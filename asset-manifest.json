@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/nasheeds-all-night/static/css/main.97a1c938.css",
+    "main.css": "/nasheeds-all-night/static/css/main.abdbcb03.css",
     "main.js": "/nasheeds-all-night/static/js/main.2dac3130.js",
     "static/media/background.webp": "/nasheeds-all-night/static/media/background.ac244ded209b1364f06e.webp",
     "static/media/ishrab_arb.txt": "/nasheeds-all-night/static/media/ishrab_arb.8dd9e2e2405064542b8d.txt",
@@ -69,9 +69,9 @@
     "static/media/qadkafani_rom.txt": "/nasheeds-all-night/static/media/qadkafani_rom.7b50fac1c6e25a16d204.txt",
     "static/media/salliyasalaam_rom.txt": "/nasheeds-all-night/static/media/salliyasalaam_rom.84bbb2016f6aed9f50ea.txt",
     "static/media/haqiqat_arb.txt": "/nasheeds-all-night/static/media/haqiqat_arb.e3fbc3c82b9fb27c7f2f.txt",
+    "index.html": "/nasheeds-all-night/index.html",
     "static/media/ya-hanana_eng.txt": "/nasheeds-all-night/static/media/ya-hanana_eng.61260e1a58a406581105.txt",
     "static/media/nakahin_arb.txt": "/nasheeds-all-night/static/media/nakahin_arb.6d5f311809738466b992.txt",
-    "index.html": "/nasheeds-all-night/index.html",
     "static/media/zahe_arb.txt": "/nasheeds-all-night/static/media/zahe_arb.c768e4ec424684df1526.txt",
     "static/media/paigham_arb.txt": "/nasheeds-all-night/static/media/paigham_arb.3d10d6d52b87ae2ebe19.txt",
     "static/media/qamarun_rom.txt": "/nasheeds-all-night/static/media/qamarun_rom.dab2e077f91004b57548.txt",
@@ -115,11 +115,11 @@
     "static/media/huzur_eng.txt": "/nasheeds-all-night/static/media/huzur_eng.0385f3a2e8aaa94e6900.txt",
     "static/media/saliqa_rom.txt": "/nasheeds-all-night/static/media/saliqa_rom.82ce5aef4c74ddfbec9f.txt",
     "static/media/huzur_rom.txt": "/nasheeds-all-night/static/media/huzur_rom.da8e497c1e07a2ca4859.txt",
-    "main.97a1c938.css.map": "/nasheeds-all-night/static/css/main.97a1c938.css.map",
+    "main.abdbcb03.css.map": "/nasheeds-all-night/static/css/main.abdbcb03.css.map",
     "main.2dac3130.js.map": "/nasheeds-all-night/static/js/main.2dac3130.js.map"
   },
   "entrypoints": [
-    "static/css/main.97a1c938.css",
+    "static/css/main.abdbcb03.css",
     "static/js/main.2dac3130.js"
   ]
 }
