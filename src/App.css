@@ -16,6 +16,9 @@
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
 }
+.no-webp .App {
+  background: url(./imgs/background.jpg);
+}
 
 .title {
   font-size: 3.7rem;
