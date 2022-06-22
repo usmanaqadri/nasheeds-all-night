@@ -63,6 +63,7 @@
 }
 .arabText {
 	font-weight: 300;
+	word-spacing: 0.5rem;
 }
 .engText {
 	font-weight: 500;

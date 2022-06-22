@@ -2,7 +2,7 @@ import React from 'react'
 
 function NasheedBoard({nasheeds, onClick}) {
 	
-	const myNasheeds = []
+	const myNasheeds = [];
 
 	nasheeds.forEach(element => myNasheeds.push(element.engTitle))
 
