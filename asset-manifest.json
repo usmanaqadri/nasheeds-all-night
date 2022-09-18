@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/nasheeds-all-night/static/css/main.72a2629d.css",
-    "main.js": "/nasheeds-all-night/static/js/main.02ef6b74.js",
+    "main.js": "/nasheeds-all-night/static/js/main.35e5e924.js",
     "static/media/background.jpg": "/nasheeds-all-night/static/media/background.76f71fc241a53fa3d685.jpg",
     "static/media/ishrab_arb.txt": "/nasheeds-all-night/static/media/ishrab_arb.8dd9e2e2405064542b8d.txt",
     "static/media/madad_arb.txt": "/nasheeds-all-night/static/media/madad_arb.04bfc876208226b4ee9f.txt",
@@ -39,7 +39,7 @@
     "static/media/hamd_arb.txt": "/nasheeds-all-night/static/media/hamd_arb.981ec9273dd225fa32f5.txt",
     "static/media/burdah_rom.txt": "/nasheeds-all-night/static/media/burdah_rom.a70b5c4cd57ff4618de8.txt",
     "static/media/salliyasalaam_eng.txt": "/nasheeds-all-night/static/media/salliyasalaam_eng.fb64d555f6267558b3a4.txt",
-    "static/media/faslon_eng.txt": "/nasheeds-all-night/static/media/faslon_eng.206c3f9fe1c1a1f190b6.txt",
+    "static/media/faslon_eng.txt": "/nasheeds-all-night/static/media/faslon_eng.05918ec2b01414af1350.txt",
     "static/media/kawakib_rom.txt": "/nasheeds-all-night/static/media/kawakib_rom.3f5e326e6fea0a140e7a.txt",
     "static/media/hamd_eng.txt": "/nasheeds-all-night/static/media/hamd_eng.a4e46c2107f1efcaad5e.txt",
     "static/media/assubhu_arb.txt": "/nasheeds-all-night/static/media/assubhu_arb.c1f0dd421eaf10d9971e.txt",
@@ -84,7 +84,7 @@
     "static/media/zamin_eng.txt": "/nasheeds-all-night/static/media/zamin_eng.6120e73640f8134d4c1e.txt",
     "static/media/assubhu_rom.txt": "/nasheeds-all-night/static/media/assubhu_rom.15ed920d375071c3a3ba.txt",
     "static/media/zahe_eng.txt": "/nasheeds-all-night/static/media/zahe_eng.03c3a51a4c0be12b43f4.txt",
-    "static/media/imam_rom.txt": "/nasheeds-all-night/static/media/imam_rom.4519783c174fc8b9ef51.txt",
+    "static/media/imam_rom.txt": "/nasheeds-all-night/static/media/imam_rom.380d8e5db3cb119a7eab.txt",
     "static/media/rok_rom.txt": "/nasheeds-all-night/static/media/rok_rom.e9fe5f04b2d21baa5c7a.txt",
     "static/media/rok_eng.txt": "/nasheeds-all-night/static/media/rok_eng.c6b501253da4dc087696.txt",
     "static/media/ya-nabi_eng.txt": "/nasheeds-all-night/static/media/ya-nabi_eng.05f259e4c327a25eeec4.txt",
@@ -107,7 +107,9 @@
     "static/media/jab_arb.txt": "/nasheeds-all-night/static/media/jab_arb.83471f919409a7dfc818.txt",
     "static/media/saliqa_arb.txt": "/nasheeds-all-night/static/media/saliqa_arb.fb9d12f4a3bda8f87c56.txt",
     "static/media/paigham_rom.txt": "/nasheeds-all-night/static/media/paigham_rom.0368759ae444b49011ec.txt",
+    "static/media/khudi_eng.txt": "/nasheeds-all-night/static/media/khudi_eng.9c1fa6ab44723500e166.txt",
     "static/media/saliqa_eng.txt": "/nasheeds-all-night/static/media/saliqa_eng.44a5d79c94644c85ee4b.txt",
+    "static/media/khudi_arb.txt": "/nasheeds-all-night/static/media/khudi_arb.37b9ab2a5b4f1947bb32.txt",
     "static/media/huzur_arb.txt": "/nasheeds-all-night/static/media/huzur_arb.b6e8f966f06af4578dd2.txt",
     "static/media/araftu_rom.txt": "/nasheeds-all-night/static/media/araftu_rom.9adf3125a60afd1ac3a7.txt",
     "static/media/ya-hadiy_rom.txt": "/nasheeds-all-night/static/media/ya-hadiy_rom.7a82be374840a72da2e7.txt",
@@ -116,13 +118,14 @@
     "static/media/yaaliman_rom.txt": "/nasheeds-all-night/static/media/yaaliman_rom.d8f2a213d99c49755ab5.txt",
     "static/media/kaabe_rom.txt": "/nasheeds-all-night/static/media/kaabe_rom.36ebcb31d634dec002fe.txt",
     "static/media/huzur_eng.txt": "/nasheeds-all-night/static/media/huzur_eng.0385f3a2e8aaa94e6900.txt",
+    "static/media/khudi_rom.txt": "/nasheeds-all-night/static/media/khudi_rom.299b39470e61084ed6e4.txt",
     "static/media/saliqa_rom.txt": "/nasheeds-all-night/static/media/saliqa_rom.82ce5aef4c74ddfbec9f.txt",
     "static/media/huzur_rom.txt": "/nasheeds-all-night/static/media/huzur_rom.da8e497c1e07a2ca4859.txt",
     "main.72a2629d.css.map": "/nasheeds-all-night/static/css/main.72a2629d.css.map",
-    "main.02ef6b74.js.map": "/nasheeds-all-night/static/js/main.02ef6b74.js.map"
+    "main.35e5e924.js.map": "/nasheeds-all-night/static/js/main.35e5e924.js.map"
   },
   "entrypoints": [
     "static/css/main.72a2629d.css",
-    "static/js/main.02ef6b74.js"
+    "static/js/main.35e5e924.js"
   ]
 }
