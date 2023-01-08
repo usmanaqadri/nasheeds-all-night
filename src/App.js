@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Modal from "./Modal.js";
-import Header from "./Header.js";
-import NasheedBoard from "./NasheedBoard.js";
+import Modal from "./components/Modal.js";
+import Header from "./components/Header.js";
+import NasheedBoard from "./components/NasheedBoard.js";
+import Loader from "./components/Loader";
 
 function App() {
   const [nasheeds, setNasheeds] = useState([]);
@@ -51,7 +52,11 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <NasheedBoard nasheeds={nasheeds} onClick={handleClick} />
+      {nasheeds.length === 0 ? (
+        <Loader />
+      ) : (
+        <NasheedBoard nasheeds={nasheeds} onClick={handleClick} />
+      )}
       {isOpen && (
         <Modal open={isOpen} onClose={handleClose} text={nasheeds[nasheedId]} />
       )}
