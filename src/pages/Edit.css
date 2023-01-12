@@ -1,0 +1,91 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #f3f3f3;
+    margin: 0;
+    overflow: hidden;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: space-around;
+}
+
+.container {
+    width: 8.5in;
+    max-height: 83vh;
+    overflow: auto;
+    padding: 0in 1in;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,.5);
+    background-color: white;
+}
+
+.edit-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .edit-title p {
+    margin: 0;
+  }
+
+  textarea {
+    font-size: 1.5rem;
+    font-family: 'Cormorant', serif;
+    margin: 1rem;
+    text-align: center;
+    border: none;
+    padding: 0;
+    display: block;
+    min-width: 8in;
+    overflow: hidden;
+    border: none;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none;
+
+  }
+
+  .arab-text {
+    margin: 13px 0;
+  }
+
+  .non-arab-text {
+    margin: 0px auto;
+  }
+
+  .edit-title textarea {
+    font-size: 3rem;
+    font-family: 'Cormorant', serif;
+    margin: 0;
+    text-align: center;
+    border: none;
+    resize: none;
+    padding: 0;
+  }
+
+.body {
+  flex: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  text-align: center;
+  padding-bottom: 1.5rem;
+  margin-top: 10px;
+}
