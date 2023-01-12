@@ -5,15 +5,26 @@
 body {
     background-color: #f3f3f3;
     margin: 0;
+    overflow: hidden;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: space-around;
 }
 
 .container {
     width: 8.5in;
-    min-height: 11in;
+    max-height: 83vh;
+    overflow: auto;
     padding: 0in 1in;
-    margin: 1rem auto;
     box-shadow: 0 0 5px 0 rgba(0,0,0,.5);
     background-color: white;
+}
+
+.edit-buttons {
+    display: flex;
+    flex-direction: column;
 }
 
 .edit-title {
@@ -34,12 +45,27 @@ body {
     margin: 1rem;
     text-align: center;
     border: none;
-    resize: none;
     padding: 0;
     display: block;
-    min-width: 70vw;
+    min-width: 8in;
     overflow: hidden;
+    border: none;
+    outline: none;
 
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none;
+
+  }
+
+  .arab-text {
+    margin: 13px 0;
+  }
+
+  .non-arab-text {
+    margin: 0px auto;
   }
 
   .edit-title textarea {

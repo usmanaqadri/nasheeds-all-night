@@ -2,12 +2,31 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./Edit.css";
 import Loader from "../components/Loader";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 function Edit() {
   const [isLoading, setIsLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [nasheed, setNasheed] = useState("");
   const [nasheedCopy, setNasheedCopy] = useState("");
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   const { id } = useParams();
   useEffect(() => {
     fetch(
@@ -40,14 +59,21 @@ function Edit() {
   const nasheedCopyText = nasheedCopy.arab?.map((arab, index) => {
     return (
       <div key={index}>
-        <textarea name={`arab${index}`} value={arab} onChange={handleChange} />
         <textarea
-          name={`rom${index}`}
+          className="arab-text"
+          name={`arab_${index}`}
+          value={arab}
+          onChange={handleChange}
+        />
+        <textarea
+          className="non-arab-text"
+          name={`rom_${index}`}
           value={nasheedCopy.rom[index]}
           onChange={handleChange}
         />
         <textarea
-          name={`eng${index}`}
+          className="non-arab-text"
+          name={`eng_${index}`}
           value={nasheedCopy.eng[index]}
           onChange={handleChange}
         />
@@ -56,45 +82,178 @@ function Edit() {
   });
 
   function handleChange(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    let index;
+    let tempValue;
+    if (name !== "arabTitle" && name !== "engTitle") {
+      [name, index] = name.split("_");
+      const copyValue = value;
+      tempValue = [...nasheedCopy[name]];
+      tempValue[index] = copyValue;
+      value = tempValue;
+    }
     setNasheedCopy((prevState) => ({ ...prevState, [name]: value }));
   }
 
   const toggleEdit = () => {
     setEditing((prevState) => !prevState);
   };
+
+  const updateNasheed = () => {
+    handleClose();
+    fetch(
+      `${
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3001"
+          : process.env.REACT_APP_API
+      }/nasheed/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(nasheedCopy),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((res) => {
+        setNasheed({ ...res });
+        setNasheedCopy({ ...res });
+        toggleEdit();
+      });
+  };
   return isLoading ? (
     <Loader />
   ) : editing ? (
     <>
-      <button onClick={toggleEdit}>Finish Edit</button>
-      <div className="container">
-        <div className="edit-title">
-          <textarea
-            name="arabTitle"
-            value={nasheedCopy.arabTitle}
-            onChange={handleChange}
-          />
-          <textarea
-            name="engTitle"
-            value={nasheedCopy.engTitle}
-            onChange={handleChange}
-          />
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h4" component="h2">
+            Are you sure you want to make these edits?
+          </Typography>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              style={{
+                fontSize: "14px",
+                marginRight: "5px",
+              }}
+              variant="contained"
+              onClick={updateNasheed}
+            >
+              Yes
+            </Button>
+            <Button
+              style={{
+                fontSize: "14px",
+                backgroundColor: "#A42A04",
+                marginRight: "5px",
+              }}
+              variant="contained"
+              onClick={handleClose}
+            >
+              No
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+      <div className="wrapper">
+        <div className="edit-buttons" style={{ visibility: "hidden" }}>
+          <Button
+            style={{
+              fontSize: "14px",
+              backgroundColor: "#A42A04",
+              marginBottom: "5px",
+              visibility: "hidden",
+            }}
+            variant="contained"
+            onClick={toggleEdit}
+          >
+            Cancel
+          </Button>
+          <Button
+            style={{
+              fontSize: "14px",
+              backgroundColor: "#2f7c31",
+              visibility: "hidden",
+            }}
+            variant="contained"
+            onClick={updateNasheed}
+          >
+            Save
+          </Button>
         </div>
-        <div style={{ marginTop: "-20px" }} className="body">
-          {nasheedCopyText}
+        <div className="container">
+          <div className="edit-title">
+            <textarea
+              name="arabTitle"
+              value={nasheedCopy.arabTitle}
+              onChange={handleChange}
+            />
+            <textarea
+              name="engTitle"
+              value={nasheedCopy.engTitle}
+              onChange={handleChange}
+            />
+          </div>
+          <div style={{ marginTop: "-20px" }} className="body">
+            {nasheedCopyText}
+          </div>
+        </div>
+        <div className="edit-buttons">
+          <Button
+            style={{
+              fontSize: "14px",
+              backgroundColor: "#A42A04",
+              marginBottom: "5px",
+            }}
+            variant="contained"
+            onClick={toggleEdit}
+          >
+            Cancel
+          </Button>
+          <Button
+            style={{ fontSize: "14px", backgroundColor: "#2f7c31" }}
+            variant="contained"
+            onClick={handleOpen}
+          >
+            Save
+          </Button>
         </div>
       </div>
     </>
   ) : (
     <>
-      <button onClick={toggleEdit}>Edit</button>
-      <div className="container">
-        <div className="edit-title">
-          <p>{nasheed.arabTitle}</p>
-          <p>{nasheed.engTitle}</p>
+      <div className="wrapper">
+        <div className="edit-buttons" style={{ visibility: "hidden" }}>
+          <Button
+            style={{ fontSize: "14px", visibility: "hidden" }}
+            variant="contained"
+            onClick={toggleEdit}
+          >
+            Edit
+          </Button>
         </div>
-        <div className="body">{nasheedText}</div>
+        <div className="container">
+          <div className="edit-title">
+            <p>{nasheed.arabTitle}</p>
+            <p>{nasheed.engTitle}</p>
+          </div>
+          <div className="body">{nasheedText}</div>
+        </div>
+        <div className="edit-buttons">
+          <Button
+            style={{ fontSize: "14px" }}
+            variant="contained"
+            onClick={toggleEdit}
+          >
+            Edit
+          </Button>
+        </div>
       </div>
     </>
   );
