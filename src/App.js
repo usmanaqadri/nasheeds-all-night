@@ -61,7 +61,7 @@ function App() {
         <MyModal
           open={isOpen}
           onClose={handleClose}
-          nasheed={nasheeds[nasheedId]}
+          text={nasheeds[nasheedId]}
         />
       )}
     </div>

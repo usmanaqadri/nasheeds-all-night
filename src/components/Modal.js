@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
 import "./Modal.css";
 
-export default function MyModal({ open, onClose, nasheed }) {
-  let { arab, arabTitle, engTitle, eng, rom, _id } = nasheed;
+export default function MyModal({ open, onClose, text }) {
+  let { arab, arabTitle, engTitle, eng, rom } = text;
   const [counter, setCounter] = useState(0);
   const handleUserKeyPress = (e) => {
     if (e.code === "ArrowLeft") {
@@ -49,19 +50,18 @@ export default function MyModal({ open, onClose, nasheed }) {
       }
     }
   };
-  if (!open) return null;
   return (
-    <>
-      <div onClick={onClose} className="overlay" />
-      <div onClick={handleClick} className="modal">
+    <Modal
+      open={open}
+      onClose={onClose}
+      onClick={handleClick}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box className="modal">
         <div className="title">
           <h1 className="arabText">
-            <Link
-              style={{ textDecoration: "none", color: "inherit" }}
-              to={`/${_id}`}
-            >
-              {arabTitle}
-            </Link>
+            {arabTitle}
             <br />
             {engTitle}
           </h1>
@@ -82,7 +82,7 @@ export default function MyModal({ open, onClose, nasheed }) {
             <p className="engText">{eng[counter + 1]}</p>
           </div>
         </div>
-      </div>
-    </>
+      </Box>
+    </Modal>
   );
 }
