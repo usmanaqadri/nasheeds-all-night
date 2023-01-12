@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Modal from "./components/Modal.js";
+import MyModal from "./components/Modal.js";
 import Header from "./components/Header.js";
 import NasheedBoard from "./components/NasheedBoard.js";
 import Loader from "./components/Loader";
@@ -58,7 +58,11 @@ function App() {
         <NasheedBoard nasheeds={nasheeds} onClick={handleClick} />
       )}
       {isOpen && (
-        <Modal open={isOpen} onClose={handleClose} text={nasheeds[nasheedId]} />
+        <MyModal
+          open={isOpen}
+          onClose={handleClose}
+          text={nasheeds[nasheedId]}
+        />
       )}
     </div>
   );

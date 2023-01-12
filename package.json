@@ -2,7 +2,7 @@
   "name": "nasheeds-all-night",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://usmanaqadri.github.io/nasheeds-all-night",
+  "homepage": "https://usmanaqadri.github.io/",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -13,6 +13,7 @@
     "express": "^4.18.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^6.6.2",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
