@@ -139,9 +139,9 @@ function Edit() {
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               style={{
-                fontSize: "14px",
                 marginRight: "5px",
               }}
+              className="mui-button"
               variant="contained"
               onClick={updateNasheed}
             >
@@ -149,10 +149,10 @@ function Edit() {
             </Button>
             <Button
               style={{
-                fontSize: "14px",
                 backgroundColor: "#A42A04",
                 marginRight: "5px",
               }}
+              className="mui-button"
               variant="contained"
               onClick={handleClose}
             >
@@ -165,11 +165,11 @@ function Edit() {
         <div className="edit-buttons" style={{ visibility: "hidden" }}>
           <Button
             style={{
-              fontSize: "14px",
               backgroundColor: "#A42A04",
               marginBottom: "5px",
               visibility: "hidden",
             }}
+            className="mui-button"
             variant="contained"
             onClick={toggleEdit}
           >
@@ -177,10 +177,10 @@ function Edit() {
           </Button>
           <Button
             style={{
-              fontSize: "14px",
               backgroundColor: "#2f7c31",
               visibility: "hidden",
             }}
+            className="mui-button"
             variant="contained"
             onClick={updateNasheed}
           >
@@ -207,17 +207,18 @@ function Edit() {
         <div className="edit-buttons">
           <Button
             style={{
-              fontSize: "14px",
               backgroundColor: "#A42A04",
               marginBottom: "5px",
             }}
+            className="mui-button"
             variant="contained"
             onClick={toggleEdit}
           >
             Cancel
           </Button>
           <Button
-            style={{ fontSize: "14px", backgroundColor: "#2f7c31" }}
+            style={{ backgroundColor: "#2f7c31" }}
+            className="mui-button"
             variant="contained"
             onClick={handleOpen}
           >
@@ -231,7 +232,8 @@ function Edit() {
       <div className="wrapper">
         <div className="edit-buttons" style={{ visibility: "hidden" }}>
           <Button
-            style={{ fontSize: "14px", visibility: "hidden" }}
+            style={{ visibility: "hidden" }}
+            className="mui-button"
             variant="contained"
             onClick={toggleEdit}
           >
@@ -247,7 +249,7 @@ function Edit() {
         </div>
         <div className="edit-buttons">
           <Button
-            style={{ fontSize: "14px" }}
+            className="mui-button"
             variant="contained"
             onClick={toggleEdit}
           >
