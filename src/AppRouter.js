@@ -8,8 +8,8 @@ function AppRouter() {
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/:id" element={<Edit />} />
+        <Route path="/nasheeds-all-night" element={<App />} />
+        <Route path="/nasheeds-all-night/:id" element={<Edit />} />
       </Routes>
     </BrowserRouter>
   );
