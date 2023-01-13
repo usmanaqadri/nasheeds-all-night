@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/nasheeds-all-night/static/css/main.ebc0ed89.css",
-    "main.js": "/nasheeds-all-night/static/js/main.a78b0aa2.js",
+    "main.js": "/nasheeds-all-night/static/js/main.57574b3f.js",
     "static/media/background.jpg": "/nasheeds-all-night/static/media/background.76f71fc241a53fa3d685.jpg",
     "index.html": "/nasheeds-all-night/index.html",
     "main.ebc0ed89.css.map": "/nasheeds-all-night/static/css/main.ebc0ed89.css.map",
-    "main.a78b0aa2.js.map": "/nasheeds-all-night/static/js/main.a78b0aa2.js.map"
+    "main.57574b3f.js.map": "/nasheeds-all-night/static/js/main.57574b3f.js.map"
   },
   "entrypoints": [
     "static/css/main.ebc0ed89.css",
-    "static/js/main.a78b0aa2.js"
+    "static/js/main.57574b3f.js"
   ]
 }
