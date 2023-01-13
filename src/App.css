@@ -25,16 +25,23 @@
   text-align: center;
 }
 
+input {
+  padding: 5px;
+}
+
 .nasheedBoard {
   margin: 1em auto;
   width: 80vw;
   height: 80vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-content: flex-start;
   flex-wrap: wrap;
-  gap: 2%;
   overflow: auto;
+}
+
+.nasheed-buttons {
+  margin: 10px;
 }
 
 
