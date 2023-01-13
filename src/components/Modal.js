@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
+import { Link } from "react-router-dom";
 import "./Modal.css";
 
 export default function MyModal({ open, onClose, text }) {
-  let { arab, arabTitle, engTitle, eng, rom } = text;
+  let { arab, arabTitle, engTitle, eng, rom, _id } = text;
   const [counter, setCounter] = useState(0);
   const handleUserKeyPress = (e) => {
     if (e.code === "ArrowLeft") {
@@ -61,7 +62,12 @@ export default function MyModal({ open, onClose, text }) {
       <Box className="modal">
         <div className="title">
           <h1 className="arabText">
-            {arabTitle}
+            <Link
+              style={{ textDecoration: "none", color: "inherit" }}
+              to={`/nasheeds-all-night/${_id}`}
+            >
+              {arabTitle}
+            </Link>
             <br />
             {engTitle}
           </h1>
