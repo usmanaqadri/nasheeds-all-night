@@ -47,7 +47,8 @@ body {
     border: none;
     padding: 0;
     display: block;
-    min-width: 8in;
+    min-width: 8.5in;
+    width: 100%;
     overflow: hidden;
     border: none;
     outline: none;
@@ -97,21 +98,39 @@ body {
 @media screen and (max-width: 850px) {
 
     .mui-button {
-        font-size: 10px !important;
+        font-size: 8px !important;
+        min-width: 50px !important;
+        padding: 6px !important;
     }
 
     .edit-buttons {
-        margin: 0 10px;
+        margin: 0 5px;
     }
     .container {
         padding: 0;
+        width: 70vw;
     }
 
-    .edit-title {
-        font-size: 1.rem;
-    }
-    textarea {
+    .edit-title p {
         font-size: 1.8rem;
+    }
+
+    .edit-title textarea {
+        font-size: 1.8rem;
+    }
+
+    .body div p {
+        font-size: 1.3rem;
+    }
+
+    .body div textarea {
+        font-size: 1.3rem;
+        min-width: 220px;
+        margin: 5px 0;
+    }
+
+    .modal-confirm {
+        width: 350px !important;
     }
 
 }
@@ -119,14 +138,49 @@ body {
 @media screen and (max-height: 600px) {
     textarea {
         font-size: 1.4rem;
+        min-width: 8.5in !important;
     }
+    .container {
+        padding: 0;
+        width: 80vw !important;
+    }
+
 }
 
 @media screen and (min-width: 1400px){
-	.edit-title {
-		font-size: 1.1vw;
-	}
-	.textarea {
-		font-size: 2.4vw;
-	}
+	.edit-title p {
+        font-size: 5.3rem;
+    }
+
+    .edit-title textarea {
+        font-size: 5.3rem;
+    }
+	
+    .body div p {
+        font-size: 4.3rem;
+    }
+    
+    .body div textarea {
+        font-size: 4.3rem;
+    }
+
+    .container {
+        padding: 0;
+        width: 80vw !important;
+    }
+
+    .modal-confirm {
+        width: 50vw !important;
+    }
+    .modal-confirm-text {
+        font-size: 5rem !important;
+        margin-bottom: 50px !important;
+    }
+
+    .mui-button {
+        font-size: 28px !important;
+        min-width: 90px !important;
+        padding: 20px 60px !important;
+    }
+
 }
