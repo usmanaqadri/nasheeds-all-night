@@ -153,7 +153,7 @@ body {
 
 }
 
-@media screen and (min-width: 1400px){
+@media screen and (min-width: 1550px){
 	.edit-title p {
         font-size: 5.3rem;
         font-family: 'Cormorant', serif !important;
@@ -169,7 +169,7 @@ body {
         font-family: 'Cormorant', serif !important;
     }
     
-    .body div textarea {
+    .container .body div textarea {
         font-size: 4.3rem;
         font-family: 'Cormorant', serif !important;
     }
