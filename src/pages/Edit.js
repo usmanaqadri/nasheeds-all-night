@@ -132,8 +132,13 @@ function Edit() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h4" component="h2">
+        <Box className="modal-confirm" sx={style}>
+          <Typography
+            className="modal-confirm-text"
+            id="modal-modal-title"
+            variant="h4"
+            component="h2"
+          >
             Are you sure you want to make these edits?
           </Typography>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
