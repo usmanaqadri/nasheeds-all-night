@@ -37,6 +37,7 @@ body {
 
   .edit-title p {
     margin: 0;
+    font-family: 'Cormorant', serif !important;
   }
 
   textarea {
@@ -113,6 +114,7 @@ body {
 
     .edit-title p {
         font-size: 1.8rem;
+        font-family: 'Cormorant', serif !important;
     }
 
     .edit-title textarea {
@@ -122,6 +124,7 @@ body {
 
     .body div p {
         font-size: 1.3rem;
+        font-family: 'Cormorant', serif !important;
     }
 
     .body div textarea {
@@ -153,6 +156,7 @@ body {
 @media screen and (min-width: 1400px){
 	.edit-title p {
         font-size: 5.3rem;
+        font-family: 'Cormorant', serif !important;
     }
 
     .edit-title textarea {
@@ -162,6 +166,7 @@ body {
 	
     .body div p {
         font-size: 4.3rem;
+        font-family: 'Cormorant', serif !important;
     }
     
     .body div textarea {
