@@ -24,6 +24,7 @@ function Edit() {
   const [editing, setEditing] = useState(false);
   const [nasheed, setNasheed] = useState("");
   const [nasheedCopy, setNasheedCopy] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -43,6 +44,10 @@ function Edit() {
         setIsLoading(false);
       });
   }, [id]);
+
+  const ShowAlert = ({ message }) => {
+    return <>{message}</>;
+  };
 
   const nasheedText = nasheed.arab?.map((arab, index) => {
     return (
@@ -120,6 +125,8 @@ function Edit() {
         setNasheed({ ...res });
         setNasheedCopy({ ...res });
         toggleEdit();
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
       });
   };
   return isLoading ? (
@@ -246,6 +253,16 @@ function Edit() {
           </Button>
         </div>
         <div className="container">
+          {showAlert && (
+            <ShowAlert
+              message={
+                <div className="alert">
+                  <span style={{ color: "#16c609" }}>✓</span> Successfully Saved
+                  Nasheed
+                </div>
+              }
+            />
+          )}
           <div className="edit-title">
             <p>{nasheed.arabTitle}</p>
             <p>{nasheed.engTitle}</p>
