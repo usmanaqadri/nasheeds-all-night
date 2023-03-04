@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import MyModal from "./components/Modal.js";
 import Header from "./components/Header.js";
-import NasheedBoard from "./components/NasheedBoard.js";
 import Loader from "./components/Loader";
+import MyModal from "./components/Modal.js";
+import NasheedBoard from "./components/NasheedBoard.js";
 import Searchbar from "./components/Searchbar";
 
 function App() {
@@ -45,12 +45,39 @@ function App() {
       });
   }, []);
 
+  const removeDiacritics = (str) => {
+    return str
+      .replace(/[Ā]/g, "A")
+      .replace(/[ā]/g, "a")
+      .replace(/[Ḍ]/g, "D")
+      .replace(/[ḍ]/g, "d")
+      .replace(/[Ē]/g, "E")
+      .replace(/[ē]/g, "e")
+      .replace(/[Ḥ]/g, "H")
+      .replace(/[ḥ]/g, "h")
+      .replace(/[Ī]/g, "I")
+      .replace(/[ī]/g, "i")
+      .replace(/[Ṅ]/g, "N")
+      .replace(/[ṅ]/g, "n")
+      .replace(/[Ō]/g, "O")
+      .replace(/[ō]/g, "o")
+      .replace(/[Ṛ]/g, "R")
+      .replace(/[ṛ]/g, "r")
+      .replace(/[Ṣ]/g, "S")
+      .replace(/[ṣ]/g, "s")
+      .replace(/[Ṭ]/g, "T")
+      .replace(/[ṭ]/g, "t")
+      .replace(/[Ū]/g, "U")
+      .replace(/[ū]/g, "u")
+      .replace(/[ʾʿ]/g, "'");
+  };
+
   const handleSearch = (search) => {
     let filteredList;
     const regexString = `.*${search}.*`;
     const regex = new RegExp(regexString, "gi");
     filteredList = nasheeds.filter((nasheed) => {
-      return nasheed.engTitle.match(regex);
+      return removeDiacritics(nasheed.engTitle).match(regex);
     });
     setFilteredNasheeds(filteredList);
   };
