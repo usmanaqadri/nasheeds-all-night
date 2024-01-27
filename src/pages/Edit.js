@@ -41,7 +41,7 @@ function Edit() {
         setNasheedCopy(data.foundNasheed);
         setIsLoading(false);
       });
-  }, [id]);
+  }, [baseURL, id]);
 
   const ShowAlert = ({ message }) => {
     return <>{message}</>;
