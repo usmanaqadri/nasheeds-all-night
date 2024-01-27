@@ -12,6 +12,11 @@ function App() {
   const [filteredNasheeds, setFilteredNasheeds] = useState([]);
   const [nasheedId, setNasheedId] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+
+  const baseURL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3001"
+      : process.env.REACT_APP_API;
   const compareFunc = (a, b) =>
     a.engTitle
       .replace(/Ṣ/g, "S")
@@ -30,20 +35,14 @@ function App() {
       ? 1
       : -1;
   useEffect(() => {
-    fetch(
-      `${
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3001"
-          : process.env.REACT_APP_API
-      }/nasheed/`
-    )
+    fetch(`${baseURL}/api/v1/nasheed/`)
       .then((res) => res.json())
       .then((data) => {
         setNasheeds([...data.nasheeds].sort(compareFunc));
         setFilteredNasheeds([...data.nasheeds].sort(compareFunc));
         setLoading(false);
       });
-  }, []);
+  }, [baseURL]);
 
   const removeDiacritics = (str) => {
     return str
