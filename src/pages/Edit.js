@@ -29,14 +29,12 @@ function Edit() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { id } = useParams();
+  const baseURL =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3001"
+      : process.env.REACT_APP_API;
   useEffect(() => {
-    fetch(
-      `${
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3001"
-          : process.env.REACT_APP_API
-      }/nasheed/${id}`
-    )
+    fetch(`${baseURL}/api/v1/nasheed/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setNasheed(data.foundNasheed);
@@ -106,20 +104,13 @@ function Edit() {
 
   const updateNasheed = () => {
     handleClose();
-    fetch(
-      `${
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3001"
-          : process.env.REACT_APP_API
-      }/nasheed/${id}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(nasheedCopy),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    fetch(`${baseURL}/api/v1/nasheed/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(nasheedCopy),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((res) => {
         setNasheed({ ...res });
