@@ -5,11 +5,15 @@ import Header from "./components/Header";
 import Edit from "./pages/Edit";
 function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      {...(process.env.NODE_ENV === "development"
+        ? { basename: "/nasheeds-all-night" }
+        : {})}
+    >
       <Header />
       <Routes>
-        <Route path="/nasheeds-all-night" element={<App />} />
-        <Route path="/nasheeds-all-night/:id" element={<Edit />} />
+        <Route path="/" element={<App />} />
+        <Route path="/:id" element={<Edit />} />
       </Routes>
     </BrowserRouter>
   );
