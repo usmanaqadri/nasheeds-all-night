@@ -2,7 +2,7 @@
   "name": "nasheeds-all-night",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://usmanaqadri.github.io/nasheeds-all-night",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
