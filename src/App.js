@@ -15,8 +15,8 @@ function App() {
 
   const baseURL =
     process.env.NODE_ENV === "development"
-      ? "http://localhost:3001"
-      : process.env.REACT_APP_API;
+      ? "http://localhost:3001/api/v1/nasheed"
+      : "/api/v1/nasheed";
   const compareFunc = (a, b) =>
     a.engTitle
       .replace(/Ṣ/g, "S")
@@ -35,7 +35,7 @@ function App() {
       ? 1
       : -1;
   useEffect(() => {
-    fetch(`${baseURL}/api/v1/nasheed/`)
+    fetch(`${baseURL}/`)
       .then((res) => res.json())
       .then((data) => {
         setNasheeds([...data.nasheeds].sort(compareFunc));
