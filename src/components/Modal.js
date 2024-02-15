@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
+import { Box, Modal, IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Close } from "@mui/icons-material";
 import "./Modal.css";
 
 export default function MyModal({ open, onClose, text }) {
@@ -60,6 +60,9 @@ export default function MyModal({ open, onClose, text }) {
       aria-describedby="modal-modal-description"
     >
       <Box className="modal">
+        <IconButton className="close-button" onClick={onClose}>
+          <Close fontSize="large" style={{ color: "white" }} />
+        </IconButton>
         <div className="title">
           <h1 className="arabText">
             <Link
