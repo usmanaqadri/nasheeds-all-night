@@ -67,7 +67,7 @@ export default function MyModal({ open, onClose, text }) {
           <h1 className="arabText">
             <Link
               style={{ textDecoration: "none", color: "inherit" }}
-              to={`/nasheeds-all-night/${_id}`}
+              to={`/${_id}`}
             >
               {arabTitle}
             </Link>
