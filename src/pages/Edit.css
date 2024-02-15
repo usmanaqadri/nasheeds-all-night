@@ -124,22 +124,22 @@ body {
     }
 
     .edit-title p {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .edit-title textarea {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .body div p {
-        font-size: 2.3rem;
+        font-size: 2rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .body div textarea {
-        font-size: 2.3rem;
+        font-size: 2rem;
         min-width: 220px;
         margin: 5px 0;
         font-family: 'Cormorant', serif !important;
