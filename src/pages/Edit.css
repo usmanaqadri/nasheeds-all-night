@@ -134,12 +134,12 @@ body {
     }
 
     .body div p {
-        font-size: 1.3rem;
+        font-size: 2.3rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .body div textarea {
-        font-size: 1.3rem;
+        font-size: 2.3rem;
         min-width: 220px;
         margin: 5px 0;
         font-family: 'Cormorant', serif !important;
