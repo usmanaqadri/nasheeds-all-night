@@ -25,15 +25,5 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build/*, server.js, package.json, routes/*, config/*"
-          target: "/home/ubuntu/nasheed-app/"
+          target: "/home/ubuntu/nasheed-app/nasheeds-all-night"
 
-      - name: SSH into EC2 and restart backend
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/nasheed-app
-            npm install
-            pm2 restart all  # or however you start the backend
