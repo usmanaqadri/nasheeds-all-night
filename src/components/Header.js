@@ -5,7 +5,7 @@ function Header() {
     <div>
       <h1 className="title">
         <Link style={{ textDecoration: "none", color: "inherit" }} to={`/`}>
-          Nasheeds All Night
+          Dhikrpedia
         </Link>
       </h1>
     </div>
