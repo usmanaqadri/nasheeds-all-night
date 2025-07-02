@@ -8,11 +8,12 @@
 	z-index: 1000;
 }
 
-.pdf-button {
+.modal-buttons {
 	position: absolute !important;
     top: 10px;
     left: 10px;
     width: 30px;
+	display: flex;
 }
 
 .close-button {
@@ -95,6 +96,39 @@
 .engText {
 	font-weight: 500;
 }
+
+.flash-overlay {
+  position: absolute;
+  top: 10px;
+  bottom: 0;
+  width: 48%;
+  background-color: rgba(255, 255, 255, 0.4); /* Light flash */
+  animation: flash 0.8s ease-out;
+  pointer-events: none; /* So clicks pass through */
+  z-index: 5;
+}
+
+.left-flash {
+  left: 10px;
+  border-top-left-radius: 50%; 
+  border-bottom-left-radius: 50%;
+}
+
+.right-flash {
+  right: 10px;
+  border-top-right-radius: 50%;
+  border-bottom-right-radius: 50%;
+}
+
+@keyframes flash {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @media screen and (max-width: 850px) {
 	/* .modal .title {
 		font-size: 0.6rem;
@@ -103,7 +137,7 @@
 		font-size: 1rem;
 	} */
 	.modal {
-		height: 70vh;
+		min-height: 70vh;
 	}
 	.modal .title {
 		font-size: 1rem;
@@ -134,7 +168,7 @@
 		font-size: 4.0vh;
 	} */
 	.modal {
-		height: 60vh;
+		min-height: 60vh;
 		padding-bottom: 3rem;
 	}
 	.modal .title {
