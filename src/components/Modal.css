@@ -8,6 +8,13 @@
 	z-index: 1000;
 }
 
+.pdf-button {
+	position: absolute !important;
+    top: 10px;
+    left: 10px;
+    width: 30px;
+}
+
 .close-button {
 	position: absolute !important;
 	top: 10px;
