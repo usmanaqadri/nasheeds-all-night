@@ -120,6 +120,16 @@
   border-bottom-right-radius: 50%;
 }
 
+.slide-number {
+	position: absolute !important;
+	bottom: 10px;
+	right: 10px;
+	padding: 5px 10px;
+	font-size: 2rem;
+    text-align: right;
+    color: white;
+}
+
 @keyframes flash {
   from {
     opacity: 0.6;
@@ -137,14 +147,24 @@
 		font-size: 1rem;
 	} */
 	.modal {
-		min-height: 70vh;
+		height: 70vh;
 	}
 	.modal .title {
 		font-size: 1rem;
 	}
 	.modal .body {
-		font-size: 1.8rem;
+		font-size: 1.2rem;
 	}
+
+	.slide-number {
+        position: absolute !important;
+		bottom: 10px;
+		right: 10px;
+		font-size: 1rem;
+        margin-top: -10px;
+        text-align: right;
+        color: white;
+    }
 }
  /* @media (max-height: 550px) {
 	
@@ -168,7 +188,7 @@
 		font-size: 4.0vh;
 	} */
 	.modal {
-		min-height: 60vh;
+		height: 60vh;
 		padding-bottom: 3rem;
 	}
 	.modal .title {
@@ -176,10 +196,10 @@
 		font-size: 0.8rem;
 	}
 	.modal .body {
-		font-size: 1.4rem;
+		font-size: 1rem;
 	}
 	.modal .body .engText {
-		font-size: 1.7rem;
+		font-size: 1.4rem;
 	}
 }
 @media screen and (min-width: 1400px){
