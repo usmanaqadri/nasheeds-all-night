@@ -174,14 +174,7 @@ export default function MyModal({ open, onClose, text }) {
                 <p className="engText">{eng[counter + 1]}</p>
               </div>
             </div>
-            <div
-              style={{
-                fontSize: "2rem",
-                textAlign: "right",
-
-                color: "white",
-              }}
-            >
+            <div className="slide-number">
               {slideNumber(currentScreen, totalScreens)}
             </div>
           </>
