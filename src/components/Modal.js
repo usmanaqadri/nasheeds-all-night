@@ -1,8 +1,52 @@
 import React, { useState, useEffect } from "react";
 import { Box, Modal, IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Close } from "@mui/icons-material";
+import { Close, PictureAsPdf } from "@mui/icons-material";
 import "./Modal.css";
+
+const baseURL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3001/api/v1/nasheed"
+    : "/api/v1/nasheed";
+
+const generatePDF = async (
+  arabTitle,
+  engTitle,
+  arabicArray,
+  englishArray,
+  transliterationArray
+) => {
+  const cleanedArabicTitle = arabTitle.replace(/\r/g, "").trim();
+  const cleanedEnglishTitle = engTitle.replace(/\r/g, "").trim();
+  const cleanedArabicArray = arabicArray.map((str) =>
+    str.replace(/\r/g, "").trim()
+  );
+  const cleanedEnglishArray = englishArray.map((str) =>
+    str.replace(/\r/g, "").trim()
+  );
+  const cleanedTransliterationArray = transliterationArray.map((str) =>
+    str.replace(/\r/g, "").trim()
+  );
+
+  const response = await fetch(`${baseURL}/generate-pdf`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      arabicTitle: cleanedArabicTitle,
+      engTitle: cleanedEnglishTitle,
+      arabicArray: cleanedArabicArray,
+      englishArray: cleanedEnglishArray,
+      transliterationArray: cleanedTransliterationArray,
+    }),
+  });
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${cleanedEnglishTitle}.pdf`;
+  link.click();
+};
 
 export default function MyModal({ open, onClose, text }) {
   let { arab, arabTitle, engTitle, eng, rom, _id } = text;
@@ -60,6 +104,15 @@ export default function MyModal({ open, onClose, text }) {
       aria-describedby="modal-modal-description"
     >
       <Box className="modal">
+        <IconButton
+          className="pdf-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            generatePDF(arabTitle, engTitle, arab, eng, rom);
+          }}
+        >
+          <PictureAsPdf fontSize="large" style={{ color: "white" }} />
+        </IconButton>
         <IconButton className="close-button" onClick={onClose}>
           <Close fontSize="large" style={{ color: "white" }} />
         </IconButton>
