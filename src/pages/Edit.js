@@ -6,6 +6,8 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import { SnackbarAlert } from "../utils/helperFunctions";
+import { baseURL } from "../utils/constants";
 
 const style = {
   position: "absolute",
@@ -25,14 +27,11 @@ function Edit() {
   const [nasheed, setNasheed] = useState("");
   const [nasheedCopy, setNasheedCopy] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const [alert, setAlert] = useState({ message: "", type: "" });
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { id } = useParams();
-  const baseURL =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3001/api/v1/nasheed"
-      : "/api/v1/nasheed";
   useEffect(() => {
     fetch(`${baseURL}/${id}`)
       .then((res) => res.json())
@@ -41,11 +40,7 @@ function Edit() {
         setNasheedCopy(data.foundNasheed);
         setIsLoading(false);
       });
-  }, [baseURL, id]);
-
-  const ShowAlert = ({ message }) => {
-    return <>{message}</>;
-  };
+  }, [id]);
 
   const nasheedText = nasheed.arab?.map((arab, index) => {
     return (
@@ -116,6 +111,7 @@ function Edit() {
         setNasheed({ ...res });
         setNasheedCopy({ ...res });
         toggleEdit();
+        setAlert({ message: "Successfully Updated Nasheed", type: "success" });
         setShowAlert(true);
         setTimeout(() => setShowAlert(false), 3000);
       });
@@ -231,46 +227,36 @@ function Edit() {
       </div>
     </>
   ) : (
-    <>
-      <div className="wrapper">
-        <div className="edit-buttons" style={{ visibility: "hidden" }}>
-          <Button
-            style={{ visibility: "hidden" }}
-            className="mui-button"
-            variant="contained"
-            onClick={toggleEdit}
-          >
-            Edit
-          </Button>
-        </div>
-        <div className="container">
-          {showAlert && (
-            <ShowAlert
-              message={
-                <div className="alert">
-                  <span style={{ color: "#16c609" }}>✓</span> Successfully Saved
-                  Nasheed
-                </div>
-              }
-            />
-          )}
-          <div className="edit-title">
-            <p>{nasheed.arabTitle}</p>
-            <p>{nasheed.engTitle}</p>
-          </div>
-          <div className="body">{nasheedText}</div>
-        </div>
-        <div className="edit-buttons">
-          <Button
-            className="mui-button"
-            variant="contained"
-            onClick={toggleEdit}
-          >
-            Edit
-          </Button>
-        </div>
+    <div className="wrapper">
+      <div className="edit-buttons" style={{ visibility: "hidden" }}>
+        <Button
+          style={{ visibility: "hidden" }}
+          className="mui-button"
+          variant="contained"
+          onClick={toggleEdit}
+        >
+          Edit
+        </Button>
       </div>
-    </>
+      <div className="container">
+        <SnackbarAlert
+          open={showAlert}
+          onClose={() => setShowAlert(false)}
+          message={alert.message}
+          type={alert.type}
+        />{" "}
+        <div className="edit-title">
+          <p>{nasheed.arabTitle}</p>
+          <p>{nasheed.engTitle}</p>
+        </div>
+        <div className="body">{nasheedText}</div>
+      </div>
+      <div className="edit-buttons">
+        <Button className="mui-button" variant="contained" onClick={toggleEdit}>
+          Edit
+        </Button>
+      </div>
+    </div>
   );
 }
 
