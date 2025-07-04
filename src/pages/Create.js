@@ -10,9 +10,13 @@ const styles = {
     gap: 2,
     maxWidth: "80vw",
     margin: "0 auto",
+    height: "75vh",
+    padding: "20px",
+    overflowY: "auto",
   },
   title: {
     width: "33%",
+    minWidth: "250px",
     mx: "auto",
     "& .MuiInputBase-input": { fontSize: "1.5rem" },
     "& .MuiInputLabel-root": { fontSize: "1.5rem" },
