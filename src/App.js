@@ -5,6 +5,7 @@ import Loader from "./components/Loader";
 import MyModal from "./components/Modal.js";
 import NasheedBoard from "./components/NasheedBoard.js";
 import Searchbar from "./components/Searchbar";
+import { baseURL } from "./utils/constants.js";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -13,10 +14,6 @@ function App() {
   const [nasheedId, setNasheedId] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  const baseURL =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3001/api/v1/nasheed"
-      : "/api/v1/nasheed";
   const compareFunc = (a, b) =>
     a.engTitle
       .replace(/Ṣ/g, "S")
@@ -42,7 +39,7 @@ function App() {
         setFilteredNasheeds([...data.nasheeds].sort(compareFunc));
         setLoading(false);
       });
-  }, [baseURL]);
+  }, []);
 
   const removeDiacritics = (str) => {
     return str
