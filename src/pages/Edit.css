@@ -11,6 +11,7 @@ body {
 .wrapper {
     display: flex;
     justify-content: space-around;
+    margin-bottom: 30px;
 }
 
 .container {
@@ -155,22 +156,22 @@ body {
 
 @media screen and (min-width: 1550px){
 	.edit-title p {
-        font-size: 5.3rem;
+        font-size: 3.3rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .container .edit-title textarea {
-        font-size: 5.3rem;
+        font-size: 3.3rem;
         font-family: 'Cormorant', serif !important;
     }
 	
-    .body div p {
-        font-size: 4.3rem;
+    .container .body div p {
+        font-size: 2.3rem;
         font-family: 'Cormorant', serif !important;
     }
     
     .container .body div textarea {
-        font-size: 4.3rem;
+        font-size: 2.3rem;
         font-family: 'Cormorant', serif !important;
     }
 
@@ -188,9 +189,9 @@ body {
     }
 
     .mui-button {
-        font-size: 28px !important;
-        min-width: 90px !important;
-        padding: 20px 60px !important;
+        font-size: 18px !important;
+        min-width: 80px !important;
+        padding: 10px 30px !important;
     }
 
 }
