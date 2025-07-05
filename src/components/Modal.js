@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Box, Modal, IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Close, PictureAsPdf, Tv, ArticleOutlined } from "@mui/icons-material";
+import {
+  Close,
+  PictureAsPdf,
+  Tv,
+  ArticleOutlined,
+  EditNote,
+} from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
 import { nasheedText } from "../utils/helperFunctions";
@@ -12,6 +18,17 @@ export default function MyModal({ open, onClose, text }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
+
+  const buttonStyles = {
+    color: "white",
+    transition: "background-color 0.3s, transform 0.1s",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.2)", // subtle highlight on hover
+    },
+    "&:active": {
+      transform: "scale(0.9)", // slight shrink effect to simulate press
+    },
+  };
 
   const handleUserKeyPress = useCallback(
     (e) => {
@@ -111,8 +128,9 @@ export default function MyModal({ open, onClose, text }) {
       <Box className="modal">
         {flashSide === "left" && <div className="flash-overlay left-flash" />}
         {flashSide === "right" && <div className="flash-overlay right-flash" />}
-        <div className="modal-buttons">
+        <div className="modal-left-buttons">
           <IconButton
+            sx={buttonStyles}
             onClick={(e) => {
               e.stopPropagation();
               generatePDF(arabTitle, engTitle, arab, eng, rom);
@@ -123,6 +141,7 @@ export default function MyModal({ open, onClose, text }) {
           {!isMobile && (
             <>
               <IconButton
+                sx={buttonStyles}
                 onClick={(e) => {
                   e.stopPropagation();
                   setMode("presentation");
@@ -131,6 +150,7 @@ export default function MyModal({ open, onClose, text }) {
                 <Tv fontSize="large" style={{ color: "white" }} />
               </IconButton>
               <IconButton
+                sx={buttonStyles}
                 onClick={(e) => {
                   e.stopPropagation();
                   setMode("scroll");
@@ -141,17 +161,24 @@ export default function MyModal({ open, onClose, text }) {
             </>
           )}
         </div>
-        <IconButton className="close-button" onClick={onClose}>
-          <Close fontSize="large" style={{ color: "white" }} />
-        </IconButton>
+        <div className="modal-right-buttons">
+          {!isMobile && (
+            <IconButton sx={buttonStyles}>
+              <Link
+                style={{ textDecoration: "none", color: "inherit" }}
+                to={`/${_id}`}
+              >
+                <EditNote fontSize="large" style={{ color: "white" }} />
+              </Link>
+            </IconButton>
+          )}
+          <IconButton sx={buttonStyles} onClick={onClose}>
+            <Close fontSize="large" style={{ color: "white" }} />
+          </IconButton>
+        </div>
         <div className="title">
           <h1 className="arabText">
-            <Link
-              style={{ textDecoration: "none", color: "inherit" }}
-              to={`/${_id}`}
-            >
-              {arabTitle}
-            </Link>
+            {arabTitle}
             <br />
             {engTitle}
           </h1>

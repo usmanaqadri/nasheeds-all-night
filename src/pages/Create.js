@@ -23,16 +23,28 @@ const styles = {
     "& .MuiFormLabel-root": { fontSize: "1.5rem" },
     "& .MuiInputBase-root": { fontSize: "1.5rem" },
   },
+  gridContainer: {
+    flexGrow: 1,
+    alignItems: "stretch",
+  },
+  gridItem: {
+    display: "flex",
+    flexDirection: "column",
+  },
   lyrics: {
+    flexGrow: 1,
+    "& .MuiInputBase-root": {
+      height: "100%",
+    },
     "& .MuiInputBase-inputMultiline": {
       fontSize: "1.5rem",
       overflow: "auto !important",
-      maxHeight: "300px",
+      height: "100%",
+      maxHeight: "none",
       resize: "none",
     },
     "& .MuiInputLabel-root": { fontSize: "1.5rem" },
     "& .MuiFormLabel-root": { fontSize: "1.5rem" },
-    "& .MuiInputBase-root": { fontSize: "1.5rem" },
   },
   submitButton: { width: "20%", mx: "auto", padding: 1, fontSize: "1.5rem" },
 };
@@ -120,8 +132,8 @@ export const Create = () => {
         required
         sx={styles.title}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
+      <Grid container spacing={2} sx={styles.gridContainer}>
+        <Grid item xs={12} md={4} sx={styles.gridItem}>
           <TextField
             label="Arabic/Urdu verses (one per line)"
             name="arab"
@@ -133,7 +145,7 @@ export const Create = () => {
             sx={styles.lyrics}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} sx={styles.gridItem}>
           <TextField
             label="Transliteration verses (one per line)"
             name="rom"
@@ -145,7 +157,7 @@ export const Create = () => {
             sx={styles.lyrics}
           />
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4} sx={styles.gridItem}>
           <TextField
             label="English verses (one per line)"
             name="eng"

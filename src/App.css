@@ -120,4 +120,9 @@ textarea:focus, input:focus{
   .button-64 {
     font-size: 1.3vw;
   }
+
+  .body div p {
+        font-size: 3.3rem;
+        font-family: 'Cormorant', serif !important;
+    }
 }
