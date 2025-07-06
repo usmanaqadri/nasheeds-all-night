@@ -121,7 +121,7 @@ textarea:focus, input:focus{
     font-size: 1.3vw;
   }
 
-  .body div p {
+  .modal .body div p {
         font-size: 3.3rem;
         font-family: 'Cormorant', serif !important;
     }

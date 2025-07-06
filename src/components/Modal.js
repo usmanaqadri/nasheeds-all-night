@@ -172,7 +172,10 @@ export default function MyModal({ open, onClose, text }) {
               </Link>
             </IconButton>
           )}
-          <IconButton sx={buttonStyles} onClick={onClose}>
+          <IconButton
+            sx={{ ...buttonStyles, marginLeft: isMobile ? "30px" : "0" }}
+            onClick={onClose}
+          >
             <Close fontSize="large" style={{ color: "white" }} />
           </IconButton>
         </div>
