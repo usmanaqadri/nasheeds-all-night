@@ -33,7 +33,7 @@ function Edit() {
   const handleClose = () => setOpen(false);
   const { id } = useParams();
   useEffect(() => {
-    fetch(`${baseURL}/${id}`)
+    fetch(`${baseURL}/nasheed/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setNasheed(data.foundNasheed);
@@ -99,7 +99,7 @@ function Edit() {
 
   const updateNasheed = () => {
     handleClose();
-    fetch(`${baseURL}/${id}`, {
+    fetch(`${baseURL}/nasheed/${id}`, {
       method: "PUT",
       body: JSON.stringify(nasheedCopy),
       headers: {

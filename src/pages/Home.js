@@ -30,7 +30,7 @@ function Home() {
       ? 1
       : -1;
   useEffect(() => {
-    fetch(`${baseURL}/`)
+    fetch(`${baseURL}/nasheed`)
       .then((res) => res.json())
       .then((data) => {
         setNasheeds([...data.nasheeds].sort(compareFunc));

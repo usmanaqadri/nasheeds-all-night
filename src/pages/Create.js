@@ -76,7 +76,7 @@ export const Create = () => {
       eng: nasheedText.eng.split("\n").filter((line) => line.trim() !== ""),
     };
 
-    fetch(`${baseURL}/`, {
+    fetch(`${baseURL}/nasheed`, {
       method: "POST",
       body: JSON.stringify(formattedData),
       headers: {
