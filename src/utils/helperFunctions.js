@@ -1,9 +1,19 @@
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { Snackbar, Alert as MuiAlert } from "@mui/material";
+import {
+  Snackbar,
+  Alert as MuiAlert,
+  Button,
+  Menu,
+  MenuItem,
+  Box,
+  Avatar,
+  IconButton,
+  Typography,
+  Divider,
+} from "@mui/material";
 import { baseURL } from "./constants";
-import { Button, Menu, MenuItem, Box } from "@mui/material";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
@@ -18,8 +28,12 @@ export const nasheedText = (nasheed) =>
     );
   });
 
-export const handleGoogleLogin = async (credentialResponse, setLoggedIn) => {
-  const googleToken = credentialResponse.credential;
+export const handleGoogleLogin = async (
+  tokenResponse,
+  setLoggedIn,
+  setUser
+) => {
+  const googleToken = tokenResponse.code;
 
   try {
     const res = await fetch(`${baseURL}/user/auth`, {
@@ -39,7 +53,7 @@ export const handleGoogleLogin = async (credentialResponse, setLoggedIn) => {
       console.log("login failed: ", data.message);
     }
 
-    console.log("here is decoded jwt", jwtDecode(data.token));
+    setUser(jwtDecode(data.token));
   } catch (error) {
     console.log("network error: ", error);
   }
@@ -70,7 +84,7 @@ export const SnackbarAlert = ({ type, message, open, onClose }) => {
   );
 };
 
-export const UserMenu = ({ name, onSignOut, darkMode }) => {
+export const UserMenu = ({ name, picture, onSignOut, darkMode }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -88,28 +102,10 @@ export const UserMenu = ({ name, onSignOut, darkMode }) => {
   };
 
   return (
-    <Box>
-      <Button
-        onClick={handleOpen}
-        endIcon={<KeyboardArrowDownIcon />}
-        sx={{
-          fontSize: "14px",
-          color: darkMode ? "white" : "black",
-          borderColor: "#888",
-          backgroundColor: "transparent",
-          borderRadius: "8px",
-          textTransform: "none",
-          transition: "0.3s",
-          marginRight: "10px",
-          border: "1px solid #888",
-          "&:hover": {
-            color: "#888",
-            borderColor: "#555",
-          },
-        }}
-      >
-        {name}
-      </Button>
+    <Box sx={{ marginRight: "10px" }}>
+      <IconButton onClick={handleOpen} size="small">
+        <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
+      </IconButton>
 
       <Menu
         anchorEl={anchorEl}
@@ -119,16 +115,74 @@ export const UserMenu = ({ name, onSignOut, darkMode }) => {
           sx: {
             mt: 1,
             borderRadius: 2,
-            minWidth: 150,
+            minWidth: 220,
             backgroundColor: darkMode ? "#222" : "white",
             color: darkMode ? "white" : "#222",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           },
         }}
       >
-        <MenuItem sx={{ fontSize: "14px" }} onClick={handleSignOut}>
+        <Box px={2}>
+          <Typography fontSize="14px" color={"gray"} noWrap>
+            {name}
+          </Typography>
+        </Box>
+        <Divider sx={{ my: 1, borderColor: "#444" }} />
+        {/* <MenuItem
+          sx={{
+            fontSize: "14px",
+            "&:hover": {
+              backgroundColor: darkMode ? "#333" : "#f5f5f5",
+            },
+          }}
+        >
+          {darkMode ? "Light" : "Dark"} Mode
+        </MenuItem> */}
+        <MenuItem
+          onClick={handleSignOut}
+          sx={{
+            fontSize: "14px",
+            "&:hover": {
+              backgroundColor: darkMode ? "#333" : "#f5f5f5",
+            },
+          }}
+        >
           Sign out
         </MenuItem>
       </Menu>
     </Box>
+  );
+};
+
+export const SignIn = ({ setLoggedIn, setUser }) => {
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      await handleGoogleLogin(tokenResponse, setLoggedIn, setUser);
+    },
+    flow: "auth-code",
+    onError: (err) => console.log("Login Failed:", err),
+  });
+
+  return (
+    <Button
+      onClick={login}
+      variant="outlined"
+      sx={{
+        fontSize: "14px",
+        color: "white",
+        borderColor: "#888",
+        backgroundColor: "transparent",
+        borderRadius: "8px",
+        textTransform: "none",
+        transition: "0.3s",
+        marginRight: "10px",
+        "&:hover": {
+          color: "#888",
+          borderColor: "#555",
+        },
+      }}
+    >
+      Sign in
+    </Button>
   );
 };

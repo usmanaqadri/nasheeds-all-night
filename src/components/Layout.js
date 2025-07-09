@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import Header from "./Header";
 import { useLocation } from "react-router-dom";
 import backgroundImage from "../assets/imgs/background.jpg";
-import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import { handleGoogleLogin, UserMenu } from "../utils/helperFunctions";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { SignIn, UserMenu } from "../utils/helperFunctions";
 import { jwtDecode } from "jwt-decode";
 
 export default function Layout({ children }) {
@@ -43,7 +43,9 @@ export default function Layout({ children }) {
         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
           {loggedIn ? (
             <UserMenu
-              name={user.firstName}
+              name={user.name}
+              picture={user.picture}
+              email={user.email}
               onSignOut={() => {
                 localStorage.removeItem("token");
                 setLoggedIn(false);
@@ -54,14 +56,7 @@ export default function Layout({ children }) {
             <GoogleOAuthProvider
               clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
             >
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  handleGoogleLogin(credentialResponse, setLoggedIn);
-                }}
-                onError={() => {
-                  console.log("Login Failed");
-                }}
-              />
+              <SignIn setLoggedIn={setLoggedIn} setUser={setUser} />
             </GoogleOAuthProvider>
           )}
         </div>
