@@ -97,7 +97,7 @@ function Home() {
         <MyModal
           open={isOpen}
           onClose={handleClose}
-          text={filteredNasheeds[nasheedId]}
+          nasheed={filteredNasheeds[nasheedId]}
         />
       )}
     </div>

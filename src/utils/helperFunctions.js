@@ -13,7 +13,8 @@ import {
   Divider,
 } from "@mui/material";
 import { baseURL } from "./constants";
-import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../components/AuthContext";
 
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
@@ -28,20 +29,14 @@ export const nasheedText = (nasheed) =>
     );
   });
 
-export const handleGoogleLogin = async (
-  tokenResponse,
-  setLoggedIn,
-  setUser
-) => {
-  const googleToken = tokenResponse.code;
-
+export const handleGoogleLogin = async (code, setLoggedIn, setUser) => {
   try {
     const res = await fetch(`${baseURL}/user/auth`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ token: googleToken }),
+      body: JSON.stringify({ code }),
     });
 
     const data = await res.json();
@@ -84,7 +79,8 @@ export const SnackbarAlert = ({ type, message, open, onClose }) => {
   );
 };
 
-export const UserMenu = ({ name, picture, onSignOut, darkMode }) => {
+export const UserMenu = ({ name, picture, darkMode }) => {
+  const { signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -98,7 +94,7 @@ export const UserMenu = ({ name, picture, onSignOut, darkMode }) => {
 
   const handleSignOut = () => {
     handleClose();
-    onSignOut();
+    signOut();
   };
 
   return (
@@ -154,10 +150,11 @@ export const UserMenu = ({ name, picture, onSignOut, darkMode }) => {
   );
 };
 
-export const SignIn = ({ setLoggedIn, setUser }) => {
+export const SignIn = ({ darkMode }) => {
+  const { setLoggedIn, setUser } = useAuth();
   const login = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      await handleGoogleLogin(tokenResponse, setLoggedIn, setUser);
+    onSuccess: async ({ code }) => {
+      await handleGoogleLogin(code, setLoggedIn, setUser);
     },
     flow: "auth-code",
     onError: (err) => console.log("Login Failed:", err),
@@ -169,7 +166,7 @@ export const SignIn = ({ setLoggedIn, setUser }) => {
       variant="outlined"
       sx={{
         fontSize: "14px",
-        color: "white",
+        color: darkMode ? "white" : "#222",
         borderColor: "#888",
         backgroundColor: "transparent",
         borderRadius: "8px",

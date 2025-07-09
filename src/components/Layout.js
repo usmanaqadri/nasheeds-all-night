@@ -1,25 +1,13 @@
-import { useEffect, useState } from "react";
 import Header from "./Header";
 import { useLocation } from "react-router-dom";
 import backgroundImage from "../assets/imgs/background.jpg";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SignIn, UserMenu } from "../utils/helperFunctions";
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from "./AuthContext";
 
 export default function Layout({ children }) {
   const location = useLocation();
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setLoggedIn(false);
-    } else {
-      setUser(jwtDecode(token));
-      setLoggedIn(true);
-    }
-  }, []);
+  const { user, loggedIn } = useAuth();
 
   const isHome = location.pathname === "/";
 
@@ -43,20 +31,16 @@ export default function Layout({ children }) {
         <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
           {loggedIn ? (
             <UserMenu
-              name={user.name}
-              picture={user.picture}
-              email={user.email}
-              onSignOut={() => {
-                localStorage.removeItem("token");
-                setLoggedIn(false);
-              }}
+              name={user?.name}
+              picture={user?.picture}
+              email={user?.email}
               darkMode={isHome}
             />
           ) : (
             <GoogleOAuthProvider
               clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
             >
-              <SignIn setLoggedIn={setLoggedIn} setUser={setUser} />
+              <SignIn darkMode={isHome} />
             </GoogleOAuthProvider>
           )}
         </div>
