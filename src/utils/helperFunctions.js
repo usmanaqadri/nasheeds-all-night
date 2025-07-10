@@ -17,7 +17,7 @@ import { baseURL } from "./constants";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Add } from "@mui/icons-material";
+import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
@@ -117,8 +117,10 @@ export const UserMenu = ({ name, picture, darkMode }) => {
             }}
             title="Create Nasheed"
           >
-            <IconButton onClick={() => navigate("/create")} size="small">
-              <Add sx={{ color: "white" }} />
+            <IconButton onClick={() => navigate("/create")}>
+              <AddCircleOutlineOutlined
+                sx={{ fontSize: "30px", color: "white" }}
+              />
             </IconButton>
           </Tooltip>
         )}
