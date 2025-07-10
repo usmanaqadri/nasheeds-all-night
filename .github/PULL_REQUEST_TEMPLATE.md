@@ -27,10 +27,6 @@ Closes #[ISSUE_NUMBER]
 
 > Provide steps to test this feature locally or link to deployment.
 
-1. Run `npm start`
-2. Click on X
-3. Expect Y to happen
-
 ---
 
 ## ✅ Checklist
