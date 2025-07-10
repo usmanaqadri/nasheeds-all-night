@@ -68,7 +68,8 @@ function SortableBlock({
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.5 : 1,
+        backgroundColor: isDragging ? "#f0f0f0" : "#fafafa",
+        boxShadow: isDragging ? "0 0 10px rgba(0,0,0,0.2)" : "none",
       }}
       sx={{
         padding: "10px",
