@@ -108,7 +108,7 @@ function SortableBlock({
             ref={setActivatorNodeRef}
             {...listeners}
             {...attributes}
-            sx={{ cursor: "grab" }}
+            sx={{ cursor: "grab", touchAction: "none" }}
             size="small"
           >
             <DragIndicator />
