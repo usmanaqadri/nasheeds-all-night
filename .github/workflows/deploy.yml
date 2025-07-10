@@ -13,6 +13,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Set environment variables for React
+        run: |
+          echo "REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
+
       - name: Build React app
         run: |
           npm install
@@ -26,4 +30,3 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build/*, server.js, package.json, routes/*, config/*"
           target: "/home/ubuntu/nasheed-app/nasheeds-all-night"
-
