@@ -4,7 +4,7 @@ import SearchIcon from "@mui/icons-material/Search";
 function Searchbar({ onSearch }) {
   return (
     <TextField
-      placeholder="Search for a nasheed"
+      placeholder="Search a nasheed"
       variant="outlined"
       onChange={(e) => onSearch(e.target.value)}
       sx={{
