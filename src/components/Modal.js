@@ -11,9 +11,11 @@ import {
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
 import { nasheedText } from "../utils/helperFunctions";
+import { useAuth } from "./AuthContext";
 
-export default function MyModal({ open, onClose, text }) {
-  let { arab, arabTitle, engTitle, eng, rom, _id } = text;
+export default function MyModal({ open, onClose, nasheed }) {
+  const { user } = useAuth();
+  let { arab, arabTitle, engTitle, eng, rom, _id } = nasheed;
   const [counter, setCounter] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
@@ -23,10 +25,10 @@ export default function MyModal({ open, onClose, text }) {
     color: "white",
     transition: "background-color 0.3s, transform 0.1s",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.2)", // subtle highlight on hover
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
     },
     "&:active": {
-      transform: "scale(0.9)", // slight shrink effect to simulate press
+      transform: "scale(0.9)",
     },
   };
 
@@ -70,7 +72,7 @@ export default function MyModal({ open, onClose, text }) {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
         setIsMobile(true);
-        setMode("scroll"); // 🔥 Automatically switch to scroll
+        setMode("scroll");
       } else {
         setIsMobile(false);
       }
@@ -117,6 +119,9 @@ export default function MyModal({ open, onClose, text }) {
     }
   };
 
+  const allowEdit =
+    !isMobile && (user?.admin || nasheed.creatorId === user?.id);
+
   return (
     <Modal
       open={open}
@@ -162,19 +167,22 @@ export default function MyModal({ open, onClose, text }) {
           )}
         </div>
         <div className="modal-right-buttons">
-          {!isMobile && (
-            <IconButton sx={buttonStyles}>
-              <Link
-                style={{ textDecoration: "none", color: "inherit" }}
-                to={`/${_id}`}
-              >
-                <EditNote fontSize="large" style={{ color: "white" }} />
-              </Link>
+          {allowEdit && (
+            <IconButton
+              onClick={(e) => e.stopPropagation()}
+              component={Link}
+              to={`/${_id}`}
+              sx={buttonStyles}
+            >
+              <EditNote fontSize="large" style={{ color: "white" }} />
             </IconButton>
           )}
           <IconButton
-            sx={{ ...buttonStyles, marginLeft: isMobile ? "30px" : "0" }}
-            onClick={onClose}
+            sx={{ ...buttonStyles, marginLeft: allowEdit ? "0" : "30px" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
           >
             <Close fontSize="large" style={{ color: "white" }} />
           </IconButton>
@@ -214,7 +222,7 @@ export default function MyModal({ open, onClose, text }) {
             className="container"
           >
             <div style={{ border: "1px dotted white" }} className="body">
-              {nasheedText(text)}
+              {nasheedText(nasheed)}
             </div>
           </div>
         )}

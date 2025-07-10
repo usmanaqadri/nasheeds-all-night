@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
+import { useAuth } from "../components/AuthContext";
 
 const style = {
   position: "absolute",
@@ -22,6 +23,7 @@ const style = {
 };
 
 function Edit() {
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [nasheed, setNasheed] = useState("");
@@ -32,8 +34,11 @@ function Edit() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const { id } = useParams();
+  const token = localStorage.getItem("token");
+
+  const allowEdit = user?.admin || nasheed.creatorId === user?.id;
   useEffect(() => {
-    fetch(`${baseURL}/${id}`)
+    fetch(`${baseURL}/nasheed/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setNasheed(data.foundNasheed);
@@ -97,24 +102,62 @@ function Edit() {
     setEditing((prevState) => !prevState);
   };
 
-  const updateNasheed = () => {
+  const updateNasheed = async () => {
     handleClose();
-    fetch(`${baseURL}/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(nasheedCopy),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((res) => {
+
+    if (!token) {
+      setAlert({
+        type: "error",
+        message: "You must be logged in to create a nasheed.",
+      });
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${baseURL}/nasheed/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(nasheedCopy),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        if (res.code === 11000) {
+          setAlert({
+            type: "error",
+            message: "Nasheed with same name already exists.",
+          });
+        } else {
+          setAlert({
+            type: "error",
+            message: res.message || "Failed to update nasheed.",
+          });
+        }
+      } else {
+        setAlert({
+          type: "success",
+          message: "Successfully updated nasheed!",
+        });
         setNasheed({ ...res });
         setNasheedCopy({ ...res });
         toggleEdit();
         setAlert({ message: "Successfully Updated Nasheed", type: "success" });
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Network error occurred. Please try again.",
       });
+    }
+
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
   };
   return isLoading ? (
     <Loader />
@@ -138,16 +181,6 @@ function Edit() {
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
               style={{
-                marginRight: "5px",
-              }}
-              className="mui-button"
-              variant="contained"
-              onClick={updateNasheed}
-            >
-              Yes
-            </Button>
-            <Button
-              style={{
                 backgroundColor: "#A42A04",
                 marginRight: "5px",
               }}
@@ -157,35 +190,27 @@ function Edit() {
             >
               No
             </Button>
+            <Button
+              style={{
+                marginRight: "5px",
+              }}
+              className="mui-button"
+              variant="contained"
+              onClick={updateNasheed}
+            >
+              Yes
+            </Button>
           </div>
         </Box>
       </Modal>
+      <SnackbarAlert
+        open={showAlert}
+        onClose={() => setShowAlert(false)}
+        message={alert.message}
+        type={alert.type}
+      />
       <div className="wrapper">
-        <div className="edit-buttons" style={{ visibility: "hidden" }}>
-          <Button
-            style={{
-              backgroundColor: "#A42A04",
-              marginBottom: "5px",
-              visibility: "hidden",
-            }}
-            className="mui-button"
-            variant="contained"
-            onClick={toggleEdit}
-          >
-            Cancel
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#2f7c31",
-              visibility: "hidden",
-            }}
-            className="mui-button"
-            variant="contained"
-            onClick={updateNasheed}
-          >
-            Save
-          </Button>
-        </div>
+        <div style={{ flex: 1 }} />
         <div className="container">
           <div className="edit-title">
             <textarea
@@ -228,16 +253,7 @@ function Edit() {
     </>
   ) : (
     <div className="wrapper">
-      <div className="edit-buttons" style={{ visibility: "hidden" }}>
-        <Button
-          style={{ visibility: "hidden" }}
-          className="mui-button"
-          variant="contained"
-          onClick={toggleEdit}
-        >
-          Edit
-        </Button>
-      </div>
+      <div style={{ flex: 1 }} />
       <div className="container">
         <SnackbarAlert
           open={showAlert}
@@ -252,9 +268,16 @@ function Edit() {
         <div className="body">{nasheedText}</div>
       </div>
       <div className="edit-buttons">
-        <Button className="mui-button" variant="contained" onClick={toggleEdit}>
-          Edit
-        </Button>
+        {
+          <Button
+            className="mui-button"
+            variant="contained"
+            onClick={toggleEdit}
+            style={{ visibility: allowEdit ? "visible" : "hidden" }}
+          >
+            Edit
+          </Button>
+        }
       </div>
     </div>
   );

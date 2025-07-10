@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, TextField, Button, Grid } from "@mui/material";
 import { baseURL } from "../utils/constants";
 import { SnackbarAlert } from "../utils/helperFunctions";
+import { useAuth } from "../components/AuthContext";
 
 const styles = {
   formContainer: {
@@ -32,20 +33,32 @@ const styles = {
     flexDirection: "column",
   },
   lyrics: {
-    flexGrow: 1,
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+
     "& .MuiInputBase-root": {
-      height: "100%",
-    },
-    "& .MuiInputBase-inputMultiline": {
       fontSize: "1.5rem",
-      overflow: "auto !important",
       height: "100%",
-      maxHeight: "none",
-      resize: "none",
+      display: "flex",
+      alignItems: "flex-start",
     },
-    "& .MuiInputLabel-root": { fontSize: "1.5rem" },
-    "& .MuiFormLabel-root": { fontSize: "1.5rem" },
+    "& .MuiInputBase-input.MuiInputBase-inputMultiline": {
+      fontSize: "1.5rem",
+      overflow: "auto",
+      height: "100%",
+      resize: "none",
+      paddingTop: "14px",
+      boxSizing: "border-box",
+    },
+    "& .MuiInputLabel-root": {
+      fontSize: "1.5rem",
+    },
+    "& .MuiFormLabel-root": {
+      fontSize: "1.5rem",
+    },
   },
+
   submitButton: { width: "20%", mx: "auto", padding: 1, fontSize: "1.5rem" },
 };
 
@@ -59,53 +72,81 @@ export const Create = () => {
     rom: "",
     eng: "",
   });
+  const { user } = useAuth();
+  const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNasheedText((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let errorFound = false;
+
+    if (!token) {
+      setAlert({
+        type: "error",
+        message: "You must be logged in to create a nasheed.",
+      });
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+      return;
+    }
 
     const formattedData = {
       ...nasheedText,
       arab: nasheedText.arab.split("\n").filter((line) => line.trim() !== ""),
       rom: nasheedText.rom.split("\n").filter((line) => line.trim() !== ""),
       eng: nasheedText.eng.split("\n").filter((line) => line.trim() !== ""),
+      creatorId: user?.id,
+      isPublic: false,
     };
 
-    fetch(`${baseURL}/`, {
-      method: "POST",
-      body: JSON.stringify(formattedData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        errorFound = true;
-        return response.json();
-      })
-      .then((res) => {
-        if (errorFound) {
-          if (res.code === 11000) {
-            setAlert({
-              type: "failure",
-              message: "Nasheed with same name already exists",
-            });
-          } else {
-            setAlert({ type: "failure", message: res.message });
-          }
+    try {
+      const response = await fetch(`${baseURL}/nasheed/create`, {
+        method: "POST",
+        body: JSON.stringify(formattedData),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        if (res.code === 11000) {
+          setAlert({
+            type: "error",
+            message: "Nasheed with same name already exists.",
+          });
         } else {
           setAlert({
-            type: "success",
-            message: "Successfully created nasheed!",
+            type: "error",
+            message: res.message || "Failed to create nasheed.",
           });
         }
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setAlert({
+          type: "success",
+          message: "Successfully created nasheed!",
+        });
+        setNasheedText({
+          arabTitle: "",
+          engTitle: "",
+          arab: "",
+          rom: "",
+          eng: "",
+        });
+      }
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Network error occurred. Please try again.",
       });
+    }
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 3000);
   };
 
   return (
@@ -117,7 +158,7 @@ export const Create = () => {
         type={alert.type}
       />{" "}
       <TextField
-        label="Arabic Title"
+        label="Arabic/Urdu Title"
         name="arabTitle"
         value={nasheedText.arabTitle}
         onChange={handleChange}
@@ -141,7 +182,6 @@ export const Create = () => {
             onChange={handleChange}
             multiline
             minRows={10}
-            fullWidth
             sx={styles.lyrics}
           />
         </Grid>
@@ -153,7 +193,6 @@ export const Create = () => {
             onChange={handleChange}
             multiline
             minRows={10}
-            fullWidth
             sx={styles.lyrics}
           />
         </Grid>
@@ -165,7 +204,6 @@ export const Create = () => {
             onChange={handleChange}
             multiline
             minRows={10}
-            fullWidth
             sx={styles.lyrics}
           />
         </Grid>

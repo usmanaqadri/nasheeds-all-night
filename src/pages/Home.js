@@ -4,8 +4,10 @@ import MyModal from "../components/Modal.js";
 import NasheedBoard from "../components/NasheedBoard.js";
 import Searchbar from "../components/Searchbar.js";
 import { baseURL } from "../utils/constants.js";
+import { useAuth } from "../components/AuthContext.js";
 
 function Home() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [nasheeds, setNasheeds] = useState([]);
   const [filteredNasheeds, setFilteredNasheeds] = useState([]);
@@ -30,14 +32,20 @@ function Home() {
       ? 1
       : -1;
   useEffect(() => {
-    fetch(`${baseURL}/`)
+    fetch(`${baseURL}/nasheed`, {
+      method: "POST",
+      body: JSON.stringify({ id: user?.id }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setNasheeds([...data.nasheeds].sort(compareFunc));
         setFilteredNasheeds([...data.nasheeds].sort(compareFunc));
         setLoading(false);
       });
-  }, []);
+  }, [user]);
 
   const removeDiacritics = (str) => {
     return str
@@ -97,7 +105,7 @@ function Home() {
         <MyModal
           open={isOpen}
           onClose={handleClose}
-          text={filteredNasheeds[nasheedId]}
+          nasheed={filteredNasheeds[nasheedId]}
         />
       )}
     </div>
