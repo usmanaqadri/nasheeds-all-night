@@ -2,7 +2,7 @@ import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import {
   Snackbar,
-  Alert as MuiAlert,
+  Alert,
   Button,
   Menu,
   MenuItem,
@@ -15,6 +15,7 @@ import {
 import { baseURL } from "./constants";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../components/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
@@ -55,11 +56,6 @@ export const handleGoogleLogin = async (code, setLoggedIn, setUser) => {
 };
 
 export const SnackbarAlert = ({ type, message, open, onClose }) => {
-  const severityMap = {
-    success: "success",
-    failure: "error",
-  };
-
   return (
     <Snackbar
       open={open}
@@ -67,20 +63,21 @@ export const SnackbarAlert = ({ type, message, open, onClose }) => {
       onClose={onClose}
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
     >
-      <MuiAlert
+      <Alert
         onClose={onClose}
-        severity={severityMap[type] || "success"}
+        severity={type || "error"}
         variant="filled"
-        sx={{ fontSize: "1.2rem" }}
+        sx={{ fontSize: "1.3rem" }}
       >
         {message}
-      </MuiAlert>
+      </Alert>
     </Snackbar>
   );
 };
 
 export const UserMenu = ({ name, picture, darkMode }) => {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -99,9 +96,33 @@ export const UserMenu = ({ name, picture, darkMode }) => {
 
   return (
     <Box sx={{ marginRight: "10px" }}>
-      <IconButton onClick={handleOpen} size="small">
-        <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
-      </IconButton>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {darkMode && user && (
+          <Button
+            variant="outlined"
+            onClick={() => navigate("/create")}
+            sx={{
+              fontSize: "14px",
+              color: darkMode ? "white" : "#222",
+              borderColor: "#888",
+              backgroundColor: "transparent",
+              borderRadius: "8px",
+              textTransform: "none",
+              transition: "0.3s",
+              marginRight: "10px",
+              "&:hover": {
+                color: "#888",
+                borderColor: "#555",
+              },
+            }}
+          >
+            + Create Nasheed
+          </Button>
+        )}
+        <IconButton onClick={handleOpen} size="small">
+          <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
+        </IconButton>
+      </Box>
 
       <Menu
         anchorEl={anchorEl}

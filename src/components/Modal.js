@@ -25,10 +25,10 @@ export default function MyModal({ open, onClose, nasheed }) {
     color: "white",
     transition: "background-color 0.3s, transform 0.1s",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.2)", // subtle highlight on hover
+      backgroundColor: "rgba(255, 255, 255, 0.2)",
     },
     "&:active": {
-      transform: "scale(0.9)", // slight shrink effect to simulate press
+      transform: "scale(0.9)",
     },
   };
 
@@ -72,7 +72,7 @@ export default function MyModal({ open, onClose, nasheed }) {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
         setIsMobile(true);
-        setMode("scroll"); // 🔥 Automatically switch to scroll
+        setMode("scroll");
       } else {
         setIsMobile(false);
       }
@@ -168,18 +168,21 @@ export default function MyModal({ open, onClose, nasheed }) {
         </div>
         <div className="modal-right-buttons">
           {allowEdit && (
-            <IconButton sx={buttonStyles}>
-              <Link
-                style={{ textDecoration: "none", color: "inherit" }}
-                to={`/${_id}`}
-              >
-                <EditNote fontSize="large" style={{ color: "white" }} />
-              </Link>
+            <IconButton
+              onClick={(e) => e.stopPropagation()}
+              component={Link}
+              to={`/${_id}`}
+              sx={buttonStyles}
+            >
+              <EditNote fontSize="large" style={{ color: "white" }} />
             </IconButton>
           )}
           <IconButton
             sx={{ ...buttonStyles, marginLeft: allowEdit ? "0" : "30px" }}
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
           >
             <Close fontSize="large" style={{ color: "white" }} />
           </IconButton>
