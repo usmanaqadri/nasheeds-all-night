@@ -41,14 +41,14 @@ const styles = {
       fontSize: "1.5rem",
       height: "100%",
       display: "flex",
-      alignItems: "flex-start", // 👈 ensures top alignment
+      alignItems: "flex-start",
     },
     "& .MuiInputBase-input.MuiInputBase-inputMultiline": {
       fontSize: "1.5rem",
       overflow: "auto",
       height: "100%",
       resize: "none",
-      paddingTop: "14px", // 👈 matches MUI's default top padding for multiline
+      paddingTop: "14px",
       boxSizing: "border-box",
     },
     "& .MuiInputLabel-root": {
@@ -103,7 +103,7 @@ export const Create = () => {
     };
 
     try {
-      const response = await fetch(`${baseURL}/nasheed`, {
+      const response = await fetch(`${baseURL}/nasheed/create`, {
         method: "POST",
         body: JSON.stringify(formattedData),
         headers: {
