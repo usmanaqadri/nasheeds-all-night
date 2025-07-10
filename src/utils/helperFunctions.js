@@ -11,11 +11,13 @@ import {
   IconButton,
   Typography,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import { baseURL } from "./constants";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Add } from "@mui/icons-material";
 
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
@@ -96,28 +98,29 @@ export const UserMenu = ({ name, picture, darkMode }) => {
 
   return (
     <Box sx={{ marginRight: "10px" }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
         {darkMode && user && (
-          <Button
-            variant="outlined"
-            onClick={() => navigate("/create")}
-            sx={{
-              fontSize: "14px",
-              color: darkMode ? "white" : "#222",
-              borderColor: "#888",
-              backgroundColor: "transparent",
-              borderRadius: "8px",
-              textTransform: "none",
-              transition: "0.3s",
-              marginRight: "10px",
-              "&:hover": {
-                color: "#888",
-                borderColor: "#555",
+          <Tooltip
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "12px",
+                  padding: "5px 10px",
+                },
               },
             }}
+            title="Create Nasheed"
           >
-            + Create Nasheed
-          </Button>
+            <IconButton onClick={() => navigate("/create")} size="small">
+              <Add sx={{ color: "white" }} />
+            </IconButton>
+          </Tooltip>
         )}
         <IconButton onClick={handleOpen} size="small">
           <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />

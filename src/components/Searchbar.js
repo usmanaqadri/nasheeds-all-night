@@ -8,13 +8,13 @@ function Searchbar({ onSearch }) {
       variant="outlined"
       onChange={(e) => onSearch(e.target.value)}
       sx={{
-        fontSize: "13px",
+        fontSize: "12px",
         backgroundColor: "white",
         borderRadius: 2,
         input: { color: "#333" },
         "& .MuiOutlinedInput-root": {
           borderRadius: 2,
-          fontSize: "13px",
+          fontSize: "12px",
         },
       }}
       InputProps={{
