@@ -2,38 +2,30 @@
 
 Closes #[ISSUE_NUMBER]
 
-> ℹ️ If your branch name starts with the issue number (e.g. `42-add-login-form`), replace `[ISSUE_NUMBER]` with `42`.
+> If your branch name starts with the issue number (e.g. `42-add-login-form`), replace `[ISSUE_NUMBER]` with `42`.
 
 ---
 
 ## ✨ Description
 
-Provide a brief summary of what this PR does and why it's needed.
+> Provide a brief summary of what this PR does and why it's needed.
 
 ---
 
 ## 🔍 Changes Made
 
-- [ ] List
-- [ ] The
-- [ ] Key
-- [ ] Changes
 
 ---
 
 ## 📸 Screenshots / Video (if applicable)
 
-_Add visuals here if the changes affect the UI._
+> _Add visuals here if the changes affect the UI._
 
 ---
 
 ## 🧪 Testing Instructions
 
 > Provide steps to test this feature locally or link to deployment.
-
-1. Run `npm start`
-2. Click on X
-3. Expect Y to happen
 
 ---
 
@@ -51,7 +43,7 @@ _Add visuals here if the changes affect the UI._
 
 ## 🙏 Additional Notes (Optional)
 
-_Add any other relevant information, questions, or blockers._
+> _Add any other relevant information, questions, or blockers._
 
 ---
 
