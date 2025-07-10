@@ -18,6 +18,7 @@ body {
     width: 8.5in;
     max-height: 83vh;
     overflow: auto;
+    overflow-x: hidden;
     padding: 0in 1in;
     box-shadow: 0 0 5px 0 rgba(0,0,0,.5);
     background-color: white;
@@ -43,15 +44,14 @@ body {
     font-family: 'Cormorant', serif !important;
   }
 
-  .container textarea {
+  textarea {
     font-size: 1.5rem;
     font-family: 'Cormorant', serif;
-    margin: 1rem;
     text-align: center;
     border: none;
     padding: 0;
     display: block;
-    min-width: 8.5in;
+    min-width: 7in;
     width: 100%;
     overflow: hidden;
     border: none;
@@ -61,7 +61,27 @@ body {
     -moz-box-shadow: none;
     box-shadow: none;
 
-    resize: none;
+    resize: none !important;
+  }
+
+  .container textarea {
+    font-size: 1.5rem;
+    font-family: 'Cormorant', serif;
+    text-align: center;
+    border: none;
+    padding: 0;
+    display: block;
+    min-width: 7.0in;
+    width: 100%;
+    overflow: hidden;
+    border: none;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none !important;
 
   }
 
@@ -148,7 +168,7 @@ body {
 @media screen and (max-height: 600px) {
     .container textarea {
         font-size: 1.4rem;
-        min-width: 8.5in !important;
+        min-width: 8.0in !important;
         font-family: 'Cormorant', serif !important;
     }
     .container {

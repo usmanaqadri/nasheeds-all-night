@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import "./Edit.css";
 import Loader from "../components/Loader";
 import Button from "@mui/material/Button";
@@ -9,6 +23,14 @@ import Modal from "@mui/material/Modal";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
+import { IconButton, Tooltip } from "@mui/material";
+import {
+  DragIndicator,
+  AddCircleOutline,
+  ContentCopy,
+  DeleteOutline,
+} from "@mui/icons-material";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 const style = {
   position: "absolute",
@@ -22,32 +44,206 @@ const style = {
   p: 4,
 };
 
+function SortableBlock({
+  block,
+  index,
+  handleChange,
+  onAddBelow,
+  onDuplicate,
+  onDelete,
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
+
+  return (
+    <Box
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      sx={{
+        padding: "10px",
+        margin: "10px",
+        border: "2px dashed #ccc",
+        borderRadius: "10px",
+        marginBottom: "24px",
+        backgroundColor: "#fafafa",
+        position: "relative",
+        "&:hover": {
+          boxShadow: "0 0 8px rgba(0,0,0,0.1)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          right: "5%",
+          transform: "translateX(5%)",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Tooltip
+          title="Move verse"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                fontSize: "12px",
+                padding: "5px 10px",
+              },
+            },
+          }}
+        >
+          <IconButton
+            ref={setActivatorNodeRef}
+            {...listeners}
+            {...attributes}
+            sx={{ cursor: "grab" }}
+            size="small"
+          >
+            <DragIndicator />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title="Add verse"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                fontSize: "12px",
+                padding: "5px 10px",
+              },
+            },
+          }}
+        >
+          <IconButton
+            onClick={() => onAddBelow(index)}
+            aria-label="Add block below"
+            size="small"
+          >
+            <AddCircleOutline />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title="Duplicate verse"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                fontSize: "12px",
+                padding: "5px 10px",
+              },
+            },
+          }}
+        >
+          <IconButton
+            onClick={() => onDuplicate(index)}
+            aria-label="Duplicate block"
+            size="small"
+          >
+            <ContentCopy />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title="Delete verse"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                fontSize: "12px",
+                padding: "5px 10px",
+              },
+            },
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={() => onDelete(index)}
+            aria-label="Delete block"
+          >
+            <DeleteOutline />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      <textarea
+        className="arab-text"
+        name={`arab_${index}`}
+        placeholder="Enter Arabic/Urdu line"
+        value={block.arab}
+        onChange={handleChange}
+      />
+      <textarea
+        className="non-arab-text"
+        name={`rom_${index}`}
+        placeholder="Enter transliteration"
+        value={block.rom}
+        onChange={handleChange}
+      />
+      <textarea
+        className="non-arab-text"
+        name={`eng_${index}`}
+        placeholder="Enter translation"
+        value={block.eng}
+        onChange={handleChange}
+      />
+    </Box>
+  );
+}
+
 function Edit() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [nasheed, setNasheed] = useState("");
-  const [nasheedCopy, setNasheedCopy] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
+  const [nasheed, setNasheed] = useState(null);
+  const [editedNasheed, setEditedNasheed] = useState(null);
   const [alert, setAlert] = useState({ message: "", type: "" });
+  const [showAlert, setShowAlert] = useState(false);
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
   const { id } = useParams();
   const token = localStorage.getItem("token");
+  const sensors = useSensors(useSensor(PointerSensor));
 
-  const allowEdit = user?.admin || nasheed.creatorId === user?.id;
+  const allowEdit = user?.admin || nasheed?.creatorId === user?.id;
   useEffect(() => {
     fetch(`${baseURL}/nasheed/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setNasheed(data.foundNasheed);
-        setNasheedCopy(data.foundNasheed);
+        setEditedNasheed({
+          arabTitle: data.foundNasheed.arabTitle,
+          engTitle: data.foundNasheed.engTitle,
+          blocks: data.foundNasheed.arab.map((_, i) => ({
+            id: i.toString(),
+            arab: data.foundNasheed.arab[i],
+            rom: data.foundNasheed.rom[i],
+            eng: data.foundNasheed.eng[i],
+          })),
+        });
         setIsLoading(false);
       });
   }, [id]);
 
-  const nasheedText = nasheed.arab?.map((arab, index) => {
+  const handleChange = (e) => {
+    const [field, index] = e.target.name.split("_");
+    setEditedNasheed((prev) => {
+      const copy = { ...prev };
+      copy.blocks[+index][field] = e.target.value;
+      return copy;
+    });
+  };
+
+  const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
     return (
       <div key={index}>
         <p>{arab}</p>
@@ -59,66 +255,35 @@ function Edit() {
     );
   });
 
-  const nasheedCopyText = nasheedCopy.arab?.map((arab, index) => {
-    return (
-      <div key={index}>
-        <textarea
-          className="arab-text"
-          name={`arab_${index}`}
-          value={arab}
-          onChange={handleChange}
-        />
-        <textarea
-          className="non-arab-text"
-          name={`rom_${index}`}
-          value={nasheedCopy.rom[index]}
-          onChange={handleChange}
-        />
-        <textarea
-          className="non-arab-text"
-          name={`eng_${index}`}
-          value={nasheedCopy.eng[index]}
-          onChange={handleChange}
-        />
-      </div>
-    );
-  });
-
-  function handleChange(e) {
-    let { name, value } = e.target;
-    let index;
-    let tempValue;
-    if (name !== "arabTitle" && name !== "engTitle") {
-      [name, index] = name.split("_");
-      const copyValue = value;
-      tempValue = [...nasheedCopy[name]];
-      tempValue[index] = copyValue;
-      value = tempValue;
-    }
-    setNasheedCopy((prevState) => ({ ...prevState, [name]: value }));
-  }
-
   const toggleEdit = () => {
     setEditing((prevState) => !prevState);
   };
 
   const updateNasheed = async () => {
-    handleClose();
+    setOpen(false);
 
     if (!token) {
       setAlert({
         type: "error",
-        message: "You must be logged in to create a nasheed.",
+        message: "You must be logged in.",
       });
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
       return;
     }
 
+    const formattedData = {
+      arab: editedNasheed.blocks.map((b) => b.arab),
+      rom: editedNasheed.blocks.map((b) => b.rom),
+      eng: editedNasheed.blocks.map((b) => b.eng),
+      arabTitle: editedNasheed.arabTitle,
+      engTitle: editedNasheed.engTitle,
+    };
+
     try {
       const response = await fetch(`${baseURL}/nasheed/${id}`, {
         method: "PUT",
-        body: JSON.stringify(nasheedCopy),
+        body: JSON.stringify(formattedData),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -145,7 +310,16 @@ function Edit() {
           message: "Successfully updated nasheed!",
         });
         setNasheed({ ...res });
-        setNasheedCopy({ ...res });
+        setEditedNasheed({
+          arabTitle: res.arabTitle,
+          engTitle: res.engTitle,
+          blocks: res.arab.map((_, i) => ({
+            id: i.toString(),
+            arab: res.arab[i],
+            rom: res.rom[i],
+            eng: res.eng[i],
+          })),
+        });
         toggleEdit();
         setAlert({ message: "Successfully Updated Nasheed", type: "success" });
       }
@@ -159,13 +333,42 @@ function Edit() {
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 3000);
   };
-  return isLoading ? (
-    <Loader />
-  ) : editing ? (
+
+  const handleAddBelow = (index) => {
+    const newBlock = {
+      arab: "",
+      rom: "",
+      eng: "",
+    };
+    const updatedBlocks = [...editedNasheed.blocks];
+    updatedBlocks.splice(index + 1, 0, newBlock);
+    setEditedNasheed({ ...editedNasheed, blocks: updatedBlocks });
+  };
+
+  const handleDuplicate = (index) => {
+    const blockToCopy = editedNasheed.blocks[index];
+    const newBlock = {
+      arab: blockToCopy.arab,
+      rom: blockToCopy.rom,
+      eng: blockToCopy.eng,
+    };
+    const updatedBlocks = [...editedNasheed.blocks];
+    updatedBlocks.splice(index + 1, 0, newBlock);
+    setEditedNasheed({ ...editedNasheed, blocks: updatedBlocks });
+  };
+
+  const handleDeleteBlock = (index) => {
+    const updatedBlocks = [...editedNasheed.blocks];
+    updatedBlocks.splice(index, 1);
+    setEditedNasheed({ ...editedNasheed, blocks: updatedBlocks });
+  };
+
+  if (isLoading) return <Loader />;
+  return editing ? (
     <>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={() => setOpen(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -176,9 +379,15 @@ function Edit() {
             variant="h4"
             component="h2"
           >
-            Are you sure you want to make these edits?
+            Are you sure you want to update?
           </Typography>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "20px",
+            }}
+          >
             <Button
               style={{
                 backgroundColor: "#A42A04",
@@ -186,9 +395,9 @@ function Edit() {
               }}
               className="mui-button"
               variant="contained"
-              onClick={handleClose}
+              onClick={() => setOpen(false)}
             >
-              No
+              Cancel
             </Button>
             <Button
               style={{
@@ -215,17 +424,67 @@ function Edit() {
           <div className="edit-title">
             <textarea
               name="arabTitle"
-              value={nasheedCopy.arabTitle}
-              onChange={handleChange}
+              placeholder="Enter Arabic/Urdu title"
+              value={editedNasheed.arabTitle}
+              onChange={(e) =>
+                setEditedNasheed({
+                  ...editedNasheed,
+                  arabTitle: e.target.value,
+                })
+              }
             />
             <textarea
               name="engTitle"
-              value={nasheedCopy.engTitle}
-              onChange={handleChange}
+              placeholder="Enter English title"
+              value={editedNasheed.engTitle}
+              onChange={(e) =>
+                setEditedNasheed({
+                  ...editedNasheed,
+                  engTitle: e.target.value,
+                })
+              }
             />
           </div>
           <div style={{ marginTop: "-20px" }} className="body">
-            {nasheedCopyText}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={({ active, over }) => {
+                if (!over || active.id === over.id) return;
+
+                const oldIdx = editedNasheed.blocks.findIndex(
+                  (b) => b.id === active.id
+                );
+                const newIdx = editedNasheed.blocks.findIndex(
+                  (b) => b.id === over.id
+                );
+
+                if (oldIdx !== -1 && newIdx !== -1) {
+                  setEditedNasheed((prev) => ({
+                    ...prev,
+                    blocks: arrayMove(prev.blocks, oldIdx, newIdx),
+                  }));
+                }
+              }}
+            >
+              <SortableContext
+                items={editedNasheed.blocks.map((b) => b.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {editedNasheed.blocks.map((block, index) => (
+                  <SortableBlock
+                    key={block.id}
+                    block={block}
+                    index={index}
+                    handleChange={handleChange}
+                    onAddBelow={handleAddBelow}
+                    onDuplicate={handleDuplicate}
+                    onDelete={handleDeleteBlock}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
         </div>
         <div className="edit-buttons">
@@ -244,7 +503,7 @@ function Edit() {
             style={{ backgroundColor: "#2f7c31" }}
             className="mui-button"
             variant="contained"
-            onClick={handleOpen}
+            onClick={() => setOpen(true)}
           >
             Save
           </Button>
@@ -265,7 +524,7 @@ function Edit() {
           <p>{nasheed.arabTitle}</p>
           <p>{nasheed.engTitle}</p>
         </div>
-        <div className="body">{nasheedText}</div>
+        <div className="body">{nasheedLyrics}</div>
       </div>
       <div className="edit-buttons">
         {
