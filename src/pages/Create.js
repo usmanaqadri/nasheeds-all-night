@@ -3,6 +3,7 @@ import { Box, TextField, Button, Grid } from "@mui/material";
 import { baseURL } from "../utils/constants";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "../components/AuthContext";
+import SeoHelmet from "../components/SeoHelmet";
 
 const styles = {
   formContainer: {
@@ -150,67 +151,75 @@ export const Create = () => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
-      <SnackbarAlert
-        open={showAlert}
-        onClose={() => setShowAlert(false)}
-        message={alert.message}
-        type={alert.type}
-      />{" "}
-      <TextField
-        label="Arabic/Urdu Title"
-        name="arabTitle"
-        value={nasheedText.arabTitle}
-        onChange={handleChange}
-        required
-        sx={styles.title}
+    <>
+      <SeoHelmet
+        title={"Add your own favorite nasheed to our collection."}
+        description={`Add your own nasheed with Arabic, transliteration, and English translation.`}
+        url={`https://dhikrpedia.com/create`}
+        type="website"
       />
-      <TextField
-        label="English Title"
-        name="engTitle"
-        value={nasheedText.engTitle}
-        onChange={handleChange}
-        required
-        sx={styles.title}
-      />
-      <Grid container spacing={2} sx={styles.gridContainer}>
-        <Grid item xs={12} md={4} sx={styles.gridItem}>
-          <TextField
-            label="Arabic/Urdu verses (one per line)"
-            name="arab"
-            value={nasheedText.arab}
-            onChange={handleChange}
-            multiline
-            minRows={10}
-            sx={styles.lyrics}
-          />
+      <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
+        <SnackbarAlert
+          open={showAlert}
+          onClose={() => setShowAlert(false)}
+          message={alert.message}
+          type={alert.type}
+        />{" "}
+        <TextField
+          label="Arabic/Urdu Title"
+          name="arabTitle"
+          value={nasheedText.arabTitle}
+          onChange={handleChange}
+          required
+          sx={styles.title}
+        />
+        <TextField
+          label="English Title"
+          name="engTitle"
+          value={nasheedText.engTitle}
+          onChange={handleChange}
+          required
+          sx={styles.title}
+        />
+        <Grid container spacing={2} sx={styles.gridContainer}>
+          <Grid item xs={12} md={4} sx={styles.gridItem}>
+            <TextField
+              label="Arabic/Urdu verses (one per line)"
+              name="arab"
+              value={nasheedText.arab}
+              onChange={handleChange}
+              multiline
+              minRows={10}
+              sx={styles.lyrics}
+            />
+          </Grid>
+          <Grid item xs={12} md={4} sx={styles.gridItem}>
+            <TextField
+              label="Transliteration verses (one per line)"
+              name="rom"
+              value={nasheedText.rom}
+              onChange={handleChange}
+              multiline
+              minRows={10}
+              sx={styles.lyrics}
+            />
+          </Grid>
+          <Grid item xs={12} md={4} sx={styles.gridItem}>
+            <TextField
+              label="English verses (one per line)"
+              name="eng"
+              value={nasheedText.eng}
+              onChange={handleChange}
+              multiline
+              minRows={10}
+              sx={styles.lyrics}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={4} sx={styles.gridItem}>
-          <TextField
-            label="Transliteration verses (one per line)"
-            name="rom"
-            value={nasheedText.rom}
-            onChange={handleChange}
-            multiline
-            minRows={10}
-            sx={styles.lyrics}
-          />
-        </Grid>
-        <Grid item xs={12} md={4} sx={styles.gridItem}>
-          <TextField
-            label="English verses (one per line)"
-            name="eng"
-            value={nasheedText.eng}
-            onChange={handleChange}
-            multiline
-            minRows={10}
-            sx={styles.lyrics}
-          />
-        </Grid>
-      </Grid>
-      <Button variant="contained" type="submit" sx={styles.submitButton}>
-        Submit
-      </Button>
-    </Box>
+        <Button variant="contained" type="submit" sx={styles.submitButton}>
+          Submit
+        </Button>
+      </Box>
+    </>
   );
 };
