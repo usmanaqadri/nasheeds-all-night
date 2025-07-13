@@ -4,10 +4,12 @@ import SearchIcon from "@mui/icons-material/Search";
 function Searchbar({ onSearch }) {
   return (
     <TextField
-      placeholder="Search a nasheed"
+      fullWidth
+      placeholder="Search for a nasheed"
       variant="outlined"
       onChange={(e) => onSearch(e.target.value)}
       sx={{
+        maxWidth: "220px",
         fontSize: "12px",
         backgroundColor: "white",
         borderRadius: 2,
