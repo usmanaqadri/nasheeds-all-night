@@ -31,6 +31,7 @@ import {
   DeleteOutline,
 } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import SeoHelmet from "../components/SeoHelmet";
 
 const style = {
   position: "absolute",
@@ -367,6 +368,11 @@ function Edit() {
   if (isLoading) return <Loader />;
   return editing ? (
     <>
+      <SeoHelmet
+        title={nasheed.engTitle}
+        description={`Edit nasheed titles "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
+        url={`https://dhikrpedia.com/${id}`}
+      />
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -512,34 +518,41 @@ function Edit() {
       </div>
     </>
   ) : (
-    <div className="wrapper">
-      <div style={{ flex: 1 }} />
-      <div className="container">
-        <SnackbarAlert
-          open={showAlert}
-          onClose={() => setShowAlert(false)}
-          message={alert.message}
-          type={alert.type}
-        />{" "}
-        <div className="edit-title">
-          <p>{nasheed.arabTitle}</p>
-          <p>{nasheed.engTitle}</p>
+    <>
+      <SeoHelmet
+        title={nasheed.engTitle}
+        description={`Edit nasheed titled "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
+        url={`https://dhikrpedia.com/${id}`}
+      />
+      <div className="wrapper">
+        <div style={{ flex: 1 }} />
+        <div className="container">
+          <SnackbarAlert
+            open={showAlert}
+            onClose={() => setShowAlert(false)}
+            message={alert.message}
+            type={alert.type}
+          />{" "}
+          <div className="edit-title">
+            <p>{nasheed.arabTitle}</p>
+            <p>{nasheed.engTitle}</p>
+          </div>
+          <div className="body">{nasheedLyrics}</div>
         </div>
-        <div className="body">{nasheedLyrics}</div>
+        <div className="edit-buttons">
+          {
+            <Button
+              className="mui-button"
+              variant="contained"
+              onClick={toggleEdit}
+              style={{ visibility: allowEdit ? "visible" : "hidden" }}
+            >
+              Edit
+            </Button>
+          }
+        </div>
       </div>
-      <div className="edit-buttons">
-        {
-          <Button
-            className="mui-button"
-            variant="contained"
-            onClick={toggleEdit}
-            style={{ visibility: allowEdit ? "visible" : "hidden" }}
-          >
-            Edit
-          </Button>
-        }
-      </div>
-    </div>
+    </>
   );
 }
 

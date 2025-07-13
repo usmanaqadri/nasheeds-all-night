@@ -5,6 +5,7 @@ import NasheedBoard from "../components/NasheedBoard.js";
 import Searchbar from "../components/Searchbar.js";
 import { baseURL } from "../utils/constants.js";
 import { useAuth } from "../components/AuthContext.js";
+import SeoHelmet from "../components/SeoHelmet.js";
 
 function Home() {
   const { user } = useAuth();
@@ -93,6 +94,12 @@ function Home() {
   };
   return (
     <div>
+      <SeoHelmet
+        title={"Discover, Read, and Add Beautiful Nasheeds"}
+        description={`Explore spiritually enriching nasheeds across languages. View, edit, and contribute`}
+        url={`https://dhikrpedia.com`}
+        type="website"
+      />
       {loading ? (
         <Loader />
       ) : (
