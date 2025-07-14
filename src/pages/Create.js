@@ -60,7 +60,13 @@ const styles = {
     },
   },
 
-  submitButton: { width: "20%", mx: "auto", padding: 1, fontSize: "1.5rem" },
+  submitButton: {
+    width: "40%",
+    maxWidth: "200px",
+    mx: "auto",
+    padding: 1,
+    fontSize: "1.5rem",
+  },
 };
 
 export const Create = () => {
