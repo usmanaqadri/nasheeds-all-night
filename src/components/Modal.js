@@ -8,6 +8,7 @@ import {
   ArticleOutlined,
   EditNote,
   CheckCircle,
+  ErrorOutline,
 } from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
@@ -20,6 +21,7 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [counter, setCounter] = useState(0);
   const [loadingPDF, setLoadingPDF] = useState(false);
   const [pdfGenerated, setPdfGenerated] = useState(false);
+  const [pdfFailed, setPdfFailed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
@@ -142,19 +144,19 @@ export default function MyModal({ open, onClose, nasheed }) {
             onClick={async (e) => {
               e.stopPropagation();
               setLoadingPDF(true);
+              setPdfGenerated(false);
+              setPdfFailed(false);
 
               try {
                 await generatePDF(arabTitle, engTitle, arab, eng, rom);
                 setLoadingPDF(false);
                 setPdfGenerated(true);
-
-                // Show checkmark for 1.5 seconds
-                setTimeout(() => {
-                  setPdfGenerated(false);
-                }, 1500);
+                setTimeout(() => setPdfGenerated(false), 1500);
               } catch (err) {
                 console.error("PDF generation failed", err);
                 setLoadingPDF(false);
+                setPdfFailed(true);
+                setTimeout(() => setPdfFailed(false), 1500);
               }
             }}
           >
@@ -162,6 +164,8 @@ export default function MyModal({ open, onClose, nasheed }) {
               <CircularProgress size={24} style={{ color: "white" }} />
             ) : pdfGenerated ? (
               <CheckCircle fontSize="large" style={{ color: "lightgreen" }} />
+            ) : pdfFailed ? (
+              <ErrorOutline fontSize="large" style={{ color: "#f44336" }} />
             ) : (
               <PictureAsPdf fontSize="large" style={{ color: "white" }} />
             )}
