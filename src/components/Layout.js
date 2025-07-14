@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Header from "./Header";
 import { useLocation } from "react-router-dom";
 import backgroundImage from "../assets/imgs/background.jpg";
@@ -7,9 +8,26 @@ import { useAuth } from "./AuthContext";
 
 export default function Layout({ children }) {
   const location = useLocation();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { user, loggedIn } = useAuth();
 
   const isHome = location.pathname === "/";
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsMobile(true);
+      } else {
+        setIsMobile(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div
@@ -23,7 +41,7 @@ export default function Layout({ children }) {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: isMobile ? "baseline" : "center",
         }}
       >
         <div style={{ flex: 1 }} />
@@ -35,6 +53,7 @@ export default function Layout({ children }) {
               picture={user?.picture}
               email={user?.email}
               darkMode={isHome}
+              isMobile={isMobile}
             />
           ) : (
             <GoogleOAuthProvider
