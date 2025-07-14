@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Modal, IconButton } from "@mui/material";
+import { Box, Modal, IconButton, CircularProgress } from "@mui/material";
 import { Link } from "react-router-dom";
 import {
   Close,
@@ -7,6 +7,8 @@ import {
   Tv,
   ArticleOutlined,
   EditNote,
+  CheckCircle,
+  ErrorOutline,
 } from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
@@ -17,6 +19,9 @@ export default function MyModal({ open, onClose, nasheed }) {
   const { user } = useAuth();
   let { arab, arabTitle, engTitle, eng, rom, _id } = nasheed;
   const [counter, setCounter] = useState(0);
+  const [loadingPDF, setLoadingPDF] = useState(false);
+  const [pdfGenerated, setPdfGenerated] = useState(false);
+  const [pdfFailed, setPdfFailed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
@@ -136,12 +141,34 @@ export default function MyModal({ open, onClose, nasheed }) {
         <div className="modal-left-buttons">
           <IconButton
             sx={buttonStyles}
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              generatePDF(arabTitle, engTitle, arab, eng, rom);
+              setLoadingPDF(true);
+              setPdfGenerated(false);
+              setPdfFailed(false);
+
+              try {
+                await generatePDF(arabTitle, engTitle, arab, eng, rom);
+                setLoadingPDF(false);
+                setPdfGenerated(true);
+                setTimeout(() => setPdfGenerated(false), 1500);
+              } catch (err) {
+                console.error("PDF generation failed", err);
+                setLoadingPDF(false);
+                setPdfFailed(true);
+                setTimeout(() => setPdfFailed(false), 1500);
+              }
             }}
           >
-            <PictureAsPdf fontSize="large" style={{ color: "white" }} />
+            {loadingPDF ? (
+              <CircularProgress size={24} style={{ color: "white" }} />
+            ) : pdfGenerated ? (
+              <CheckCircle fontSize="large" style={{ color: "lightgreen" }} />
+            ) : pdfFailed ? (
+              <ErrorOutline fontSize="large" style={{ color: "#f44336" }} />
+            ) : (
+              <PictureAsPdf fontSize="large" style={{ color: "white" }} />
+            )}
           </IconButton>
           {!isMobile && (
             <>
