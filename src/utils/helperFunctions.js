@@ -77,7 +77,7 @@ export const SnackbarAlert = ({ type, message, open, onClose }) => {
   );
 };
 
-export const UserMenu = ({ name, picture, darkMode }) => {
+export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -101,7 +101,8 @@ export const UserMenu = ({ name, picture, darkMode }) => {
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          alignItems: isMobile ? "flex-end" : "center",
+          flexDirection: isMobile ? "column-reverse" : "row",
           gap: 1,
         }}
       >

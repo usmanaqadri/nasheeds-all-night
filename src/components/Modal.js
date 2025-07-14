@@ -7,12 +7,12 @@ import {
   Tv,
   ArticleOutlined,
   EditNote,
-  CheckCircle,
+  CheckCircleOutline,
   ErrorOutline,
 } from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
-import { nasheedText } from "../utils/helperFunctions";
+import { nasheedText, SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "./AuthContext";
 
 export default function MyModal({ open, onClose, nasheed }) {
@@ -22,6 +22,8 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [loadingPDF, setLoadingPDF] = useState(false);
   const [pdfGenerated, setPdfGenerated] = useState(false);
   const [pdfFailed, setPdfFailed] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
@@ -142,6 +144,7 @@ export default function MyModal({ open, onClose, nasheed }) {
           <IconButton
             sx={buttonStyles}
             onClick={async (e) => {
+              if (loadingPDF || pdfFailed) return;
               e.stopPropagation();
               setLoadingPDF(true);
               setPdfGenerated(false);
@@ -154,22 +157,40 @@ export default function MyModal({ open, onClose, nasheed }) {
                 setTimeout(() => setPdfGenerated(false), 1500);
               } catch (err) {
                 console.error("PDF generation failed", err);
+                setAlertMessage(err.message);
+                setShowAlert(true);
                 setLoadingPDF(false);
                 setPdfFailed(true);
-                setTimeout(() => setPdfFailed(false), 1500);
+                setTimeout(
+                  () => {
+                    setPdfFailed(false);
+                    setShowAlert(false);
+                  },
+
+                  3000
+                );
               }
             }}
           >
             {loadingPDF ? (
               <CircularProgress size={24} style={{ color: "white" }} />
             ) : pdfGenerated ? (
-              <CheckCircle fontSize="large" style={{ color: "lightgreen" }} />
+              <CheckCircleOutline
+                fontSize="large"
+                style={{ color: "#4caf50" }}
+              />
             ) : pdfFailed ? (
               <ErrorOutline fontSize="large" style={{ color: "#f44336" }} />
             ) : (
               <PictureAsPdf fontSize="large" style={{ color: "white" }} />
             )}
           </IconButton>
+          <SnackbarAlert
+            open={showAlert}
+            onClose={() => setShowAlert(false)}
+            message={alertMessage}
+            type={"error"}
+          />
           {!isMobile && (
             <>
               <IconButton
