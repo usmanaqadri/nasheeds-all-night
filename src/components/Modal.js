@@ -151,24 +151,25 @@ export default function MyModal({ open, onClose, nasheed }) {
               setPdfFailed(false);
 
               try {
+                // 1. Trigger PDF generation
                 await generatePDF(arabTitle, engTitle, arab, eng, rom);
+
+                // 2. Mark generation complete
                 setLoadingPDF(false);
                 setPdfGenerated(true);
-                setTimeout(() => setPdfGenerated(false), 1500);
+
+                // 3. Wait 1s for user to see ✅, then reset
+                setTimeout(() => setPdfGenerated(false), 1000);
               } catch (err) {
                 console.error("PDF generation failed", err);
                 setAlertMessage(err.message);
                 setShowAlert(true);
                 setLoadingPDF(false);
                 setPdfFailed(true);
-                setTimeout(
-                  () => {
-                    setPdfFailed(false);
-                    setShowAlert(false);
-                  },
-
-                  3000
-                );
+                setTimeout(() => {
+                  setPdfFailed(false);
+                  setShowAlert(false);
+                }, 3000);
               }
             }}
           >
@@ -185,6 +186,7 @@ export default function MyModal({ open, onClose, nasheed }) {
               <PictureAsPdf fontSize="large" style={{ color: "white" }} />
             )}
           </IconButton>
+
           <SnackbarAlert
             open={showAlert}
             onClose={() => setShowAlert(false)}
