@@ -32,7 +32,8 @@ export const generatePDF = async (
   });
 
   if (!response.ok) {
-    throw new Error("Failed to generate PDF");
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Unknown PDF generation error");
   }
 
   const blob = await response.blob();
@@ -40,6 +41,8 @@ export const generatePDF = async (
   const link = document.createElement("a");
   link.href = url;
   link.download = `${cleanedEnglishTitle}.pdf`;
+  document.body.appendChild(link);
   link.click();
-  window.URL.revokeObjectURL(url); // cleanup
+  link.remove();
+  window.URL.revokeObjectURL(url);
 };
