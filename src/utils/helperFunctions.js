@@ -101,7 +101,7 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
       <Box
         sx={{
           display: "flex",
-          alignItems: isMobile ? "flex-end" : "center",
+          alignItems: "center",
           flexDirection: isMobile ? "column-reverse" : "row",
           gap: 1,
         }}
