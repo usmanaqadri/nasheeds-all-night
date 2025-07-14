@@ -31,18 +31,29 @@ export const generatePDF = async (
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Unknown PDF generation error");
-  }
-
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${cleanedEnglishTitle}.pdf`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.URL.revokeObjectURL(url);
+
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    // Open in a new tab for Safari
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.location.href = url;
+    } else {
+      alert("Please allow popups to view the PDF");
+    }
+  } else {
+    // Trigger direct download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${cleanedEnglishTitle}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  window.URL.revokeObjectURL(url); // Clean up
 };
