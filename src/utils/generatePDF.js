@@ -19,7 +19,7 @@ export const generatePDF = async (
     str.replace(/\r/g, "").trim()
   );
 
-  const response = await fetch(`${baseURL}/generate-pdf`, {
+  const response = await fetch(`${baseURL}/nasheed/generate-pdf`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -31,10 +31,15 @@ export const generatePDF = async (
     }),
   });
 
+  if (!response.ok) {
+    throw new Error("Failed to generate PDF");
+  }
+
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
   link.download = `${cleanedEnglishTitle}.pdf`;
   link.click();
+  window.URL.revokeObjectURL(url); // cleanup
 };
