@@ -6,6 +6,11 @@ import Searchbar from "../components/Searchbar.js";
 import { baseURL } from "../utils/constants.js";
 import { useAuth } from "../components/AuthContext.js";
 import SeoHelmet from "../components/SeoHelmet.js";
+import {
+  alphabetize,
+  removeDiacritics,
+  SnackbarAlert,
+} from "../utils/helperFunctions.js";
 
 function Home() {
   const { user } = useAuth();
@@ -14,66 +19,37 @@ function Home() {
   const [filteredNasheeds, setFilteredNasheeds] = useState([]);
   const [nasheedId, setNasheedId] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
 
-  const compareFunc = (a, b) =>
-    a.engTitle
-      .replace(/Ṣ/g, "S")
-      .replace(/Ṭ/g, "T")
-      .replace(/ʿ/g, "")
-      .replace(/Ā/g, "A")
-      .replace(/Ḥ/g, "H")
-      .replace(/Ī/g, "I") >
-    b.engTitle
-      .replace(/Ṣ/g, "S")
-      .replace(/Ṭ/g, "T")
-      .replace(/ʿ/g, "")
-      .replace(/Ā/g, "A")
-      .replace(/Ḥ/g, "H")
-      .replace(/Ī/g, "I")
-      ? 1
-      : -1;
   useEffect(() => {
-    fetch(`${baseURL}/nasheed`, {
-      method: "POST",
-      body: JSON.stringify({ id: user?.id }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setNasheeds([...data.nasheeds].sort(compareFunc));
-        setFilteredNasheeds([...data.nasheeds].sort(compareFunc));
-        setLoading(false);
-      });
-  }, [user]);
+    let queryParam = "";
+    if (user?.id) {
+      queryParam = `?userId=${user?.id}`;
+    }
 
-  const removeDiacritics = (str) => {
-    return str
-      .replace(/[Ā]/g, "A")
-      .replace(/[ā]/g, "a")
-      .replace(/[Ḍ]/g, "D")
-      .replace(/[ḍ]/g, "d")
-      .replace(/[Ē]/g, "E")
-      .replace(/[ē]/g, "e")
-      .replace(/[Ḥ]/g, "H")
-      .replace(/[ḥ]/g, "h")
-      .replace(/[Ī]/g, "I")
-      .replace(/[ī]/g, "i")
-      .replace(/[Ṅ]/g, "N")
-      .replace(/[ṅ]/g, "n")
-      .replace(/[Ō]/g, "O")
-      .replace(/[ō]/g, "o")
-      .replace(/[Ṛ]/g, "R")
-      .replace(/[ṛ]/g, "r")
-      .replace(/[Ṣ]/g, "S")
-      .replace(/[ṣ]/g, "s")
-      .replace(/[Ṭ]/g, "T")
-      .replace(/[ṭ]/g, "t")
-      .replace(/[Ū]/g, "U")
-      .replace(/[ū]/g, "u")
-      .replace(/[ʾʿ]/g, "'");
-  };
+    const fetchNasheeds = async () => {
+      try {
+        const response = await fetch(`${baseURL}/nasheed${queryParam}`);
+        const { nasheeds } = await response.json();
+
+        const sorted = [...nasheeds].sort(alphabetize);
+
+        setNasheeds(sorted);
+        setFilteredNasheeds(sorted);
+      } catch (error) {
+        console.error("Failed to fetch nasheeds:", error);
+        setAlertMessage(error.message || "Failed to fetch nasheeds");
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+      }
+      setLoading(false);
+    };
+
+    fetchNasheeds();
+  }, [user?.id]);
 
   const handleSearch = (search) => {
     let filteredList;
@@ -104,6 +80,12 @@ function Home() {
         <Loader />
       ) : (
         <>
+          <SnackbarAlert
+            open={showAlert}
+            onClose={() => setShowAlert(false)}
+            type={"error"}
+            message={alertMessage}
+          />
           <Searchbar onSearch={handleSearch} />
           <NasheedBoard nasheeds={filteredNasheeds} onClick={handleClick} />
         </>
