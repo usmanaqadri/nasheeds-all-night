@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Modal, IconButton, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Modal,
+  IconButton,
+  CircularProgress,
+  Tooltip,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import {
   Close,
@@ -183,7 +189,20 @@ export default function MyModal({ open, onClose, nasheed }) {
             ) : pdfFailed ? (
               <ErrorOutline fontSize="large" style={{ color: "#f44336" }} />
             ) : (
-              <PictureAsPdf fontSize="large" style={{ color: "white" }} />
+              <Tooltip
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
+                }}
+                title="Export as PDF"
+              >
+                <PictureAsPdf fontSize="large" style={{ color: "white" }} />
+              </Tooltip>
             )}
           </IconButton>
 
@@ -195,47 +214,102 @@ export default function MyModal({ open, onClose, nasheed }) {
           />
           {!isMobile && (
             <>
-              <IconButton
-                sx={buttonStyles}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setMode("presentation");
+              <Tooltip
+                placement="top"
+                title="Presentation Mode"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
                 }}
               >
-                <Tv fontSize="large" style={{ color: "white" }} />
-              </IconButton>
-              <IconButton
-                sx={buttonStyles}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setMode("scroll");
+                <IconButton
+                  sx={buttonStyles}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMode("presentation");
+                  }}
+                >
+                  <Tv fontSize="large" style={{ color: "white" }} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip
+                placement="top"
+                title="Reading Mode"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
                 }}
               >
-                <ArticleOutlined fontSize="large" style={{ color: "white" }} />
-              </IconButton>
+                <IconButton
+                  sx={buttonStyles}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMode("scroll");
+                  }}
+                >
+                  <ArticleOutlined
+                    fontSize="large"
+                    style={{ color: "white" }}
+                  />
+                </IconButton>
+              </Tooltip>
             </>
           )}
         </div>
         <div className="modal-right-buttons">
           {allowEdit && (
-            <IconButton
-              onClick={(e) => e.stopPropagation()}
-              component={Link}
-              to={`/${_id}`}
-              sx={buttonStyles}
+            <Tooltip
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+              title="Edit Nasheed"
             >
-              <EditNote fontSize="large" style={{ color: "white" }} />
-            </IconButton>
+              <IconButton
+                onClick={(e) => e.stopPropagation()}
+                component={Link}
+                to={`/${_id}`}
+                sx={buttonStyles}
+              >
+                <EditNote fontSize="large" style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
           )}
-          <IconButton
-            sx={{ ...buttonStyles, marginLeft: allowEdit ? "0" : "30px" }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
+          <Tooltip
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "12px",
+                  padding: "5px 10px",
+                },
+              },
             }}
+            title="Close"
           >
-            <Close fontSize="large" style={{ color: "white" }} />
-          </IconButton>
+            <IconButton
+              sx={{ ...buttonStyles, marginLeft: allowEdit ? "0" : "30px" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+            >
+              <Close fontSize="large" style={{ color: "white" }} />
+            </IconButton>
+          </Tooltip>
         </div>
         <div className="title">
           <h1 className="arabText">

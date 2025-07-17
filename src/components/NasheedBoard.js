@@ -21,7 +21,7 @@ function NasheedBoard({ nasheeds, onClick }) {
         justifyContent: "space-between",
 
         "&:hover": {
-          backgroundColor: "#FAD6A5",
+          backgroundColor: "#bacaf5",
           boxShadow: "0 6px 24px rgba(0, 0, 0, 0.2)",
           transform: "scale(1.02)",
         },

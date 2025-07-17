@@ -34,8 +34,14 @@ function Header({ isHome }) {
       <div style={{ flex: 1 }} />
       <div style={{ flex: 1 }}>
         <h1 className="title">
-          <Link style={{ textDecoration: "none", color: "inherit" }} to={`/`}>
-            Dhikrpedia
+          <Link
+            style={{
+              textDecoration: "none",
+              color: isHome ? "white" : "inherit",
+            }}
+            to={`/`}
+          >
+            dhikrpedia
           </Link>
         </h1>
       </div>
