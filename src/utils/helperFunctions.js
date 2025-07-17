@@ -19,6 +19,51 @@ import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
+export const alphabetize = (a, b) =>
+  a.engTitle
+    .replace(/Ṣ/g, "S")
+    .replace(/Ṭ/g, "T")
+    .replace(/ʿ/g, "")
+    .replace(/Ā/g, "A")
+    .replace(/Ḥ/g, "H")
+    .replace(/Ī/g, "I") >
+  b.engTitle
+    .replace(/Ṣ/g, "S")
+    .replace(/Ṭ/g, "T")
+    .replace(/ʿ/g, "")
+    .replace(/Ā/g, "A")
+    .replace(/Ḥ/g, "H")
+    .replace(/Ī/g, "I")
+    ? 1
+    : -1;
+
+export const removeDiacritics = (str) => {
+  return str
+    .replace(/[Ā]/g, "A")
+    .replace(/[ā]/g, "a")
+    .replace(/[Ḍ]/g, "D")
+    .replace(/[ḍ]/g, "d")
+    .replace(/[Ē]/g, "E")
+    .replace(/[ē]/g, "e")
+    .replace(/[Ḥ]/g, "H")
+    .replace(/[ḥ]/g, "h")
+    .replace(/[Ī]/g, "I")
+    .replace(/[ī]/g, "i")
+    .replace(/[Ṅ]/g, "N")
+    .replace(/[ṅ]/g, "n")
+    .replace(/[Ō]/g, "O")
+    .replace(/[ō]/g, "o")
+    .replace(/[Ṛ]/g, "R")
+    .replace(/[ṛ]/g, "r")
+    .replace(/[Ṣ]/g, "S")
+    .replace(/[ṣ]/g, "s")
+    .replace(/[Ṭ]/g, "T")
+    .replace(/[ṭ]/g, "t")
+    .replace(/[Ū]/g, "U")
+    .replace(/[ū]/g, "u")
+    .replace(/[ʾʿ]/g, "'");
+};
+
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
     return (
@@ -108,6 +153,7 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
       >
         {darkMode && user && (
           <Tooltip
+            placement="top"
             componentsProps={{
               tooltip: {
                 sx: {
