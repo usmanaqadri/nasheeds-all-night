@@ -153,6 +153,7 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
       >
         {darkMode && user && (
           <Tooltip
+            placement="top"
             componentsProps={{
               tooltip: {
                 sx: {

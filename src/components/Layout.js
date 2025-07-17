@@ -1,6 +1,6 @@
 import Header from "./Header";
 import { useLocation } from "react-router-dom";
-import backgroundImage from "../assets/imgs/background.jpg";
+import minaret from "../assets/imgs/minaret.jpg";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -12,7 +12,7 @@ export default function Layout({ children }) {
       key={isHome ? "home" : "other"}
       className="App"
       style={{
-        backgroundImage: isHome ? backgroundImage : "none",
+        backgroundImage: isHome ? minaret : "none",
       }}
     >
       <Header isHome={isHome} />

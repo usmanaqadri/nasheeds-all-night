@@ -13,10 +13,9 @@
   margin: 0;
   width: 100%;
   text-align: center;
-  background: url(./assets/imgs/background.jpg);
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background: url(./assets/imgs/water.jpg);
+  background-position: center 10%;
+  background-size: contain;
   background-attachment: scroll;
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
