@@ -97,6 +97,7 @@ function SortableBlock({
       >
         <Tooltip
           title="Move verse"
+          placement="top"
           componentsProps={{
             tooltip: {
               sx: {
@@ -119,6 +120,7 @@ function SortableBlock({
 
         <Tooltip
           title="Add verse"
+          placement="top"
           componentsProps={{
             tooltip: {
               sx: {
@@ -139,6 +141,7 @@ function SortableBlock({
 
         <Tooltip
           title="Duplicate verse"
+          placement="top"
           componentsProps={{
             tooltip: {
               sx: {
@@ -159,6 +162,7 @@ function SortableBlock({
 
         <Tooltip
           title="Delete verse"
+          placement="top"
           componentsProps={{
             tooltip: {
               sx: {
