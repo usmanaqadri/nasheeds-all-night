@@ -1,9 +1,29 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Grid } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Grid,
+  Typography,
+  InputAdornment,
+  IconButton,
+  Tooltip,
+  keyframes,
+  CircularProgress,
+} from "@mui/material";
 import { baseURL } from "../utils/constants";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "../components/AuthContext";
 import SeoHelmet from "../components/SeoHelmet";
+import { AutoAwesome } from "@mui/icons-material";
+
+const colorFlash = keyframes`
+  0% { color: #ff4081; }
+  25% { color: #7c4dff; }
+  50% { color: #40c4ff; }
+  75% { color: #69f0ae; }
+  100% { color: #ff4081; }
+`;
 
 const styles = {
   formContainer: {
@@ -70,6 +90,8 @@ const styles = {
 };
 
 export const Create = () => {
+  const [loadingTranslation, setLoadingTranslation] = useState(false);
+  const [loadingTransliteration, setLoadingTransliteration] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alert, setAlert] = useState({ message: "", type: "" });
   const [nasheedText, setNasheedText] = useState({
@@ -93,7 +115,7 @@ export const Create = () => {
     if (!token) {
       setAlert({
         type: "error",
-        message: "You must be logged in to create a nasheed.",
+        message: "You must be logged in to add your own nasheed.",
       });
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
@@ -130,13 +152,13 @@ export const Create = () => {
         } else {
           setAlert({
             type: "error",
-            message: res.message || "Failed to create nasheed.",
+            message: res.message || "Failed to add nasheed.",
           });
         }
       } else {
         setAlert({
           type: "success",
-          message: "Successfully created nasheed!",
+          message: "Successfully added nasheed!",
         });
         setNasheedText({
           arabTitle: "",
@@ -156,6 +178,71 @@ export const Create = () => {
     setTimeout(() => setShowAlert(false), 3000);
   };
 
+  const getTransliteration = async (e) => {
+    e.preventDefault();
+    setLoadingTransliteration(true);
+
+    const arabicArr = nasheedText.arab
+      .split("\n")
+      .filter((line) => line.trim() !== "");
+
+    try {
+      const response = await fetch(
+        `${baseURL}/nasheed/generate-transliteration`,
+        {
+          method: "POST",
+          body: JSON.stringify({ arabicArr }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const res = await response.json();
+
+      setNasheedText((prev) => ({ ...prev, rom: res.transliteration }));
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Network error occurred. Please try again.",
+      });
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+    setLoadingTransliteration(false);
+  };
+
+  const getTranslation = async (e) => {
+    e.preventDefault();
+    setLoadingTranslation(true);
+
+    const arabicArr = nasheedText.arab
+      .split("\n")
+      .filter((line) => line.trim() !== "");
+
+    try {
+      const response = await fetch(`${baseURL}/nasheed/generate-translation`, {
+        method: "POST",
+        body: JSON.stringify({ arabicArr }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const res = await response.json();
+
+      setNasheedText((prev) => ({ ...prev, eng: res.translation }));
+    } catch (error) {
+      setAlert({
+        type: "error",
+        message: "Network error occurred. Please try again.",
+      });
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+    setLoadingTranslation(false);
+  };
+
   return (
     <>
       <SeoHelmet
@@ -165,6 +252,19 @@ export const Create = () => {
         type="website"
       />
       <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
+        <Typography textAlign={"left"} variant="h4" component="h1" gutterBottom>
+          Add Your Favorite Nasheed
+        </Typography>
+        <Typography
+          fontSize={"1.5rem"}
+          textAlign="left"
+          variant="body1"
+          sx={{ mb: 3 }}
+        >
+          Add a nasheed you love to your private collection. It'll only be
+          visible to you for now. Later, you'll have the option to make it
+          public through a review process to ensure quality.
+        </Typography>
         <SnackbarAlert
           open={showAlert}
           onClose={() => setShowAlert(false)}
@@ -200,26 +300,141 @@ export const Create = () => {
             />
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
-            <TextField
-              label="Transliteration verses (one per line)"
-              name="rom"
-              value={nasheedText.rom}
-              onChange={handleChange}
-              multiline
-              minRows={10}
-              sx={styles.lyrics}
-            />
+            <Box sx={{ position: "relative" }}>
+              <TextField
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              fontSize: "12px",
+                              padding: "5px 10px",
+                            },
+                          },
+                        }}
+                        placement="top"
+                        title="Use AI to generate"
+                      >
+                        <span>
+                          {" "}
+                          <IconButton
+                            edge="end"
+                            onClick={getTransliteration}
+                            disabled={loadingTransliteration}
+                          >
+                            <AutoAwesome
+                              fontSize="large"
+                              sx={
+                                loadingTransliteration
+                                  ? {
+                                      animation: `${colorFlash} 2s infinite`,
+                                    }
+                                  : {}
+                              }
+                            />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
+                label="Transliteration verses (one per line)"
+                name="rom"
+                value={nasheedText.rom}
+                onChange={handleChange}
+                multiline
+                minRows={10}
+                sx={{
+                  opacity: loadingTransliteration ? 0.6 : 1,
+                  ...styles.lyrics,
+                }}
+                disabled={loadingTransliteration}
+              />
+              {loadingTransliteration && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    zIndex: 1,
+                  }}
+                >
+                  <CircularProgress size={32} />
+                </Box>
+              )}
+            </Box>
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
-            <TextField
-              label="English verses (one per line)"
-              name="eng"
-              value={nasheedText.eng}
-              onChange={handleChange}
-              multiline
-              minRows={10}
-              sx={styles.lyrics}
-            />
+            <Box sx={{ position: "relative" }}>
+              <TextField
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              fontSize: "12px",
+                              padding: "5px 10px",
+                            },
+                          },
+                        }}
+                        placement="top"
+                        title="Use AI to generate"
+                      >
+                        <span>
+                          {" "}
+                          {/* for disabled IconButton workaround */}
+                          <IconButton
+                            edge="end"
+                            onClick={getTranslation}
+                            disabled={loadingTranslation}
+                          >
+                            <AutoAwesome
+                              fontSize="large"
+                              sx={
+                                loadingTranslation
+                                  ? {
+                                      animation: `${colorFlash} 2s infinite`,
+                                    }
+                                  : {}
+                              }
+                            />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                }}
+                label="English verses (one per line)"
+                name="eng"
+                value={nasheedText.eng}
+                onChange={handleChange}
+                multiline
+                minRows={10}
+                sx={{
+                  opacity: loadingTranslation ? 0.6 : 1,
+                  ...styles.lyrics,
+                }}
+                disabled={loadingTranslation}
+              />
+              {loadingTranslation && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    zIndex: 1,
+                  }}
+                >
+                  <CircularProgress size={32} />
+                </Box>
+              )}
+            </Box>
           </Grid>
         </Grid>
         <Button variant="contained" type="submit" sx={styles.submitButton}>

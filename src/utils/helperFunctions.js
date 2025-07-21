@@ -162,7 +162,7 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
                 },
               },
             }}
-            title="Create Nasheed"
+            title="Add Nasheed"
           >
             <IconButton onClick={() => navigate("/create")}>
               <AddCircleOutlineOutlined
@@ -171,9 +171,22 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
             </IconButton>
           </Tooltip>
         )}
-        <IconButton onClick={handleOpen} size="small">
-          <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
-        </IconButton>
+        <Tooltip
+          placement="top"
+          componentsProps={{
+            tooltip: {
+              sx: {
+                fontSize: "12px",
+                padding: "5px 10px",
+              },
+            },
+          }}
+          title="Profile"
+        >
+          <IconButton onClick={handleOpen} size="small">
+            <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <Menu
