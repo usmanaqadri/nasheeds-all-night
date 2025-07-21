@@ -44,7 +44,7 @@ body {
     font-family: 'Cormorant', serif !important;
   }
 
-  textarea {
+  .container textarea {
     font-size: 1.5rem;
     font-family: 'Cormorant', serif;
     text-align: center;
@@ -201,19 +201,19 @@ body {
 
     .container {
         padding: 0;
-        width: 80vw !important;
+        width: 70vw !important;
     }
 
     .modal-confirm {
         width: 50vw !important;
     }
     .modal-confirm-text {
-        font-size: 5rem !important;
+        font-size: 3rem !important;
         margin-bottom: 50px !important;
     }
 
     .mui-button {
-        font-size: 18px !important;
+        font-size: 14px !important;
         min-width: 80px !important;
         padding: 10px 30px !important;
     }
