@@ -23,7 +23,8 @@ import { useAuth } from "./AuthContext";
 
 export default function MyModal({ open, onClose, nasheed }) {
   const { user } = useAuth();
-  let { arab, arabTitle, engTitle, eng, rom, _id } = nasheed;
+  let { arab, arabTitle, engTitle, eng, rom, _id, footnotes } = nasheed;
+  const engWFootnote = [...eng];
   const [counter, setCounter] = useState(0);
   const [loadingPDF, setLoadingPDF] = useState(false);
   const [pdfGenerated, setPdfGenerated] = useState(false);
@@ -33,6 +34,39 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
+  footnotes.forEach((note, i) => {
+    if (note.verseIndex === counter || note.verseIndex === counter + 1) {
+      const original = engWFootnote[note.verseIndex] || "";
+      const [_start, end] = note.range;
+      engWFootnote[note.verseIndex] =
+        original.slice(0, end) + `<sup>${i + 1}</sup>` + original.slice(end);
+    }
+  });
+
+  const Footer = () => {
+    const footnoteIdxs = footnotes.map((note) => note.verseIndex);
+    const footnoteDivs = [];
+
+    if (
+      !(footnoteIdxs.includes(counter) || footnoteIdxs.includes(counter + 1))
+    ) {
+      return;
+    }
+
+    for (let i = 0; i < footnotes.length; i++) {
+      if (footnotes[i].verseIndex < counter) continue;
+      else if (footnotes[i].verseIndex > counter + 1) break;
+      else {
+        footnoteDivs.push(
+          <div>
+            <sup>{i + 1}</sup> {footnotes[i].content}
+          </div>
+        );
+      }
+    }
+
+    return <div style={{ fontSize: "medium" }}>{footnoteDivs}</div>;
+  };
 
   const buttonStyles = {
     color: "white",
@@ -323,19 +357,27 @@ export default function MyModal({ open, onClose, nasheed }) {
             <div className="body">
               <div className="paragraph">
                 <p className="arabText">{arab[counter]}</p>
-                <p className="engText">
-                  <em dangerouslySetInnerHTML={{ __html: rom[counter] }} />
-                </p>
-                <p className="engText">{eng[counter]}</p>
+                <p
+                  className="engText"
+                  dangerouslySetInnerHTML={{
+                    __html: engWFootnote[counter],
+                  }}
+                />
               </div>
               <div className="paragraph">
                 <p className="arabText">{arab[counter + 1]}</p>
                 <p className="engText">
                   <em dangerouslySetInnerHTML={{ __html: rom[counter + 1] }} />
                 </p>
-                <p className="engText">{eng[counter + 1]}</p>
+                <p
+                  className="engText"
+                  dangerouslySetInnerHTML={{
+                    __html: engWFootnote[counter + 1],
+                  }}
+                />
               </div>
             </div>
+            <Footer />
             <div className="slide-number">
               {slideNumber(currentScreen, totalScreens)}
             </div>
@@ -348,6 +390,7 @@ export default function MyModal({ open, onClose, nasheed }) {
             <div style={{ border: "1px dotted white" }} className="body">
               {nasheedText(nasheed)}
             </div>
+            <div>This is the footer</div>
           </div>
         )}
       </Box>
