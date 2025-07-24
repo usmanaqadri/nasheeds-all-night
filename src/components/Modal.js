@@ -218,7 +218,14 @@ export default function MyModal({ open, onClose, nasheed }) {
 
               try {
                 // 1. Trigger PDF generation
-                await generatePDF(arabTitle, engTitle, arab, eng, rom);
+                await generatePDF(
+                  arabTitle,
+                  engTitle,
+                  arab,
+                  eng,
+                  rom,
+                  footnotes
+                );
 
                 // 2. Mark generation complete
                 setLoadingPDF(false);

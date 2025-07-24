@@ -5,7 +5,8 @@ export const generatePDF = async (
   engTitle,
   arabicArray,
   englishArray,
-  transliterationArray
+  transliterationArray,
+  footnotes
 ) => {
   const cleanedArabicTitle = arabTitle.replace(/\r/g, "").trim();
   const cleanedEnglishTitle = engTitle.replace(/\r/g, "").trim();
@@ -28,6 +29,7 @@ export const generatePDF = async (
       arabicArray: cleanedArabicArray,
       englishArray: cleanedEnglishArray,
       transliterationArray: cleanedTransliterationArray,
+      footnotes,
     }),
   });
 
