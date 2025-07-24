@@ -67,12 +67,16 @@ export const removeDiacritics = (str) => {
 export const nasheedText = (nasheed) =>
   nasheed.arab?.map((arab, index) => {
     return (
-      <div key={index}>
+      <div key={index} className="translation-container">
         <p>{arab}</p>
         <p>
           <em dangerouslySetInnerHTML={{ __html: nasheed.rom[index] }} />
         </p>
-        <p>{nasheed.eng[index]}</p>
+        <p
+          dangerouslySetInnerHTML={{
+            __html: nasheed.eng[index],
+          }}
+        />
       </div>
     );
   });
