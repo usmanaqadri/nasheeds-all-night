@@ -39,7 +39,7 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	background: linear-gradient(rgb(2, 16, 28), rgb(2, 16, 25));
+	background: linear-gradient(#021d37, #021019);
 	background-size: cover;
 	padding: 50px;
 	z-index: 1000;
@@ -58,6 +58,19 @@
 	font-family: 'Cormorant', sans-serif;
 	user-select:none;
 	-webkit-user-select:none;
+}
+
+.text-container {
+    min-width: 8.5in;
+    max-height: 83vh;
+    overflow: auto;
+    overflow-x: hidden;
+    padding: 0in 1in;
+    background-color: white;
+}
+
+.translation-container {
+	padding: 0 0.5in;
 }
 
 .modal .title{

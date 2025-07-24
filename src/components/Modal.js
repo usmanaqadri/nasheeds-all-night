@@ -5,6 +5,9 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
+  Typography,
+  Popper,
+  Paper,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import {
@@ -34,13 +37,21 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mode, setMode] = useState(isMobile ? "scroll" : "presentation");
   const [flashSide, setFlashSide] = useState(null);
+  const [openFootnote, setOpenFootnote] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   footnotes.forEach((note, i) => {
-    if (note.verseIndex === counter || note.verseIndex === counter + 1) {
-      const original = engWFootnote[note.verseIndex] || "";
-      const [_start, end] = note.range;
-      engWFootnote[note.verseIndex] =
-        original.slice(0, end) + `<sup>${i + 1}</sup>` + original.slice(end);
-    }
+    const original = engWFootnote[note.verseIndex] || "";
+    const [_start, end] = note.range;
+
+    const supTag =
+      mode === "scroll"
+        ? `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+            i + 1
+          }</sup>`
+        : `<sup>${i + 1}</sup>`;
+
+    engWFootnote[note.verseIndex] =
+      original.slice(0, end) + supTag + original.slice(end);
   });
 
   const Footer = () => {
@@ -58,7 +69,7 @@ export default function MyModal({ open, onClose, nasheed }) {
       else if (footnotes[i].verseIndex > counter + 1) break;
       else {
         footnoteDivs.push(
-          <div>
+          <div key={footnotes[i].content}>
             <sup>{i + 1}</sup> {footnotes[i].content}
           </div>
         );
@@ -114,6 +125,21 @@ export default function MyModal({ open, onClose, nasheed }) {
       };
     }
   }, [mode, handleUserKeyPress]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      const target = e.target;
+      if (target.tagName === "SUP" && target.dataset.idx) {
+        setOpenFootnote(parseInt(target.dataset.idx));
+        setAnchorEl(target);
+      }
+    };
+
+    const container = document.querySelector(".text-container");
+    container?.addEventListener("click", handler);
+
+    return () => container?.removeEventListener("click", handler);
+  }, [counter, mode]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -192,7 +218,14 @@ export default function MyModal({ open, onClose, nasheed }) {
 
               try {
                 // 1. Trigger PDF generation
-                await generatePDF(arabTitle, engTitle, arab, eng, rom);
+                await generatePDF(
+                  arabTitle,
+                  engTitle,
+                  arab,
+                  eng,
+                  rom,
+                  footnotes
+                );
 
                 // 2. Mark generation complete
                 setLoadingPDF(false);
@@ -383,15 +416,47 @@ export default function MyModal({ open, onClose, nasheed }) {
             </div>
           </>
         ) : (
-          <div
-            style={{ backgroundColor: "inherit", margin: "0 auto" }}
-            className="container"
-          >
-            <div style={{ border: "1px dotted white" }} className="body">
-              {nasheedText(nasheed)}
+          <>
+            <Popper
+              open={openFootnote !== null}
+              anchorEl={anchorEl}
+              placement="top-start"
+              style={{ zIndex: 1300 }}
+            >
+              <Paper sx={{ maxWidth: 300, position: "relative" }}>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setOpenFootnote(null);
+                    setAnchorEl(null);
+                  }}
+                  sx={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    zIndex: 1,
+                  }}
+                >
+                  <Close fontSize="small" />
+                </IconButton>
+
+                <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
+                  {openFootnote !== null
+                    ? footnotes[openFootnote]?.content
+                    : ""}
+                </Typography>
+              </Paper>
+            </Popper>
+
+            <div
+              style={{ backgroundColor: "inherit", margin: "0 auto" }}
+              className="text-container"
+            >
+              <div style={{ border: "1px dotted white" }} className="body">
+                {nasheedText({ arab, eng: engWFootnote, rom })}
+              </div>
             </div>
-            <div>This is the footer</div>
-          </div>
+          </>
         )}
       </Box>
     </Modal>
