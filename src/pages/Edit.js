@@ -16,19 +16,29 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import "./Edit.css";
 import Loader from "../components/Loader";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Box,
+  Typography,
+  Modal,
+  IconButton,
+  Tooltip,
+  Popover,
+} from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
-import { IconButton, Tooltip } from "@mui/material";
 import {
   DragIndicator,
   AddCircleOutline,
   ContentCopy,
   DeleteOutline,
+  Close,
 } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SeoHelmet from "../components/SeoHelmet";
@@ -52,6 +62,7 @@ function SortableBlock({
   onAddBelow,
   onDuplicate,
   onDelete,
+  onMouseUp,
 }) {
   const {
     attributes,
@@ -196,12 +207,19 @@ function SortableBlock({
         value={block.rom}
         onChange={handleChange}
       />
-      <textarea
+      <div
         className="non-arab-text"
         name={`eng_${index}`}
+        contentEditable
+        suppressContentEditableWarning
         placeholder="Enter translation"
-        value={block.eng}
-        onChange={handleChange}
+        data-index={index}
+        onInput={() => {}}
+        onBlur={handleChange}
+        onMouseUp={(e) => {
+          onMouseUp(e, index);
+        }}
+        dangerouslySetInnerHTML={{ __html: block.eng || "" }}
       />
     </Box>
   );
@@ -216,11 +234,59 @@ function Edit() {
   const [alert, setAlert] = useState({ message: "", type: "" });
   const [showAlert, setShowAlert] = useState(false);
   const [open, setOpen] = useState(false);
+  const [popoverCoords, setPopoverCoords] = useState({ top: 0, left: 0 });
+  const [selectedText, setSelectedText] = useState("");
+  const [selectedRange, setSelectedRange] = useState(null);
+  const [showPopover, setShowPopover] = useState(false);
+  const [showFootnoteModal, setShowFootnoteModal] = useState(false);
+  const [footnoteContent, setFootnoteContent] = useState("");
+  const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
+
   const { id } = useParams();
   const token = localStorage.getItem("token");
   const sensors = useSensors(useSensor(PointerSensor));
 
   const allowEdit = user?.admin || nasheed?.creatorId === user?.id;
+
+  const handleMouseUp = (e, blockIdx) => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+
+      const selected = selection.toString();
+      const start = range.startOffset;
+      const end = range.endOffset;
+
+      setSelectedText(selected);
+      setSelectedRange([start, end]);
+      setSelectedBlockIndex(blockIdx);
+      setPopoverCoords({
+        top: rect.top - 40 + window.scrollY,
+        left: rect.left,
+      });
+      setShowPopover(true);
+    }
+  };
+
+  const handleSaveFootnote = () => {
+    if (selectedRange) {
+      const newFootnote = {
+        range: selectedRange,
+        content: footnoteContent,
+        verseIndex: selectedBlockIndex,
+      };
+
+      setEditedNasheed((prev) => {
+        prev.footnotes.push(newFootnote);
+        return prev;
+      });
+      setShowFootnoteModal(false);
+      setShowPopover(false);
+      setFootnoteContent("");
+    }
+  };
+
   useEffect(() => {
     fetch(`${baseURL}/nasheed/${id}`)
       .then((res) => res.json())
@@ -229,6 +295,7 @@ function Edit() {
         setEditedNasheed({
           arabTitle: data.foundNasheed.arabTitle,
           engTitle: data.foundNasheed.engTitle,
+          footnotes: data.foundNasheed.footnotes,
           blocks: data.foundNasheed.arab.map((_, i) => ({
             id: i.toString(),
             arab: data.foundNasheed.arab[i],
@@ -241,10 +308,18 @@ function Edit() {
   }, [id]);
 
   const handleChange = (e) => {
-    const [field, index] = e.target.name.split("_");
+    const target = e.currentTarget;
+    const name = target.getAttribute("name") || "";
+    const [field, index] = name.split("_");
+
+    const value =
+      target.tagName === "DIV" && target.isContentEditable
+        ? target.innerText
+        : target.value;
+
     setEditedNasheed((prev) => {
       const copy = { ...prev };
-      copy.blocks[+index][field] = e.target.value;
+      copy.blocks[+index][field] = value;
       return copy;
     });
   };
@@ -284,6 +359,12 @@ function Edit() {
       eng: editedNasheed.blocks.map((b) => b.eng),
       arabTitle: editedNasheed.arabTitle,
       engTitle: editedNasheed.engTitle,
+      footnotes: editedNasheed.footnotes.sort((a, b) => {
+        if (a.verseIndex !== b.verseIndex) {
+          return a.verseIndex - b.verseIndex;
+        }
+        return a.range[0] - b.range[0];
+      }),
     };
 
     try {
@@ -429,6 +510,78 @@ function Edit() {
         message={alert.message}
         type={alert.type}
       />
+      <Popover
+        open={showPopover}
+        anchorReference="anchorPosition"
+        anchorPosition={{ top: popoverCoords.top, left: popoverCoords.left }}
+        onClose={() => setShowPopover(false)}
+      >
+        <Button onClick={() => setShowFootnoteModal(true)}>Add Footnote</Button>
+      </Popover>
+
+      <Dialog
+        open={showFootnoteModal}
+        onClose={() => setShowFootnoteModal(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{ "& .MuiDialog-paper": { fontSize: "1.5rem" } }}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "1.5rem",
+          }}
+        >
+          Add Footnote
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowFootnoteModal(false)}
+            sx={{ color: (theme) => theme.palette.grey[500] }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent>
+          <p>
+            <strong>Selected:</strong> "{selectedText}"
+          </p>
+          <TextField
+            multiline
+            fullWidth
+            label="Footnote content"
+            value={footnoteContent}
+            onChange={(e) => setFootnoteContent(e.target.value)}
+            sx={{
+              fontSize: "1.2rem",
+              "& .MuiOutlinedInput-root": { fontSize: "1.2rem" },
+              "& .MuiInputBase-input": { fontSize: "1.2rem" },
+              "& .MuiInputLabel-root": { fontSize: "1.2rem" },
+              "& .MuiFormLabel-root": { fontSize: "1.2rem" },
+              "& .MuiInputBase-root": { fontSize: "1.2rem" },
+            }}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            sx={{ fontSize: "1.1rem" }}
+            onClick={() => setShowFootnoteModal(false)}
+            color="secondary"
+          >
+            Cancel
+          </Button>
+          <Button
+            sx={{ fontSize: "1.1rem" }}
+            onClick={handleSaveFootnote}
+            variant="contained"
+          >
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
       <div className="wrapper">
         <div style={{ flex: 1 }} />
         <div className="container">
@@ -492,6 +645,7 @@ function Edit() {
                     onAddBelow={handleAddBelow}
                     onDuplicate={handleDuplicate}
                     onDelete={handleDeleteBlock}
+                    onMouseUp={handleMouseUp}
                   />
                 ))}
               </SortableContext>

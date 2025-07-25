@@ -86,12 +86,16 @@ body {
   }
 
   .arab-text {
-    margin: 13px 0;
+    padding: 13px 0 !important;
   }
 
   .non-arab-text {
-    margin: 0px auto;
-  }
+    background: white;
+    padding: 0.5rem;
+    min-height: 4rem;
+    white-space: pre-wrap;
+    overflow-y: auto;
+}
 
   .edit-title textarea {
     font-size: 3rem;
@@ -195,6 +199,11 @@ body {
     }
     
     .container .body div textarea {
+        font-size: 2.3rem;
+        font-family: 'Cormorant', serif !important;
+    }
+    
+    .container .body div div {
         font-size: 2.3rem;
         font-family: 'Cormorant', serif !important;
     }
