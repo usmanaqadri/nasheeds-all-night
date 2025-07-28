@@ -47,6 +47,7 @@ import {
 } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SeoHelmet from "../components/SeoHelmet";
+import FootnoteDialog from "../components/FootnoteDialog";
 
 const style = {
   position: "absolute",
@@ -70,6 +71,7 @@ function SortableBlock({
   onMouseUp,
   footnotes,
   setEditedNasheed,
+  setShowPopover,
 }) {
   const {
     attributes,
@@ -81,7 +83,7 @@ function SortableBlock({
     isDragging,
   } = useSortable({ id: block.id });
 
-  let engCopy = block.eng;
+  let engCopy = block.eng.slice(0);
   footnotes.forEach((note, i) => {
     if (note.verseIndex !== index) {
       return;
@@ -97,7 +99,6 @@ function SortableBlock({
 
   return (
     <Box
-      className={"nasheed-lyrics"}
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
@@ -230,6 +231,7 @@ function SortableBlock({
         onChange={handleChange}
       />
       <div
+        key={engCopy}
         className="non-arab-text"
         name={`eng_${index}`}
         contentEditable
@@ -237,7 +239,7 @@ function SortableBlock({
         spellCheck="false"
         placeholder="Enter translation"
         data-index={index}
-        onInput={() => {}}
+        onInput={() => setShowPopover(false)}
         onBlur={(e) => {
           const newText = e.currentTarget.innerHTML.replace(
             /<sup[^>]*>.*?<\/sup>/g,
@@ -297,7 +299,7 @@ function Edit() {
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editingFootnote, setEditingFootnote] = useState(false);
-  const [editedFootnote, setEditedFootnote] = useState("");
+  const [editedFootnote, setEditedFootnote] = useState(null);
 
   const { id } = useParams();
   const token = localStorage.getItem("token");
@@ -305,26 +307,19 @@ function Edit() {
 
   const allowEdit = user?.admin || nasheed?.creatorId === user?.id;
 
-  const engCopy = nasheed?.eng ? [...nasheed.eng] : null;
-
-  nasheed?.footnotes?.forEach((note, i) => {
-    const original = engCopy[note.verseIndex] || "";
-    const [_start, end] = note.range;
-
-    const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
-      i + 1
-    }</sup>`;
-
-    engCopy[note.verseIndex] =
-      original.slice(0, end) + supTag + original.slice(end);
-  });
-
   useEffect(() => {
     const handler = (e) => {
       const target = e.target;
       if (target.tagName === "SUP" && target.dataset.idx) {
         setOpenFootnote(parseInt(target.dataset.idx));
-        if (!editing) setAnchorEl(target);
+        if (editing) {
+          setEditedFootnote(
+            editedNasheed?.footnotes[parseInt(target.dataset.idx)]
+          );
+        } else {
+          setFootnoteContent(nasheed.footnotes[parseInt(target.dataset.idx)]);
+          setAnchorEl(target);
+        }
       }
     };
 
@@ -332,11 +327,7 @@ function Edit() {
     container?.addEventListener("click", handler);
 
     return () => container?.removeEventListener("click", handler);
-  }, [editing, nasheed]);
-
-  const handleClose = () => {
-    setOpenFootnote(null);
-  };
+  }, [editing, nasheed, editedNasheed]);
 
   const handleMouseUp = (e, blockIdx) => {
     const selection = window.getSelection();
@@ -423,13 +414,26 @@ function Edit() {
   };
 
   const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
+    let engCopy = nasheed?.eng?.[index];
+    nasheed?.footnotes?.forEach((note, i) => {
+      if (note.verseIndex !== index) {
+        return;
+      }
+      const [_start, end] = note.range;
+
+      const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+        i + 1
+      }</sup>`;
+
+      engCopy = engCopy.slice(0, end) + supTag + engCopy.slice(end);
+    });
     return (
-      <div key={index} className="nasheed-lyrics">
+      <div key={index}>
         <p>{arab}</p>
         <p>
           <em dangerouslySetInnerHTML={{ __html: nasheed.rom[index] }} />
         </p>
-        <p dangerouslySetInnerHTML={{ __html: engCopy[index] }} />
+        <p dangerouslySetInnerHTML={{ __html: engCopy }} />
       </div>
     );
   });
@@ -454,7 +458,9 @@ function Edit() {
     const formattedData = {
       arab: editedNasheed.blocks.map((b) => b.arab),
       rom: editedNasheed.blocks.map((b) => b.rom),
-      eng: editedNasheed.blocks.map((b) => b.eng),
+      eng: editedNasheed.blocks.map((b) =>
+        b.eng.replace(/<sup[^>]*>.*?<\/sup>/g, "")
+      ),
       arabTitle: editedNasheed.arabTitle,
       engTitle: editedNasheed.engTitle,
       footnotes: editedNasheed.footnotes,
@@ -551,14 +557,17 @@ function Edit() {
   const handleSave = () => {
     setEditedNasheed((prev) => {
       const updatedFootnotes = prev.footnotes;
-      updatedFootnotes[openFootnote].content = editedFootnote;
+      updatedFootnotes[openFootnote] = editedFootnote;
       return { ...prev, updatedFootnotes };
     });
     setEditingFootnote(false);
   };
 
   const handleCancel = () => {
-    setEditedFootnote(editedNasheed.footnotes[openFootnote]?.content);
+    setEditedFootnote((prev) => ({
+      ...prev,
+      content: nasheed.footnotes[openFootnote]?.content,
+    }));
     setEditingFootnote(false);
   };
 
@@ -571,10 +580,6 @@ function Edit() {
     setOpenFootnote(null);
   };
 
-  useEffect(() => {
-    setEditedFootnote(editedNasheed?.footnotes[openFootnote]?.content);
-  }, [openFootnote, editedNasheed?.footnotes]);
-
   if (isLoading) return <Loader />;
   return editing ? (
     <>
@@ -584,223 +589,62 @@ function Edit() {
         url={`https://dhikrpedia.com/${id}`}
       />
 
-      <Dialog
+      <FootnoteDialog
         open={openFootnote !== null}
         onClose={() => setOpenFootnote(null)}
-        fullWidth
-        maxWidth="sm"
-        sx={{ "& .MuiDialogContent-root": { fontSize: "1.5rem" } }}
-      >
-        <DialogTitle sx={{ m: 0, p: 2, fontSize: "1.7rem" }}>
-          {editedNasheed.blocks[
-            editedNasheed.footnotes[openFootnote]?.verseIndex
-          ]?.eng?.slice(
-            editedNasheed.footnotes[openFootnote]?.range?.[0],
-            editedNasheed.footnotes[openFootnote]?.range?.[1]
-          )}
-          <sup>{openFootnote + 1}</sup>
-          <Tooltip
-            placement="top"
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  fontSize: "12px",
-                  padding: "5px 10px",
-                },
-              },
-            }}
-            title="Close"
-          >
-            <IconButton
-              aria-label="close"
-              onClick={() => setOpenFootnote(null)}
-              sx={{
-                position: "absolute",
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <Close fontSize="large" />
-            </IconButton>
-          </Tooltip>
-        </DialogTitle>
-
-        <DialogContent dividers>
-          {editingFootnote ? (
-            <TextField
-              fullWidth
-              multiline
-              value={editedFootnote}
-              onChange={(e) => setEditedFootnote(e.target.value)}
-              minRows={3}
-              sx={{
-                "& .MuiInputBase-input": {
-                  fontSize: "1.3rem",
-                },
-                "& .MuiInputLabel-root": {
-                  fontSize: "1.3rem",
-                },
-              }}
-            />
-          ) : (
-            <div>{editedNasheed.footnotes[openFootnote]?.content}</div>
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          {editingFootnote ? (
-            <>
-              <Tooltip
-                placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
-                    },
-                  },
-                }}
-                title="Cancel Edit"
-              >
-                <IconButton aria-label="revert footnote" onClick={handleCancel}>
-                  <Cancel fontSize="large" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip
-                placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
-                    },
-                  },
-                }}
-                title="Update Footnote"
-              >
-                <IconButton
-                  sx={{ ml: "0 !important" }}
-                  aria-label="save footnote"
-                  onClick={handleSave}
-                >
-                  <CheckCircle fontSize="large" />
-                </IconButton>
-              </Tooltip>
-            </>
-          ) : (
-            <>
-              <Tooltip
-                placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
-                    },
-                  },
-                }}
-                title="Edit"
-              >
-                <IconButton aria-label="edit" onClick={handleEditClick}>
-                  <EditIcon fontSize="large" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip
-                placement="top"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
-                    },
-                  },
-                }}
-                title="Delete"
-              >
-                <IconButton aria-label="edit" onClick={handleDeleteFootnote}>
-                  <DeleteOutline fontSize="large" />
-                </IconButton>
-              </Tooltip>
-            </>
-          )}
-        </DialogActions>
-      </Dialog>
+        title={
+          <span>
+            {editedNasheed.blocks[editedFootnote?.verseIndex]?.eng?.slice(
+              editedFootnote?.range?.[0],
+              editedFootnote?.range?.[1]
+            )}
+            <sup>{openFootnote + 1}</sup>
+          </span>
+        }
+        content={editedFootnote?.content}
+        isEditing={editingFootnote}
+        onChange={(val) =>
+          setEditedFootnote((prev) => ({ ...prev, content: val }))
+        }
+        onCancelEdit={handleCancel}
+        onSave={handleSave}
+        onEditClick={handleEditClick}
+        onDelete={handleDeleteFootnote}
+      />
 
       <Popover
         open={showPopover}
         anchorReference="anchorPosition"
+        disableEnforceFocus
+        disableAutoFocus
         anchorPosition={{ top: popoverCoords.top, left: popoverCoords.left }}
         onClose={() => setShowPopover(false)}
       >
-        <Button onClick={() => setShowFootnoteModal(true)}>Add Footnote</Button>
-      </Popover>
-
-      <Dialog
-        open={showFootnoteModal}
-        onClose={() => setShowFootnoteModal(false)}
-        maxWidth="sm"
-        fullWidth
-        sx={{ "& .MuiDialog-paper": { fontSize: "1.5rem" } }}
-      >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: "1.5rem",
+        <Button
+          onClick={() => {
+            setShowFootnoteModal(true);
+            setShowPopover(false);
           }}
         >
           Add Footnote
-          <IconButton
-            aria-label="close"
-            onClick={() => setShowFootnoteModal(false)}
-            sx={{ color: (theme) => theme.palette.grey[500] }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
+        </Button>
+      </Popover>
 
-        <DialogContent>
-          <p>
-            <strong>Selected:</strong> "{selectedText}"
-          </p>
-          <TextField
-            multiline
-            fullWidth
-            label="Footnote content"
-            value={footnoteContent}
-            onChange={(e) => setFootnoteContent(e.target.value)}
-            sx={{
-              fontSize: "1.2rem",
-              "& .MuiOutlinedInput-root": { fontSize: "1.2rem" },
-              "& .MuiInputBase-input": { fontSize: "1.2rem" },
-              "& .MuiInputLabel-root": { fontSize: "1.2rem" },
-              "& .MuiFormLabel-root": { fontSize: "1.2rem" },
-              "& .MuiInputBase-root": { fontSize: "1.2rem" },
-            }}
-          />
-        </DialogContent>
+      <FootnoteDialog
+        open={showFootnoteModal}
+        onClose={() => setShowFootnoteModal(false)}
+        title={
+          <span>
+            {selectedText}
+            <sup>x</sup>
+          </span>
+        }
+        content={footnoteContent}
+        onChange={setFootnoteContent}
+        onAdd={handleSaveFootnote}
+        mode="add"
+      />
 
-        <DialogActions>
-          <Button
-            sx={{ fontSize: "1.1rem" }}
-            onClick={() => setShowFootnoteModal(false)}
-            color="secondary"
-          >
-            Cancel
-          </Button>
-          <Button
-            sx={{ fontSize: "1.1rem" }}
-            onClick={handleSaveFootnote}
-            variant="contained"
-          >
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -919,6 +763,7 @@ function Edit() {
                     onMouseUp={handleMouseUp}
                     footnotes={editedNasheed.footnotes}
                     setEditedNasheed={setEditedNasheed}
+                    setShowPopover={setShowPopover}
                   />
                 ))}
               </SortableContext>
