@@ -29,6 +29,8 @@ import {
   IconButton,
   Tooltip,
   Popover,
+  Popper,
+  Paper,
 } from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
@@ -39,6 +41,9 @@ import {
   ContentCopy,
   DeleteOutline,
   Close,
+  Edit as EditIcon,
+  Cancel,
+  CheckCircle,
 } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SeoHelmet from "../components/SeoHelmet";
@@ -63,6 +68,8 @@ function SortableBlock({
   onDuplicate,
   onDelete,
   onMouseUp,
+  footnotes,
+  setEditedNasheed,
 }) {
   const {
     attributes,
@@ -74,8 +81,23 @@ function SortableBlock({
     isDragging,
   } = useSortable({ id: block.id });
 
+  let engCopy = block.eng;
+  footnotes.forEach((note, i) => {
+    if (note.verseIndex !== index) {
+      return;
+    }
+    const [_start, end] = note.range;
+
+    const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+      i + 1
+    }</sup>`;
+
+    engCopy = engCopy.slice(0, end) + supTag + engCopy.slice(end);
+  });
+
   return (
     <Box
+      className={"nasheed-lyrics"}
       ref={setNodeRef}
       style={{
         transform: CSS.Transform.toString(transform),
@@ -212,14 +234,45 @@ function SortableBlock({
         name={`eng_${index}`}
         contentEditable
         suppressContentEditableWarning
+        spellCheck="false"
         placeholder="Enter translation"
         data-index={index}
         onInput={() => {}}
-        onBlur={handleChange}
+        onBlur={(e) => {
+          const newText = e.currentTarget.innerHTML.replace(
+            /<sup[^>]*>.*?<\/sup>/g,
+            ""
+          );
+          const oldText = block.eng || "";
+
+          // Update footnote ranges
+          const updatedFootnotes = footnotes.map((note) => {
+            if (note.verseIndex !== index) return note;
+            const footnotedText = oldText.slice(note.range[0], note.range[1]);
+
+            if (newText.indexOf(footnotedText) !== -1) {
+              return {
+                ...note,
+                range: [
+                  newText.indexOf(footnotedText),
+                  newText.indexOf(footnotedText) + footnotedText.length,
+                ],
+              };
+            } else {
+              return null;
+            }
+          });
+
+          setEditedNasheed((prev) => ({
+            ...prev,
+            footnotes: updatedFootnotes,
+          }));
+          handleChange(e);
+        }}
         onMouseUp={(e) => {
           onMouseUp(e, index);
         }}
-        dangerouslySetInnerHTML={{ __html: block.eng || "" }}
+        dangerouslySetInnerHTML={{ __html: engCopy || "" }}
       />
     </Box>
   );
@@ -241,12 +294,49 @@ function Edit() {
   const [showFootnoteModal, setShowFootnoteModal] = useState(false);
   const [footnoteContent, setFootnoteContent] = useState("");
   const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
+  const [openFootnote, setOpenFootnote] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [editingFootnote, setEditingFootnote] = useState(false);
+  const [editedFootnote, setEditedFootnote] = useState("");
 
   const { id } = useParams();
   const token = localStorage.getItem("token");
   const sensors = useSensors(useSensor(PointerSensor));
 
   const allowEdit = user?.admin || nasheed?.creatorId === user?.id;
+
+  const engCopy = nasheed?.eng ? [...nasheed.eng] : null;
+
+  nasheed?.footnotes?.forEach((note, i) => {
+    const original = engCopy[note.verseIndex] || "";
+    const [_start, end] = note.range;
+
+    const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+      i + 1
+    }</sup>`;
+
+    engCopy[note.verseIndex] =
+      original.slice(0, end) + supTag + original.slice(end);
+  });
+
+  useEffect(() => {
+    const handler = (e) => {
+      const target = e.target;
+      if (target.tagName === "SUP" && target.dataset.idx) {
+        setOpenFootnote(parseInt(target.dataset.idx));
+        if (!editing) setAnchorEl(target);
+      }
+    };
+
+    const container = document.querySelector(".wrapper");
+    container?.addEventListener("click", handler);
+
+    return () => container?.removeEventListener("click", handler);
+  }, [editing, nasheed]);
+
+  const handleClose = () => {
+    setOpenFootnote(null);
+  };
 
   const handleMouseUp = (e, blockIdx) => {
     const selection = window.getSelection();
@@ -278,8 +368,16 @@ function Edit() {
       };
 
       setEditedNasheed((prev) => {
-        prev.footnotes.push(newFootnote);
-        return prev;
+        const updatedFootnotes = [...prev.footnotes, newFootnote].sort(
+          (a, b) => {
+            if (a.verseIndex !== b.verseIndex) {
+              return a.verseIndex - b.verseIndex;
+            }
+            return a.range[0] - b.range[0];
+          }
+        );
+
+        return { ...prev, footnotes: updatedFootnotes };
       });
       setShowFootnoteModal(false);
       setShowPopover(false);
@@ -314,7 +412,7 @@ function Edit() {
 
     const value =
       target.tagName === "DIV" && target.isContentEditable
-        ? target.innerText
+        ? target.innerHTML.replace(/<sup[^>]*>.*?<\/sup>/g, "")
         : target.value;
 
     setEditedNasheed((prev) => {
@@ -326,12 +424,12 @@ function Edit() {
 
   const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
     return (
-      <div key={index}>
+      <div key={index} className="nasheed-lyrics">
         <p>{arab}</p>
         <p>
           <em dangerouslySetInnerHTML={{ __html: nasheed.rom[index] }} />
         </p>
-        <p>{nasheed.eng[index]}</p>
+        <p dangerouslySetInnerHTML={{ __html: engCopy[index] }} />
       </div>
     );
   });
@@ -359,12 +457,7 @@ function Edit() {
       eng: editedNasheed.blocks.map((b) => b.eng),
       arabTitle: editedNasheed.arabTitle,
       engTitle: editedNasheed.engTitle,
-      footnotes: editedNasheed.footnotes.sort((a, b) => {
-        if (a.verseIndex !== b.verseIndex) {
-          return a.verseIndex - b.verseIndex;
-        }
-        return a.range[0] - b.range[0];
-      }),
+      footnotes: editedNasheed.footnotes,
     };
 
     try {
@@ -398,6 +491,7 @@ function Edit() {
         });
         setNasheed({ ...res });
         setEditedNasheed({
+          footnotes: res.footnotes,
           arabTitle: res.arabTitle,
           engTitle: res.engTitle,
           blocks: res.arab.map((_, i) => ({
@@ -450,6 +544,37 @@ function Edit() {
     setEditedNasheed({ ...editedNasheed, blocks: updatedBlocks });
   };
 
+  const handleEditClick = () => {
+    setEditingFootnote(true);
+  };
+
+  const handleSave = () => {
+    setEditedNasheed((prev) => {
+      const updatedFootnotes = prev.footnotes;
+      updatedFootnotes[openFootnote].content = editedFootnote;
+      return { ...prev, updatedFootnotes };
+    });
+    setEditingFootnote(false);
+  };
+
+  const handleCancel = () => {
+    setEditedFootnote(editedNasheed.footnotes[openFootnote]?.content);
+    setEditingFootnote(false);
+  };
+
+  const handleDeleteFootnote = () => {
+    setEditedNasheed((prev) => {
+      const updatedFootnotes = [...editedNasheed.footnotes];
+      updatedFootnotes.splice(openFootnote, 1);
+      return { ...prev, footnotes: updatedFootnotes };
+    });
+    setOpenFootnote(null);
+  };
+
+  useEffect(() => {
+    setEditedFootnote(editedNasheed?.footnotes[openFootnote]?.content);
+  }, [openFootnote, editedNasheed?.footnotes]);
+
   if (isLoading) return <Loader />;
   return editing ? (
     <>
@@ -458,58 +583,152 @@ function Edit() {
         description={`Edit nasheed titles "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
         url={`https://dhikrpedia.com/${id}`}
       />
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+
+      <Dialog
+        open={openFootnote !== null}
+        onClose={() => setOpenFootnote(null)}
+        fullWidth
+        maxWidth="sm"
+        sx={{ "& .MuiDialogContent-root": { fontSize: "1.5rem" } }}
       >
-        <Box className="modal-confirm" sx={style}>
-          <Typography
-            className="modal-confirm-text"
-            id="modal-modal-title"
-            variant="h4"
-            component="h2"
-          >
-            Are you sure you want to update?
-          </Typography>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              marginTop: "20px",
+        <DialogTitle sx={{ m: 0, p: 2, fontSize: "1.7rem" }}>
+          {editedNasheed.blocks[
+            editedNasheed.footnotes[openFootnote]?.verseIndex
+          ]?.eng?.slice(
+            editedNasheed.footnotes[openFootnote]?.range?.[0],
+            editedNasheed.footnotes[openFootnote]?.range?.[1]
+          )}
+          <sup>{openFootnote + 1}</sup>
+          <Tooltip
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "12px",
+                  padding: "5px 10px",
+                },
+              },
             }}
+            title="Close"
           >
-            <Button
-              style={{
-                backgroundColor: "#A42A04",
-                marginRight: "5px",
+            <IconButton
+              aria-label="close"
+              onClick={() => setOpenFootnote(null)}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
               }}
-              className="mui-button"
-              variant="contained"
-              onClick={() => setOpen(false)}
             >
-              Cancel
-            </Button>
-            <Button
-              style={{
-                marginRight: "5px",
+              <Close fontSize="large" />
+            </IconButton>
+          </Tooltip>
+        </DialogTitle>
+
+        <DialogContent dividers>
+          {editingFootnote ? (
+            <TextField
+              fullWidth
+              multiline
+              value={editedFootnote}
+              onChange={(e) => setEditedFootnote(e.target.value)}
+              minRows={3}
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontSize: "1.3rem",
+                },
+                "& .MuiInputLabel-root": {
+                  fontSize: "1.3rem",
+                },
               }}
-              className="mui-button"
-              variant="contained"
-              onClick={updateNasheed}
-            >
-              Yes
-            </Button>
-          </div>
-        </Box>
-      </Modal>
-      <SnackbarAlert
-        open={showAlert}
-        onClose={() => setShowAlert(false)}
-        message={alert.message}
-        type={alert.type}
-      />
+            />
+          ) : (
+            <div>{editedNasheed.footnotes[openFootnote]?.content}</div>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          {editingFootnote ? (
+            <>
+              <Tooltip
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
+                }}
+                title="Cancel Edit"
+              >
+                <IconButton aria-label="revert footnote" onClick={handleCancel}>
+                  <Cancel fontSize="large" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
+                }}
+                title="Update Footnote"
+              >
+                <IconButton
+                  sx={{ ml: "0 !important" }}
+                  aria-label="save footnote"
+                  onClick={handleSave}
+                >
+                  <CheckCircle fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Tooltip
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
+                }}
+                title="Edit"
+              >
+                <IconButton aria-label="edit" onClick={handleEditClick}>
+                  <EditIcon fontSize="large" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip
+                placement="top"
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      fontSize: "12px",
+                      padding: "5px 10px",
+                    },
+                  },
+                }}
+                title="Delete"
+              >
+                <IconButton aria-label="edit" onClick={handleDeleteFootnote}>
+                  <DeleteOutline fontSize="large" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+
       <Popover
         open={showPopover}
         anchorReference="anchorPosition"
@@ -582,6 +801,58 @@ function Edit() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className="modal-confirm" sx={style}>
+          <Typography
+            className="modal-confirm-text"
+            id="modal-modal-title"
+            variant="h4"
+            component="h2"
+          >
+            Are you sure you want to update?
+          </Typography>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginTop: "20px",
+            }}
+          >
+            <Button
+              style={{
+                backgroundColor: "#A42A04",
+                marginRight: "5px",
+              }}
+              className="mui-button"
+              variant="contained"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              style={{
+                marginRight: "5px",
+              }}
+              className="mui-button"
+              variant="contained"
+              onClick={updateNasheed}
+            >
+              Yes
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+      <SnackbarAlert
+        open={showAlert}
+        onClose={() => setShowAlert(false)}
+        message={alert.message}
+        type={alert.type}
+      />
       <div className="wrapper">
         <div style={{ flex: 1 }} />
         <div className="container">
@@ -646,6 +917,8 @@ function Edit() {
                     onDuplicate={handleDuplicate}
                     onDelete={handleDeleteBlock}
                     onMouseUp={handleMouseUp}
+                    footnotes={editedNasheed.footnotes}
+                    setEditedNasheed={setEditedNasheed}
                   />
                 ))}
               </SortableContext>
@@ -677,6 +950,36 @@ function Edit() {
     </>
   ) : (
     <>
+      <Popper
+        open={openFootnote !== null}
+        anchorEl={anchorEl}
+        placement="top-start"
+        style={{ zIndex: 1300 }}
+      >
+        <Paper sx={{ maxWidth: 300, position: "relative" }}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              setOpenFootnote(null);
+              setAnchorEl(null);
+            }}
+            sx={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              zIndex: 1,
+            }}
+          >
+            <Close fontSize="small" />
+          </IconButton>
+
+          <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
+            {openFootnote !== null
+              ? nasheed.footnotes[openFootnote]?.content
+              : ""}
+          </Typography>
+        </Paper>
+      </Popper>
       <SeoHelmet
         title={nasheed.engTitle}
         description={`Edit nasheed titled "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
