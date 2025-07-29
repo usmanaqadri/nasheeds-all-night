@@ -31,6 +31,7 @@ import {
   Popover,
   Popper,
   Paper,
+  ClickAwayListener,
 } from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
@@ -801,29 +802,49 @@ function Edit() {
         placement="top-start"
         style={{ zIndex: 1300 }}
       >
-        <Paper sx={{ maxWidth: 300, position: "relative" }}>
-          <IconButton
-            size="small"
-            onClick={() => {
-              setOpenFootnote(null);
-              setAnchorEl(null);
-            }}
-            sx={{
-              position: "absolute",
-              top: 4,
-              right: 4,
-              zIndex: 1,
-            }}
-          >
-            <Close fontSize="small" />
-          </IconButton>
+        <ClickAwayListener
+          onClickAway={() => {
+            setOpenFootnote(null);
+            setAnchorEl(null);
+          }}
+        >
+          <Paper sx={{ maxWidth: 300, position: "relative" }}>
+            <Tooltip
+              title="Close"
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+            >
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setOpenFootnote(null);
+                  setAnchorEl(null);
+                }}
+                sx={{
+                  position: "absolute",
+                  top: 4,
+                  right: 4,
+                  zIndex: 1,
+                }}
+              >
+                <Close fontSize="small" />
+              </IconButton>
+            </Tooltip>
 
-          <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
-            {openFootnote !== null
-              ? nasheed.footnotes[openFootnote]?.content
-              : ""}
-          </Typography>
-        </Paper>
+            <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
+              {openFootnote !== null
+                ? nasheed.footnotes[openFootnote]?.content
+                : ""}
+            </Typography>
+          </Paper>
+        </ClickAwayListener>
       </Popper>
       <SeoHelmet
         title={nasheed.engTitle}
