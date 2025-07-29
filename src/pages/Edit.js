@@ -10,45 +10,31 @@ import {
 import {
   arrayMove,
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import "./Edit.css";
 import Loader from "../components/Loader";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  TextField,
-  Box,
   Typography,
-  Modal,
   IconButton,
   Tooltip,
   Popover,
   Popper,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogActions,
   ClickAwayListener,
 } from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
-import {
-  DragIndicator,
-  AddCircleOutline,
-  ContentCopy,
-  DeleteOutline,
-  Close,
-  Edit as EditIcon,
-  Cancel,
-  CheckCircle,
-} from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SeoHelmet from "../components/SeoHelmet";
 import FootnoteDialog from "../components/FootnoteDialog";
+import { SortableBlock } from "../components/SortableBlock";
 
 const style = {
   position: "absolute",
@@ -62,229 +48,10 @@ const style = {
   p: 4,
 };
 
-function SortableBlock({
-  block,
-  index,
-  handleChange,
-  onAddBelow,
-  onDuplicate,
-  onDelete,
-  onMouseUp,
-  footnotes,
-  setEditedNasheed,
-  setShowPopover,
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: block.id });
-
-  let engCopy = block.eng.slice(0);
-  footnotes.forEach((note, i) => {
-    if (note.verseIndex !== index) {
-      return;
-    }
-    const [_start, end] = note.range;
-
-    const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
-      i + 1
-    }</sup>`;
-
-    engCopy = engCopy.slice(0, end) + supTag + engCopy.slice(end);
-  });
-
-  return (
-    <Box
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        backgroundColor: isDragging ? "#f0f0f0" : "#fafafa",
-        boxShadow: isDragging ? "0 0 10px rgba(0,0,0,0.2)" : "none",
-      }}
-      sx={{
-        padding: "10px",
-        margin: "10px",
-        border: "2px dashed #ccc",
-        borderRadius: "10px",
-        marginBottom: "24px",
-        backgroundColor: "#fafafa",
-        position: "relative",
-        "&:hover": {
-          boxShadow: "0 0 8px rgba(0,0,0,0.1)",
-        },
-      }}
-    >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          right: "5%",
-          transform: "translateX(5%)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Tooltip
-          title="Move verse"
-          placement="top"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                fontSize: "12px",
-                padding: "5px 10px",
-              },
-            },
-          }}
-        >
-          <IconButton
-            ref={setActivatorNodeRef}
-            {...listeners}
-            {...attributes}
-            sx={{ cursor: "grab", touchAction: "none" }}
-            size="small"
-          >
-            <DragIndicator />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip
-          title="Add verse"
-          placement="top"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                fontSize: "12px",
-                padding: "5px 10px",
-              },
-            },
-          }}
-        >
-          <IconButton
-            onClick={() => onAddBelow(index)}
-            aria-label="Add block below"
-            size="small"
-          >
-            <AddCircleOutline />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip
-          title="Duplicate verse"
-          placement="top"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                fontSize: "12px",
-                padding: "5px 10px",
-              },
-            },
-          }}
-        >
-          <IconButton
-            onClick={() => onDuplicate(index)}
-            aria-label="Duplicate block"
-            size="small"
-          >
-            <ContentCopy />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip
-          title="Delete verse"
-          placement="top"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                fontSize: "12px",
-                padding: "5px 10px",
-              },
-            },
-          }}
-        >
-          <IconButton
-            size="small"
-            onClick={() => onDelete(index)}
-            aria-label="Delete block"
-          >
-            <DeleteOutline />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
-      <textarea
-        className="arab-text"
-        name={`arab_${index}`}
-        placeholder="Enter Arabic/Urdu line"
-        value={block.arab}
-        onChange={handleChange}
-      />
-      <textarea
-        className="non-arab-text"
-        name={`rom_${index}`}
-        placeholder="Enter transliteration"
-        value={block.rom}
-        onChange={handleChange}
-      />
-      <div
-        key={engCopy}
-        className="non-arab-text"
-        name={`eng_${index}`}
-        contentEditable
-        suppressContentEditableWarning
-        spellCheck="false"
-        placeholder="Enter translation"
-        data-index={index}
-        onInput={() => setShowPopover(false)}
-        onBlur={(e) => {
-          const newText = e.currentTarget.innerHTML.replace(
-            /<sup[^>]*>.*?<\/sup>/g,
-            ""
-          );
-          const oldText = block.eng || "";
-
-          // Update footnote ranges
-          const updatedFootnotes = footnotes.map((note) => {
-            if (note.verseIndex !== index) return note;
-            const footnotedText = oldText.slice(note.range[0], note.range[1]);
-
-            if (newText.indexOf(footnotedText) !== -1) {
-              return {
-                ...note,
-                range: [
-                  newText.indexOf(footnotedText),
-                  newText.indexOf(footnotedText) + footnotedText.length,
-                ],
-              };
-            } else {
-              return null;
-            }
-          });
-
-          setEditedNasheed((prev) => ({
-            ...prev,
-            footnotes: updatedFootnotes,
-          }));
-          handleChange(e);
-        }}
-        onMouseUp={(e) => {
-          onMouseUp(e, index);
-        }}
-        dangerouslySetInnerHTML={{ __html: engCopy || "" }}
-      />
-    </Box>
-  );
-}
-
 function Edit() {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [nasheed, setNasheed] = useState(null);
   const [editedNasheed, setEditedNasheed] = useState(null);
   const [alert, setAlert] = useState({ message: "", type: "" });
@@ -313,7 +80,7 @@ function Edit() {
       const target = e.target;
       if (target.tagName === "SUP" && target.dataset.idx) {
         setOpenFootnote(parseInt(target.dataset.idx));
-        if (editing) {
+        if (isEditing) {
           setEditedFootnote(
             editedNasheed?.footnotes[parseInt(target.dataset.idx)]
           );
@@ -328,7 +95,7 @@ function Edit() {
     container?.addEventListener("click", handler);
 
     return () => container?.removeEventListener("click", handler);
-  }, [editing, nasheed, editedNasheed]);
+  }, [isEditing, nasheed, editedNasheed]);
 
   const handleMouseUp = (e, blockIdx) => {
     const selection = window.getSelection();
@@ -351,6 +118,13 @@ function Edit() {
     }
   };
 
+  const sortFootnotes = (a, b) => {
+    if (a.verseIndex !== b.verseIndex) {
+      return a.verseIndex - b.verseIndex;
+    }
+    return a.range[0] - b.range[0];
+  };
+
   const handleSaveFootnote = () => {
     if (selectedRange) {
       const newFootnote = {
@@ -361,12 +135,7 @@ function Edit() {
 
       setEditedNasheed((prev) => {
         const updatedFootnotes = [...prev.footnotes, newFootnote].sort(
-          (a, b) => {
-            if (a.verseIndex !== b.verseIndex) {
-              return a.verseIndex - b.verseIndex;
-            }
-            return a.range[0] - b.range[0];
-          }
+          sortFootnotes
         );
 
         return { ...prev, footnotes: updatedFootnotes };
@@ -393,7 +162,7 @@ function Edit() {
             eng: data.foundNasheed.eng[i],
           })),
         });
-        setIsLoading(false);
+        setIsFetching(false);
       });
   }, [id]);
 
@@ -415,7 +184,7 @@ function Edit() {
   };
 
   const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
-    let engCopy = nasheed?.eng?.[index];
+    let engWFootnote = nasheed?.eng?.[index];
     nasheed?.footnotes?.forEach((note, i) => {
       if (note.verseIndex !== index) {
         return;
@@ -426,7 +195,8 @@ function Edit() {
         i + 1
       }</sup>`;
 
-      engCopy = engCopy.slice(0, end) + supTag + engCopy.slice(end);
+      engWFootnote =
+        engWFootnote.slice(0, end) + supTag + engWFootnote.slice(end);
     });
     return (
       <div key={index}>
@@ -434,13 +204,13 @@ function Edit() {
         <p>
           <em dangerouslySetInnerHTML={{ __html: nasheed.rom[index] }} />
         </p>
-        <p dangerouslySetInnerHTML={{ __html: engCopy }} />
+        <p dangerouslySetInnerHTML={{ __html: engWFootnote }} />
       </div>
     );
   });
 
   const toggleEdit = () => {
-    setEditing((prevState) => !prevState);
+    setIsEditing((prevState) => !prevState);
   };
 
   const updateNasheed = async () => {
@@ -522,6 +292,35 @@ function Edit() {
     setTimeout(() => setShowAlert(false), 3000);
   };
 
+  const handleRearrangeBlocks = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+
+    const oldIdx = editedNasheed.blocks.findIndex((b) => b.id === active.id);
+    const newIdx = editedNasheed.blocks.findIndex((b) => b.id === over.id);
+
+    if (oldIdx !== -1 && newIdx !== -1) {
+      setEditedNasheed((prev) => {
+        const updatedFootnotes = [...prev.footnotes];
+
+        for (let i = 0; i < updatedFootnotes.length; i++) {
+          if (updatedFootnotes[i].verseIndex === oldIdx) {
+            updatedFootnotes[i] = {
+              ...updatedFootnotes[i],
+              verseIndex: newIdx,
+            };
+          }
+        }
+
+        updatedFootnotes.sort(sortFootnotes);
+        return {
+          ...prev,
+          footnotes: updatedFootnotes,
+          blocks: arrayMove(prev.blocks, oldIdx, newIdx),
+        };
+      });
+    }
+  };
+
   const handleAddBelow = (index) => {
     const newBlock = {
       arab: "",
@@ -581,8 +380,8 @@ function Edit() {
     setOpenFootnote(null);
   };
 
-  if (isLoading) return <Loader />;
-  return editing ? (
+  if (isFetching) return <Loader />;
+  return isEditing ? (
     <>
       <SeoHelmet
         title={nasheed.engTitle}
@@ -646,52 +445,37 @@ function Edit() {
         mode="add"
       />
 
-      <Modal
+      <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        aria-labelledby="confirm-dialog-title"
       >
-        <Box className="modal-confirm" sx={style}>
-          <Typography
-            className="modal-confirm-text"
-            id="modal-modal-title"
-            variant="h4"
-            component="h2"
-          >
+        <DialogTitle id="confirm-dialog-title">
+          <Typography variant="h5" className="modal-confirm-text">
             Are you sure you want to update?
           </Typography>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              marginTop: "20px",
-            }}
+        </DialogTitle>
+
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setOpen(false)}
+            color="error"
+            variant="contained"
+            sx={{ fontSize: "12px" }}
           >
-            <Button
-              style={{
-                backgroundColor: "#A42A04",
-                marginRight: "5px",
-              }}
-              className="mui-button"
-              variant="contained"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              style={{
-                marginRight: "5px",
-              }}
-              className="mui-button"
-              variant="contained"
-              onClick={updateNasheed}
-            >
-              Yes
-            </Button>
-          </div>
-        </Box>
-      </Modal>
+            Cancel
+          </Button>
+          <Button
+            onClick={updateNasheed}
+            color="success"
+            variant="contained"
+            sx={{ ml: 1, fontSize: "12px" }}
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <SnackbarAlert
         open={showAlert}
         onClose={() => setShowAlert(false)}
@@ -730,23 +514,7 @@ function Edit() {
               sensors={sensors}
               collisionDetection={closestCenter}
               modifiers={[restrictToVerticalAxis]}
-              onDragEnd={({ active, over }) => {
-                if (!over || active.id === over.id) return;
-
-                const oldIdx = editedNasheed.blocks.findIndex(
-                  (b) => b.id === active.id
-                );
-                const newIdx = editedNasheed.blocks.findIndex(
-                  (b) => b.id === over.id
-                );
-
-                if (oldIdx !== -1 && newIdx !== -1) {
-                  setEditedNasheed((prev) => ({
-                    ...prev,
-                    blocks: arrayMove(prev.blocks, oldIdx, newIdx),
-                  }));
-                }
-              }}
+              onDragEnd={handleRearrangeBlocks}
             >
               <SortableContext
                 items={editedNasheed.blocks.map((b) => b.id)}
