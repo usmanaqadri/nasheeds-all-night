@@ -21,6 +21,7 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
+  Box,
 } from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
@@ -130,23 +131,37 @@ function Edit() {
   };
 
   useEffect(() => {
-    fetch(`${baseURL}/nasheed/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setNasheed(data.foundNasheed);
+    const fetchNasheed = async () => {
+      try {
+        const res = await fetch(`${baseURL}/nasheed/${id}`);
+        const { foundNasheed } = await res.json();
+
+        setNasheed(foundNasheed);
         setEditedNasheed({
-          arabTitle: data.foundNasheed.arabTitle,
-          engTitle: data.foundNasheed.engTitle,
-          footnotes: data.foundNasheed.footnotes,
-          blocks: data.foundNasheed.arab.map((_, i) => ({
+          arabTitle: foundNasheed.arabTitle,
+          engTitle: foundNasheed.engTitle,
+          footnotes: foundNasheed.footnotes,
+          blocks: foundNasheed.arab.map((_, i) => ({
             id: i.toString(),
-            arab: data.foundNasheed.arab[i],
-            rom: data.foundNasheed.rom[i],
-            eng: data.foundNasheed.eng[i],
+            arab: foundNasheed.arab[i],
+            rom: foundNasheed.rom[i],
+            eng: foundNasheed.eng[i],
           })),
         });
+      } catch (error) {
+        setAlert({
+          type: "error",
+          message: "Error fetching nasheed.",
+        });
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+        console.error("Error fetching nasheed:", error);
+      } finally {
         setIsFetching(false);
-      });
+      }
+    };
+
+    fetchNasheed();
   }, [id]);
 
   const handleChange = (e) => {
@@ -409,6 +424,7 @@ function Edit() {
             onClose={() => setShowPopover(false)}
           >
             <Button
+              size="large"
               onClick={() => {
                 setShowFootnoteModal(true);
                 setShowPopover(false);
@@ -498,6 +514,21 @@ function Edit() {
                 />
               </div>
               <div style={{ marginTop: "-20px" }} className="body">
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      mb: 2,
+                      color: "gray",
+                      fontStyle: "italic",
+                      fontSize: "1.1rem",
+                      textAlign: "left",
+                    }}
+                  >
+                    Tip: Highlight part of the English translation to add a
+                    footnote.
+                  </Typography>
+                </Box>
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}

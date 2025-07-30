@@ -54,7 +54,7 @@ const styles = {
     flexDirection: "column",
   },
   lyrics: {
-    height: "100%",
+    height: "80%",
     display: "flex",
     flexDirection: "column",
 
@@ -289,18 +289,24 @@ export const Create = () => {
         />
         <Grid container spacing={2} sx={styles.gridContainer}>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
-            <TextField
-              label="Arabic/Urdu verses (one per line)"
-              name="arab"
-              value={nasheedText.arab}
-              onChange={handleChange}
-              multiline
-              minRows={10}
-              sx={styles.lyrics}
-            />
+            <Box sx={{ position: "relative" }}>
+              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
+              {/* Placeholder for alignment */}
+              <TextField
+                label="Arabic/Urdu verses (one per line)"
+                name="arab"
+                value={nasheedText.arab}
+                onChange={handleChange}
+                multiline
+                minRows={10}
+                sx={styles.lyrics}
+              />
+            </Box>
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
             <Box sx={{ position: "relative" }}>
+              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
+              {/* Placeholder for alignment */}
               <TextField
                 InputProps={{
                   endAdornment: (
@@ -369,6 +375,20 @@ export const Create = () => {
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
             <Box sx={{ position: "relative" }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 2,
+                  color: "gray",
+                  fontStyle: "italic",
+                  fontSize: "1.0rem",
+                  textAlign: "left",
+                  minHeight: "1.4rem", // matches other placeholder height
+                }}
+              >
+                Tip: Highlight part of the English translation to add a
+                footnote.
+              </Typography>
               <TextField
                 InputProps={{
                   endAdornment: (
