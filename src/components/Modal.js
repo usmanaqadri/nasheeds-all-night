@@ -5,9 +5,6 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
-  Typography,
-  Popper,
-  Paper,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import {
@@ -23,6 +20,7 @@ import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
 import { nasheedText, SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "./AuthContext";
+import { FootnotePopper } from "./FootnotePopper";
 
 export default function MyModal({ open, onClose, nasheed }) {
   const { user } = useAuth();
@@ -417,37 +415,13 @@ export default function MyModal({ open, onClose, nasheed }) {
           </>
         ) : (
           <>
-            <Popper
-              open={openFootnote !== null}
+            <FootnotePopper
+              openFootnote={openFootnote}
               anchorEl={anchorEl}
-              placement="top-start"
-              style={{ zIndex: 1300 }}
-            >
-              <Paper sx={{ maxWidth: 300, position: "relative" }}>
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    setOpenFootnote(null);
-                    setAnchorEl(null);
-                  }}
-                  sx={{
-                    position: "absolute",
-                    top: 4,
-                    right: 4,
-                    zIndex: 1,
-                  }}
-                >
-                  <Close fontSize="small" />
-                </IconButton>
-
-                <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
-                  {openFootnote !== null
-                    ? footnotes[openFootnote]?.content
-                    : ""}
-                </Typography>
-              </Paper>
-            </Popper>
-
+              setOpenFootnote={setOpenFootnote}
+              setAnchorEl={setAnchorEl}
+              footnotes={footnotes}
+            />
             <div
               style={{ backgroundColor: "inherit", margin: "0 auto" }}
               className="text-container"

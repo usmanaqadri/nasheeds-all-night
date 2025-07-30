@@ -17,36 +17,19 @@ import Loader from "../components/Loader";
 import {
   Button,
   Typography,
-  IconButton,
-  Tooltip,
   Popover,
-  Popper,
-  Paper,
   Dialog,
   DialogTitle,
   DialogActions,
-  ClickAwayListener,
 } from "@mui/material";
 import { SnackbarAlert } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
-import { Close } from "@mui/icons-material";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import SeoHelmet from "../components/SeoHelmet";
 import FootnoteDialog from "../components/FootnoteDialog";
 import { SortableBlock } from "../components/SortableBlock";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
+import { FootnotePopper } from "../components/FootnotePopper";
 
 function Edit() {
   const { user } = useAuth();
@@ -381,272 +364,231 @@ function Edit() {
   };
 
   if (isFetching) return <Loader />;
-  return isEditing ? (
+  return (
     <>
-      <SeoHelmet
-        title={nasheed.engTitle}
-        description={`Edit nasheed titles "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
-        url={`https://dhikrpedia.com/${id}`}
-      />
-
-      <FootnoteDialog
-        open={openFootnote !== null}
-        onClose={() => setOpenFootnote(null)}
-        title={
-          <span>
-            {editedNasheed.blocks[editedFootnote?.verseIndex]?.eng?.slice(
-              editedFootnote?.range?.[0],
-              editedFootnote?.range?.[1]
-            )}
-            <sup>{openFootnote + 1}</sup>
-          </span>
-        }
-        content={editedFootnote?.content}
-        isEditing={editingFootnote}
-        onChange={(val) =>
-          setEditedFootnote((prev) => ({ ...prev, content: val }))
-        }
-        onCancelEdit={handleCancel}
-        onSave={handleSave}
-        onEditClick={handleEditClick}
-        onDelete={handleDeleteFootnote}
-      />
-
-      <Popover
-        open={showPopover}
-        anchorReference="anchorPosition"
-        disableEnforceFocus
-        disableAutoFocus
-        anchorPosition={{ top: popoverCoords.top, left: popoverCoords.left }}
-        onClose={() => setShowPopover(false)}
-      >
-        <Button
-          onClick={() => {
-            setShowFootnoteModal(true);
-            setShowPopover(false);
-          }}
-        >
-          Add Footnote
-        </Button>
-      </Popover>
-
-      <FootnoteDialog
-        open={showFootnoteModal}
-        onClose={() => setShowFootnoteModal(false)}
-        title={
-          <span>
-            {selectedText}
-            <sup>x</sup>
-          </span>
-        }
-        content={footnoteContent}
-        onChange={setFootnoteContent}
-        onAdd={handleSaveFootnote}
-        mode="add"
-      />
-
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="confirm-dialog-title"
-      >
-        <DialogTitle id="confirm-dialog-title">
-          <Typography variant="h5" className="modal-confirm-text">
-            Are you sure you want to update?
-          </Typography>
-        </DialogTitle>
-
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setOpen(false)}
-            color="error"
-            variant="contained"
-            sx={{ fontSize: "12px" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={updateNasheed}
-            color="success"
-            variant="contained"
-            sx={{ ml: 1, fontSize: "12px" }}
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <SnackbarAlert
-        open={showAlert}
-        onClose={() => setShowAlert(false)}
-        message={alert.message}
-        type={alert.type}
-      />
-      <div className="wrapper">
-        <div style={{ flex: 1 }} />
-        <div className="container">
-          <div className="edit-title">
-            <textarea
-              name="arabTitle"
-              placeholder="Enter Arabic/Urdu title"
-              value={editedNasheed.arabTitle}
-              onChange={(e) =>
-                setEditedNasheed({
-                  ...editedNasheed,
-                  arabTitle: e.target.value,
-                })
-              }
-            />
-            <textarea
-              name="engTitle"
-              placeholder="Enter English title"
-              value={editedNasheed.engTitle}
-              onChange={(e) =>
-                setEditedNasheed({
-                  ...editedNasheed,
-                  engTitle: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div style={{ marginTop: "-20px" }} className="body">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              modifiers={[restrictToVerticalAxis]}
-              onDragEnd={handleRearrangeBlocks}
-            >
-              <SortableContext
-                items={editedNasheed.blocks.map((b) => b.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                {editedNasheed.blocks.map((block, index) => (
-                  <SortableBlock
-                    key={block.id}
-                    block={block}
-                    index={index}
-                    handleChange={handleChange}
-                    onAddBelow={handleAddBelow}
-                    onDuplicate={handleDuplicate}
-                    onDelete={handleDeleteBlock}
-                    onMouseUp={handleMouseUp}
-                    footnotes={editedNasheed.footnotes}
-                    setEditedNasheed={setEditedNasheed}
-                    setShowPopover={setShowPopover}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </div>
-        </div>
-        <div className="edit-buttons">
-          <Button
-            style={{
-              backgroundColor: "#A42A04",
-              marginBottom: "5px",
-            }}
-            className="mui-button"
-            variant="contained"
-            onClick={toggleEdit}
-          >
-            Cancel
-          </Button>
-          <Button
-            style={{ backgroundColor: "#2f7c31" }}
-            className="mui-button"
-            variant="contained"
-            onClick={() => setOpen(true)}
-          >
-            Save
-          </Button>
-        </div>
-      </div>
-    </>
-  ) : (
-    <>
-      <Popper
-        open={openFootnote !== null}
-        anchorEl={anchorEl}
-        placement="top-start"
-        style={{ zIndex: 1300 }}
-      >
-        <ClickAwayListener
-          onClickAway={() => {
-            setOpenFootnote(null);
-            setAnchorEl(null);
-          }}
-        >
-          <Paper sx={{ maxWidth: 300, position: "relative" }}>
-            <Tooltip
-              title="Close"
-              placement="top"
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    fontSize: "12px",
-                    padding: "5px 10px",
-                  },
-                },
-              }}
-            >
-              <IconButton
-                size="small"
-                onClick={() => {
-                  setOpenFootnote(null);
-                  setAnchorEl(null);
-                }}
-                sx={{
-                  position: "absolute",
-                  top: 4,
-                  right: 4,
-                  zIndex: 1,
-                }}
-              >
-                <Close fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            <Typography sx={{ fontSize: "1.2rem", padding: 2, pt: 4 }}>
-              {openFootnote !== null
-                ? nasheed.footnotes[openFootnote]?.content
-                : ""}
-            </Typography>
-          </Paper>
-        </ClickAwayListener>
-      </Popper>
       <SeoHelmet
         title={nasheed.engTitle}
         description={`Edit nasheed titled "${nasheed.engTitle}" with Arabic, transliteration, and English translation.`}
         url={`https://dhikrpedia.com/${id}`}
       />
-      <div className="wrapper">
-        <div style={{ flex: 1 }} />
-        <div className="container">
+
+      {isEditing ? (
+        <>
+          <FootnoteDialog
+            open={openFootnote !== null}
+            onClose={() => setOpenFootnote(null)}
+            title={
+              <span>
+                {editedNasheed.blocks[editedFootnote?.verseIndex]?.eng?.slice(
+                  editedFootnote?.range?.[0],
+                  editedFootnote?.range?.[1]
+                )}
+                <sup>{openFootnote + 1}</sup>
+              </span>
+            }
+            content={editedFootnote?.content}
+            isEditing={editingFootnote}
+            onChange={(val) =>
+              setEditedFootnote((prev) => ({ ...prev, content: val }))
+            }
+            onCancelEdit={handleCancel}
+            onSave={handleSave}
+            onEditClick={handleEditClick}
+            onDelete={handleDeleteFootnote}
+          />
+
+          <Popover
+            open={showPopover}
+            anchorReference="anchorPosition"
+            disableEnforceFocus
+            disableAutoFocus
+            anchorPosition={{
+              top: popoverCoords.top,
+              left: popoverCoords.left,
+            }}
+            onClose={() => setShowPopover(false)}
+          >
+            <Button
+              onClick={() => {
+                setShowFootnoteModal(true);
+                setShowPopover(false);
+              }}
+            >
+              Add Footnote
+            </Button>
+          </Popover>
+
+          <FootnoteDialog
+            open={showFootnoteModal}
+            onClose={() => setShowFootnoteModal(false)}
+            title={
+              <span>
+                {selectedText}
+                <sup>x</sup>
+              </span>
+            }
+            content={footnoteContent}
+            onChange={setFootnoteContent}
+            onAdd={handleSaveFootnote}
+            mode="add"
+          />
+
+          <Dialog
+            open={open}
+            onClose={() => setOpen(false)}
+            aria-labelledby="confirm-dialog-title"
+          >
+            <DialogTitle id="confirm-dialog-title">
+              <Typography variant="h5" className="modal-confirm-text">
+                Are you sure you want to update?
+              </Typography>
+            </DialogTitle>
+
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+              <Button
+                onClick={() => setOpen(false)}
+                color="error"
+                variant="contained"
+                sx={{ fontSize: "12px" }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={updateNasheed}
+                color="success"
+                variant="contained"
+                sx={{ ml: 1, fontSize: "12px" }}
+              >
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
+
           <SnackbarAlert
             open={showAlert}
             onClose={() => setShowAlert(false)}
             message={alert.message}
             type={alert.type}
-          />{" "}
-          <div className="edit-title">
-            <p>{nasheed.arabTitle}</p>
-            <p>{nasheed.engTitle}</p>
+          />
+          <div className="wrapper">
+            <div style={{ flex: 1 }} />
+            <div className="container">
+              <div className="edit-title">
+                <textarea
+                  name="arabTitle"
+                  placeholder="Enter Arabic/Urdu title"
+                  value={editedNasheed.arabTitle}
+                  onChange={(e) =>
+                    setEditedNasheed({
+                      ...editedNasheed,
+                      arabTitle: e.target.value,
+                    })
+                  }
+                />
+                <textarea
+                  name="engTitle"
+                  placeholder="Enter English title"
+                  value={editedNasheed.engTitle}
+                  onChange={(e) =>
+                    setEditedNasheed({
+                      ...editedNasheed,
+                      engTitle: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div style={{ marginTop: "-20px" }} className="body">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  modifiers={[restrictToVerticalAxis]}
+                  onDragEnd={handleRearrangeBlocks}
+                >
+                  <SortableContext
+                    items={editedNasheed.blocks.map((b) => b.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {editedNasheed.blocks.map((block, index) => (
+                      <SortableBlock
+                        key={block.id}
+                        block={block}
+                        index={index}
+                        handleChange={handleChange}
+                        onAddBelow={handleAddBelow}
+                        onDuplicate={handleDuplicate}
+                        onDelete={handleDeleteBlock}
+                        onMouseUp={handleMouseUp}
+                        footnotes={editedNasheed.footnotes}
+                        setEditedNasheed={setEditedNasheed}
+                        setShowPopover={setShowPopover}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
+            </div>
+            <div className="edit-buttons">
+              <Button
+                style={{
+                  backgroundColor: "#A42A04",
+                  marginBottom: "5px",
+                }}
+                className="mui-button"
+                variant="contained"
+                onClick={toggleEdit}
+              >
+                Cancel
+              </Button>
+              <Button
+                style={{ backgroundColor: "#2f7c31" }}
+                className="mui-button"
+                variant="contained"
+                onClick={() => setOpen(true)}
+              >
+                Save
+              </Button>
+            </div>
           </div>
-          <div className="body">{nasheedLyrics}</div>
-        </div>
-        <div className="edit-buttons">
-          {
-            <Button
-              className="mui-button"
-              variant="contained"
-              onClick={toggleEdit}
-              style={{ visibility: allowEdit ? "visible" : "hidden" }}
-            >
-              Edit
-            </Button>
-          }
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <FootnotePopper
+            footnotes={nasheed.footnotes}
+            openFootnote={openFootnote}
+            anchorEl={anchorEl}
+            setOpenFootnote={setOpenFootnote}
+            setAnchorEl={setAnchorEl}
+          />
+          <div className="wrapper">
+            <div style={{ flex: 1 }} />
+            <div className="container">
+              <SnackbarAlert
+                open={showAlert}
+                onClose={() => setShowAlert(false)}
+                message={alert.message}
+                type={alert.type}
+              />{" "}
+              <div className="edit-title">
+                <p>{nasheed.arabTitle}</p>
+                <p>{nasheed.engTitle}</p>
+              </div>
+              <div className="body">{nasheedLyrics}</div>
+            </div>
+            <div className="edit-buttons">
+              {
+                <Button
+                  className="mui-button"
+                  variant="contained"
+                  onClick={toggleEdit}
+                  style={{ visibility: allowEdit ? "visible" : "hidden" }}
+                >
+                  Edit
+                </Button>
+              }
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
