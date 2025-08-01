@@ -69,7 +69,7 @@ export default function FootnoteDialog({
         </Tooltip>
       </DialogTitle>
 
-      <DialogContent dividers={!isEditing}>
+      <DialogContent dividers={!isEditing && mode !== "add"}>
         {isEditing || mode === "add" ? (
           <TextField
             fullWidth

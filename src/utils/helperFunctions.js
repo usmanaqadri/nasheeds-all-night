@@ -81,6 +81,13 @@ export const nasheedText = (nasheed) =>
     );
   });
 
+export const sortFootnotes = (a, b) => {
+  if (a.verseIndex !== b.verseIndex) {
+    return a.verseIndex - b.verseIndex;
+  }
+  return a.range[0] - b.range[0];
+};
+
 export const handleGoogleLogin = async (code, setLoggedIn, setUser) => {
   try {
     const res = await fetch(`${baseURL}/user/auth`, {

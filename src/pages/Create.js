@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   TextField,
@@ -10,12 +10,15 @@ import {
   Tooltip,
   keyframes,
   CircularProgress,
+  Popover,
 } from "@mui/material";
 import { baseURL } from "../utils/constants";
-import { SnackbarAlert } from "../utils/helperFunctions";
+import { SnackbarAlert, sortFootnotes } from "../utils/helperFunctions";
 import { useAuth } from "../components/AuthContext";
 import SeoHelmet from "../components/SeoHelmet";
 import { AutoAwesome } from "@mui/icons-material";
+import FootnoteDialog from "../components/FootnoteDialog";
+import getCaretCoordinates from "textarea-caret";
 
 const colorFlash = keyframes`
   0% { color: #ff4081; }
@@ -89,24 +92,93 @@ const styles = {
   },
 };
 
-export const Create = () => {
+const Create = () => {
   const [loadingTranslation, setLoadingTranslation] = useState(false);
   const [loadingTransliteration, setLoadingTransliteration] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alert, setAlert] = useState({ message: "", type: "" });
-  const [nasheedText, setNasheedText] = useState({
+  const [nasheed, setNasheed] = useState({
     arabTitle: "",
     engTitle: "",
     arab: "",
     rom: "",
     eng: "",
+    footnotes: [],
   });
   const { user } = useAuth();
   const token = localStorage.getItem("token");
+  const [popoverCoords, setPopoverCoords] = useState({ top: 0, left: 0 });
+  const [selectedText, setSelectedText] = useState("");
+  const [selectedRange, setSelectedRange] = useState(null);
+  const [showPopover, setShowPopover] = useState(false);
+  const [showFootnoteModal, setShowFootnoteModal] = useState(false);
+  const [footnoteContent, setFootnoteContent] = useState("");
+  const textFieldRef = useRef(null);
+  const popoverContentRef = useRef(null);
+
+  const handleMouseUp = (e, blockIdx) => {
+    const textarea = textFieldRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end);
+
+    if (start === end || !selected.trim()) {
+      setShowPopover(false);
+      return;
+    }
+
+    const caretStart = getCaretCoordinates(textarea, start);
+    const caretEnd = getCaretCoordinates(textarea, end);
+
+    const caretCoords = {
+      top: caretStart.top,
+      left: (caretStart.left + caretEnd.left) / 2,
+    };
+
+    const rect = textarea.getBoundingClientRect();
+    const baseLeft = rect.left + caretCoords.left + window.scrollX;
+    const top = rect.top + caretCoords.top + window.scrollY - 40;
+
+    // Wait until popover renders, then re-center it
+    setTimeout(() => {
+      const width = popoverContentRef.current?.offsetWidth || 0;
+      setPopoverCoords({
+        top,
+        left: baseLeft - width / 2,
+      });
+    }, 0);
+
+    setSelectedText(selected);
+    setSelectedRange([start, end]);
+    setShowPopover(true);
+  };
+
+  const handleSaveFootnote = () => {
+    if (selectedRange) {
+      const tempFootnote = {
+        range: selectedRange,
+        content: footnoteContent,
+        verseIndex: "",
+      };
+
+      setNasheed((prev) => {
+        const tmpFootnotes = [...prev.footnotes, tempFootnote].sort(
+          sortFootnotes
+        );
+
+        return { ...prev, footnotes: tmpFootnotes };
+      });
+      setShowFootnoteModal(false);
+      setShowPopover(false);
+      setFootnoteContent("");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNasheedText((prev) => ({ ...prev, [name]: value }));
+    setNasheed((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -122,11 +194,44 @@ export const Create = () => {
       return;
     }
 
+    const engVerses = nasheed.eng.split("\n");
+
+    let currentOffset = 0;
+
+    const adjustedFootnotes = nasheed.footnotes.map((footnote) => {
+      const { range } = footnote;
+      const [start, end] = range;
+
+      // Find which verse this footnote belongs to
+      let verseIndex = -1;
+      for (let i = 0; i < engVerses.length; i++) {
+        const verse = engVerses[i];
+        const verseStart = currentOffset;
+        const verseEnd = currentOffset + verse.length;
+
+        if (start >= verseStart && end <= verseEnd) {
+          verseIndex = i;
+
+          return {
+            ...footnote,
+            verseIndex,
+            range: [start - verseStart, end - verseStart],
+          };
+        }
+
+        currentOffset = verseEnd + 1; // +1 for newline character
+      }
+
+      // fallback in case not found
+      return footnote;
+    });
+
     const formattedData = {
-      ...nasheedText,
-      arab: nasheedText.arab.split("\n").filter((line) => line.trim() !== ""),
-      rom: nasheedText.rom.split("\n").filter((line) => line.trim() !== ""),
-      eng: nasheedText.eng.split("\n").filter((line) => line.trim() !== ""),
+      ...nasheed,
+      arab: nasheed.arab.split("\n").filter((line) => line.trim() !== ""),
+      rom: nasheed.rom.split("\n").filter((line) => line.trim() !== ""),
+      eng: nasheed.eng.split("\n").filter((line) => line.trim() !== ""),
+      footnotes: adjustedFootnotes,
       creatorId: user?.id,
       isPublic: false,
     };
@@ -160,7 +265,7 @@ export const Create = () => {
           type: "success",
           message: "Successfully added nasheed!",
         });
-        setNasheedText({
+        setNasheed({
           arabTitle: "",
           engTitle: "",
           arab: "",
@@ -182,7 +287,7 @@ export const Create = () => {
     e.preventDefault();
     setLoadingTransliteration(true);
 
-    const arabicArr = nasheedText.arab
+    const arabicArr = nasheed.arab
       .split("\n")
       .filter((line) => line.trim() !== "");
 
@@ -200,7 +305,7 @@ export const Create = () => {
 
       const res = await response.json();
 
-      setNasheedText((prev) => ({ ...prev, rom: res.transliteration }));
+      setNasheed((prev) => ({ ...prev, rom: res.transliteration }));
     } catch (error) {
       setAlert({
         type: "error",
@@ -216,7 +321,7 @@ export const Create = () => {
     e.preventDefault();
     setLoadingTranslation(true);
 
-    const arabicArr = nasheedText.arab
+    const arabicArr = nasheed.arab
       .split("\n")
       .filter((line) => line.trim() !== "");
 
@@ -231,7 +336,7 @@ export const Create = () => {
 
       const res = await response.json();
 
-      setNasheedText((prev) => ({ ...prev, eng: res.translation }));
+      setNasheed((prev) => ({ ...prev, eng: res.translation }));
     } catch (error) {
       setAlert({
         type: "error",
@@ -251,7 +356,44 @@ export const Create = () => {
         url={`https://dhikrpedia.com/create`}
         type="website"
       />
+      <Popover
+        open={showPopover}
+        anchorReference="anchorPosition"
+        disableEnforceFocus
+        disableAutoFocus
+        anchorPosition={{
+          top: popoverCoords.top,
+          left: popoverCoords.left,
+        }}
+        onClose={() => setShowPopover(false)}
+      >
+        <Box ref={popoverContentRef}>
+          <Button
+            size="large"
+            onClick={() => {
+              setShowFootnoteModal(true);
+              setShowPopover(false);
+            }}
+          >
+            Add Footnote
+          </Button>
+        </Box>
+      </Popover>
       <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
+        <FootnoteDialog
+          open={showFootnoteModal}
+          onClose={() => setShowFootnoteModal(false)}
+          title={
+            <span>
+              {selectedText}
+              <sup>x</sup>
+            </span>
+          }
+          content={footnoteContent}
+          onChange={setFootnoteContent}
+          onAdd={handleSaveFootnote}
+          mode="add"
+        />
         <Typography textAlign={"left"} variant="h4" component="h1" gutterBottom>
           Add Your Favorite Nasheed
         </Typography>
@@ -274,7 +416,7 @@ export const Create = () => {
         <TextField
           label="Arabic/Urdu Title"
           name="arabTitle"
-          value={nasheedText.arabTitle}
+          value={nasheed.arabTitle}
           onChange={handleChange}
           required
           sx={styles.title}
@@ -282,7 +424,7 @@ export const Create = () => {
         <TextField
           label="English Title"
           name="engTitle"
-          value={nasheedText.engTitle}
+          value={nasheed.engTitle}
           onChange={handleChange}
           required
           sx={styles.title}
@@ -295,7 +437,7 @@ export const Create = () => {
               <TextField
                 label="Arabic/Urdu verses (one per line)"
                 name="arab"
-                value={nasheedText.arab}
+                value={nasheed.arab}
                 onChange={handleChange}
                 multiline
                 minRows={10}
@@ -348,7 +490,7 @@ export const Create = () => {
                 }}
                 label="Transliteration verses (one per line)"
                 name="rom"
-                value={nasheedText.rom}
+                value={nasheed.rom}
                 onChange={handleChange}
                 multiline
                 minRows={10}
@@ -431,8 +573,10 @@ export const Create = () => {
                 }}
                 label="English verses (one per line)"
                 name="eng"
-                value={nasheedText.eng}
+                value={nasheed.eng}
                 onChange={handleChange}
+                onMouseUp={handleMouseUp}
+                inputRef={textFieldRef}
                 multiline
                 minRows={10}
                 sx={{
@@ -441,6 +585,7 @@ export const Create = () => {
                 }}
                 disabled={loadingTranslation}
               />
+
               {loadingTranslation && (
                 <Box
                   sx={{
@@ -464,3 +609,5 @@ export const Create = () => {
     </>
   );
 };
+
+export default Create;

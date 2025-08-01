@@ -12,7 +12,7 @@ import {
   SnackbarAlert,
 } from "../utils/helperFunctions.js";
 
-function Home() {
+const Home = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [nasheeds, setNasheeds] = useState([]);
@@ -99,6 +99,6 @@ function Home() {
       )}
     </div>
   );
-}
+};
 
 export default Home;

@@ -37,6 +37,7 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [flashSide, setFlashSide] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  let offset = 0;
   footnotes.forEach((note, i) => {
     const original = engWFootnote[note.verseIndex] || "";
     const [_start, end] = note.range;
@@ -48,8 +49,12 @@ export default function MyModal({ open, onClose, nasheed }) {
           }</sup>`
         : `<sup>${i + 1}</sup>`;
 
+    const adjustedEnd = end + offset;
+
     engWFootnote[note.verseIndex] =
-      original.slice(0, end) + supTag + original.slice(end);
+      original.slice(0, adjustedEnd) + supTag + original.slice(adjustedEnd);
+
+    offset += supTag.length; // update the offset for future insertions
   });
 
   const Footer = () => {

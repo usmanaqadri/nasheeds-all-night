@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   DndContext,
@@ -23,7 +23,7 @@ import {
   DialogActions,
   Box,
 } from "@mui/material";
-import { SnackbarAlert } from "../utils/helperFunctions";
+import { SnackbarAlert, sortFootnotes } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -32,7 +32,7 @@ import FootnoteDialog from "../components/FootnoteDialog";
 import { SortableBlock } from "../components/SortableBlock";
 import { FootnotePopper } from "../components/FootnotePopper";
 
-function Edit() {
+const Edit = () => {
   const { user } = useAuth();
   const [isFetching, setIsFetching] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -45,13 +45,14 @@ function Edit() {
   const [selectedText, setSelectedText] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [showPopover, setShowPopover] = useState(false);
+  const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
   const [showFootnoteModal, setShowFootnoteModal] = useState(false);
   const [footnoteContent, setFootnoteContent] = useState("");
-  const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editingFootnote, setEditingFootnote] = useState(false);
   const [editedFootnote, setEditedFootnote] = useState(null);
+  const popoverContentRef = useRef(null);
 
   const { id } = useParams();
   const token = localStorage.getItem("token");
@@ -94,19 +95,19 @@ function Edit() {
       setSelectedText(selected);
       setSelectedRange([start, end]);
       setSelectedBlockIndex(blockIdx);
-      setPopoverCoords({
-        top: rect.top - 40 + window.scrollY,
-        left: rect.left,
-      });
-      setShowPopover(true);
-    }
-  };
+      setShowPopover(true); // Must trigger before measuring width
 
-  const sortFootnotes = (a, b) => {
-    if (a.verseIndex !== b.verseIndex) {
-      return a.verseIndex - b.verseIndex;
+      // Wait for the popover to render, then adjust position
+      setTimeout(() => {
+        const width = popoverContentRef.current?.offsetWidth || 0;
+        const centerX = rect.left + rect.width / 2;
+        const topY = rect.top - 40 + window.scrollY;
+        setPopoverCoords({
+          top: topY,
+          left: centerX - width / 2 + window.scrollX,
+        });
+      }, 0);
     }
-    return a.range[0] - b.range[0];
   };
 
   const handleSaveFootnote = () => {
@@ -183,6 +184,7 @@ function Edit() {
 
   const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
     let engWFootnote = nasheed?.eng?.[index];
+    let offset = 0;
     nasheed?.footnotes?.forEach((note, i) => {
       if (note.verseIndex !== index) {
         return;
@@ -193,8 +195,14 @@ function Edit() {
         i + 1
       }</sup>`;
 
+      const adjustedEnd = end + offset;
+
       engWFootnote =
-        engWFootnote.slice(0, end) + supTag + engWFootnote.slice(end);
+        engWFootnote.slice(0, adjustedEnd) +
+        supTag +
+        engWFootnote.slice(adjustedEnd);
+
+      offset += supTag.length; // update the offset for future insertions
     });
     return (
       <div key={index}>
@@ -423,15 +431,17 @@ function Edit() {
             }}
             onClose={() => setShowPopover(false)}
           >
-            <Button
-              size="large"
-              onClick={() => {
-                setShowFootnoteModal(true);
-                setShowPopover(false);
-              }}
-            >
-              Add Footnote
-            </Button>
+            <Box ref={popoverContentRef}>
+              <Button
+                size="large"
+                onClick={() => {
+                  setShowFootnoteModal(true);
+                  setShowPopover(false);
+                }}
+              >
+                Add Footnote
+              </Button>
+            </Box>
           </Popover>
 
           <FootnoteDialog
@@ -622,6 +632,6 @@ function Edit() {
       )}
     </>
   );
-}
+};
 
 export default Edit;

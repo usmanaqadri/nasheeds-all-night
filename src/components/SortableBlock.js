@@ -31,6 +31,7 @@ export function SortableBlock({
   } = useSortable({ id: block.id });
 
   let engWFootnote = block.eng.slice(0);
+  let offset = 0;
   footnotes.forEach((note, i) => {
     if (note.verseIndex !== index) {
       return;
@@ -41,8 +42,14 @@ export function SortableBlock({
       i + 1
     }</sup>`;
 
+    const adjustedEnd = end + offset;
+
     engWFootnote =
-      engWFootnote.slice(0, end) + supTag + engWFootnote.slice(end);
+      engWFootnote.slice(0, adjustedEnd) +
+      supTag +
+      engWFootnote.slice(adjustedEnd);
+
+    offset += supTag.length; // update the offset for future insertions
   });
 
   return (
