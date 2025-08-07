@@ -37,9 +37,9 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [flashSide, setFlashSide] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  let offset = 0;
   footnotes.forEach((note, i) => {
-    const original = engWFootnote[note.verseIndex] || "";
+    const verseIndex = note.verseIndex;
+    const original = engWFootnote[verseIndex] || "";
     const [_start, end] = note.range;
 
     const supTag =
@@ -49,12 +49,22 @@ export default function MyModal({ open, onClose, nasheed }) {
           }</sup>`
         : `<sup>${i + 1}</sup>`;
 
+    // Track offset per verse to avoid interference across verses
+    if (!engWFootnote._offsets) {
+      engWFootnote._offsets = {};
+    }
+
+    if (!engWFootnote._offsets[verseIndex]) {
+      engWFootnote._offsets[verseIndex] = 0;
+    }
+
+    const offset = engWFootnote._offsets[verseIndex];
     const adjustedEnd = end + offset;
 
-    engWFootnote[note.verseIndex] =
+    engWFootnote[verseIndex] =
       original.slice(0, adjustedEnd) + supTag + original.slice(adjustedEnd);
 
-    offset += supTag.length; // update the offset for future insertions
+    engWFootnote._offsets[verseIndex] += supTag.length;
   });
 
   const Footer = () => {
@@ -393,6 +403,9 @@ export default function MyModal({ open, onClose, nasheed }) {
             <div className="body">
               <div className="paragraph">
                 <p className="arabText">{arab[counter]}</p>
+                <p className="engText">
+                  <em dangerouslySetInnerHTML={{ __html: rom[counter] }} />
+                </p>
                 <p
                   className="engText"
                   dangerouslySetInnerHTML={{

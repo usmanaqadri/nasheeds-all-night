@@ -1,16 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Box,
-  TextField,
   Button,
   Grid,
   Typography,
-  InputAdornment,
   IconButton,
   Tooltip,
   keyframes,
   CircularProgress,
   Popover,
+  Container,
 } from "@mui/material";
 import { baseURL } from "../utils/constants";
 import { SnackbarAlert, sortFootnotes } from "../utils/helperFunctions";
@@ -92,6 +91,134 @@ const styles = {
   },
 };
 
+function htmlToPlainTextWithNewlines(html) {
+  // Replace <div> and </div> with \n
+  let text = html
+    .replace(/<sup[^>]*>.*?<\/sup>/g, "") // remove sup tags
+    .replace(/<div><br><\/div>/gi, "\n") // empty lines
+    .replace(/<div>/gi, "\n")
+    .replace(/<\/div>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n") // <br> to newline
+    .replace(/&nbsp;/gi, " ") // decode common entity
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/[ \t]+\n/g, "\n");
+
+  return text.trim();
+}
+
+function RichTextField({
+  label,
+  name,
+  value,
+  required,
+  onChange,
+  endAdornment,
+  disabled,
+  editableRef,
+  footnotes = null,
+  onMouseUp = () => {},
+  placeholder = "Enter a value",
+  multiline = false,
+}) {
+  let val = value.replace(/<sup[^>]*>.*?<\/sup>/g, "");
+
+  if (name === "eng" && footnotes?.length) {
+    let offset = 0;
+
+    footnotes.forEach((note, i) => {
+      const [start, end] = note.range;
+
+      const supTag = `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+        i + 1
+      }</sup>`;
+
+      const adjustedEnd = end + offset;
+
+      val = val.slice(0, adjustedEnd) + supTag + val.slice(adjustedEnd);
+
+      offset += supTag.length;
+    });
+  }
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.5,
+        width: multiline ? "100%" : "33%",
+        minWidth: "250px",
+      }}
+    >
+      <Typography
+        variant="subtitle1"
+        sx={{ color: "text.secondary", textAlign: "left", fontSize: "1.5rem" }}
+      >
+        {label} {required && <span style={{ color: "red" }}>*</span>}
+      </Typography>
+      <Box sx={{ position: "relative", width: "100%" }}>
+        <Box
+          ref={editableRef}
+          contentEditable={!disabled}
+          onKeyDown={(e) => {
+            if (!multiline && e.key === "Enter") e.preventDefault(); // disable line breaks
+          }}
+          dangerouslySetInnerHTML={{ __html: val }}
+          onMouseUp={onMouseUp}
+          onInput={() => {}}
+          onBlur={(e) =>
+            onChange?.({
+              name,
+              value: htmlToPlainTextWithNewlines(e.currentTarget.innerHTML),
+            })
+          }
+          sx={{
+            textAlign: "left",
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            padding: multiline ? "12.5px 14px" : "16.5px 14px",
+            paddingRight: endAdornment ? "48px" : "14px", // leave space for adornment
+            minHeight: multiline ? "145px" : "56px", // match default TextField height
+            fontSize: "1.5rem",
+            fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+            lineHeight: 1.4375, // default for MUI
+            width: "100%",
+            overflow: "auto", // allow scrolling
+            whiteSpace: "pre", // preserve spacing + allow horizontal overflow
+            wordBreak: "normal", // don't break long words
+            overflowX: "auto", // specifically allow horizontal scrolling
+            "&:focus": {
+              outline: disabled ? "none" : "2px solid #1976d2",
+            },
+            "&:empty::before": {
+              content: `"${placeholder}"`,
+              color: "rgba(0, 0, 0, 0.38)", // MUI's default placeholder color
+              pointerEvents: "none",
+              display: "block",
+            },
+          }}
+        />
+        {endAdornment && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 4,
+              right: 14,
+              zIndex: 1,
+              pointerEvents: disabled ? "none" : "auto",
+            }}
+          >
+            {endAdornment}
+          </Box>
+        )}
+      </Box>
+    </Box>
+  );
+}
+
 const Create = () => {
   const [loadingTranslation, setLoadingTranslation] = useState(false);
   const [loadingTransliteration, setLoadingTransliteration] = useState(false);
@@ -110,75 +237,136 @@ const Create = () => {
   const [popoverCoords, setPopoverCoords] = useState({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
+  const [indicesToOffset, setIndicesToOffset] = useState([]);
   const [showPopover, setShowPopover] = useState(false);
   const [showFootnoteModal, setShowFootnoteModal] = useState(false);
   const [footnoteContent, setFootnoteContent] = useState("");
-  const textFieldRef = useRef(null);
+  const [openFootnote, setOpenFootnote] = useState(null);
+  const [selectedFootnote, setSelectedFootnote] = useState(null);
+  const [editingFootnote, setEditingFootnote] = useState(false);
+  const editableRef = useRef(null);
+
   const popoverContentRef = useRef(null);
 
-  const handleMouseUp = (e, blockIdx) => {
-    const textarea = textFieldRef.current;
-    if (!textarea) return;
+  console.log("here is nasheed", nasheed);
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selected = textarea.value.slice(start, end);
+  useEffect(() => {
+    const handler = (e) => {
+      const target = e.target;
+      if (target.tagName === "SUP" && target.dataset.idx) {
+        setOpenFootnote(parseInt(target.dataset.idx));
+        setSelectedFootnote(nasheed?.footnotes[parseInt(target.dataset.idx)]);
+      }
+    };
 
-    if (start === end || !selected.trim()) {
+    const container = document.querySelector(".create-nasheed-form");
+    container?.addEventListener("click", handler);
+
+    return () => container?.removeEventListener("click", handler);
+  }, [nasheed]);
+
+  const handleMouseUp = (e) => {
+    const selection = window.getSelection();
+    const range = selection.getRangeAt(0);
+    const selected = selection.toString();
+
+    console.log("what do we got in here?", e.target.innerText);
+    console.log("indices to shift/offset", indicesToOffset);
+
+    console.log("what is selected", selected);
+    if (!selected.trim() || selection.rangeCount === 0 || range.collapsed) {
       setShowPopover(false);
       return;
     }
 
-    const caretStart = getCaretCoordinates(textarea, start);
-    const caretEnd = getCaretCoordinates(textarea, end);
-
-    const caretCoords = {
-      top: caretStart.top,
-      left: (caretStart.left + caretEnd.left) / 2,
-    };
-
-    const rect = textarea.getBoundingClientRect();
-    const baseLeft = rect.left + caretCoords.left + window.scrollX;
-    const top = rect.top + caretCoords.top + window.scrollY - 40;
-
-    // Wait until popover renders, then re-center it
-    setTimeout(() => {
-      const width = popoverContentRef.current?.offsetWidth || 0;
-      setPopoverCoords({
-        top,
-        left: baseLeft - width / 2,
-      });
-    }, 0);
+    const rect = range.getBoundingClientRect();
 
     setSelectedText(selected);
-    setSelectedRange([start, end]);
+
+    let offset = 0;
+    const parent = e.currentTarget;
+    const preSelectionRange = document.createRange();
+    preSelectionRange.setStart(parent, 0);
+    preSelectionRange.setEnd(range.startContainer, range.startOffset);
+    const start = preSelectionRange.toString().length;
+    for (const indexThatShifts of indicesToOffset) {
+      console.log("am I in this?", indexThatShifts);
+      if (start > indexThatShifts) offset--;
+    }
+    console.log("here is start", start);
+    console.log("here is offset", offset);
+    const adjustedStart = start + offset;
+    const end = adjustedStart + selected.length;
+
+    console.log("here is the start and end", adjustedStart, end);
+
+    console.log(
+      "does this match the selected?",
+      e.target.innerText.slice(adjustedStart, end)
+    );
+
+    setSelectedRange([adjustedStart, end]);
     setShowPopover(true);
+
+    setTimeout(() => {
+      const width = popoverContentRef.current?.offsetWidth || 0;
+      const centerX = rect.left + rect.width / 2;
+      const topY = rect.top - 40 + window.scrollY;
+      setPopoverCoords({
+        top: topY,
+        left: centerX - width / 2 + window.scrollX,
+      });
+    }, 0);
   };
 
   const handleSaveFootnote = () => {
-    if (selectedRange) {
-      const tempFootnote = {
-        range: selectedRange,
-        content: footnoteContent,
-        verseIndex: "",
-      };
+    if (!selectedRange) return;
 
-      setNasheed((prev) => {
-        const tmpFootnotes = [...prev.footnotes, tempFootnote].sort(
-          sortFootnotes
-        );
+    setIndicesToOffset((prev) => {
+      return [...prev, selectedRange[1]].sort((a, b) => a - b);
+    });
 
-        return { ...prev, footnotes: tmpFootnotes };
-      });
-      setShowFootnoteModal(false);
-      setShowPopover(false);
-      setFootnoteContent("");
-    }
+    const tempFootnote = {
+      range: [...selectedRange], // clone to avoid mutation
+      content: footnoteContent,
+      verseIndex: "",
+    };
+
+    setNasheed((prev) => {
+      const oldFootnotes = prev.footnotes || [];
+      const newFootnotes = [];
+      let inserted = false;
+
+      for (let i = 0; i <= oldFootnotes.length; i++) {
+        const fn = oldFootnotes[i];
+
+        // Insert the new footnote at the right place
+        if (
+          !inserted &&
+          (i === oldFootnotes.length || tempFootnote.range[0] < fn.range[0])
+        ) {
+          newFootnotes.push(tempFootnote);
+        }
+
+        if (fn) {
+          newFootnotes.push(fn);
+        }
+      }
+
+      return { ...prev, footnotes: newFootnotes };
+    });
+
+    setShowFootnoteModal(false);
+    setShowPopover(false);
+    setFootnoteContent("");
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNasheed((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (target) => {
+    const { name, value } = target;
+    setNasheed((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -196,18 +384,17 @@ const Create = () => {
 
     const engVerses = nasheed.eng.split("\n");
 
-    let currentOffset = 0;
-
     const adjustedFootnotes = nasheed.footnotes.map((footnote) => {
       const { range } = footnote;
       const [start, end] = range;
 
-      // Find which verse this footnote belongs to
       let verseIndex = -1;
+      let runningOffset = 0;
+
       for (let i = 0; i < engVerses.length; i++) {
         const verse = engVerses[i];
-        const verseStart = currentOffset;
-        const verseEnd = currentOffset + verse.length;
+        const verseStart = runningOffset;
+        const verseEnd = runningOffset + verse.length;
 
         if (start >= verseStart && end <= verseEnd) {
           verseIndex = i;
@@ -219,10 +406,10 @@ const Create = () => {
           };
         }
 
-        currentOffset = verseEnd + 1; // +1 for newline character
+        runningOffset = verseEnd + 1; // Only update AFTER checking this verse
       }
 
-      // fallback in case not found
+      // fallback (if somehow not found)
       return footnote;
     });
 
@@ -348,6 +535,41 @@ const Create = () => {
     setLoadingTranslation(false);
   };
 
+  const handleCancel = () => {
+    setSelectedFootnote((prev) => ({
+      ...prev,
+      content: nasheed.footnotes[openFootnote]?.content,
+    }));
+    setEditingFootnote(false);
+  };
+
+  const handleDeleteFootnote = () => {
+    setNasheed((prev) => {
+      const updatedFootnotes = [];
+      prev.footnotes.forEach((fn, index) => {
+        if (index === openFootnote) {
+          setIndicesToOffset((prev) => {
+            return prev.filter((idx) => fn.range[1] !== idx);
+          });
+          return;
+        }
+        updatedFootnotes.push(fn);
+      });
+      return { ...prev, footnotes: updatedFootnotes };
+    });
+
+    setOpenFootnote(null);
+  };
+
+  const handleSave = () => {
+    setNasheed((prev) => {
+      const updatedFootnotes = prev.footnotes;
+      updatedFootnotes[openFootnote] = selectedFootnote;
+      return { ...prev, updatedFootnotes };
+    });
+    setEditingFootnote(false);
+  };
+
   return (
     <>
       <SeoHelmet
@@ -355,6 +577,28 @@ const Create = () => {
         description={`Add your own nasheed with Arabic, transliteration, and English translation.`}
         url={`https://dhikrpedia.com/create`}
         type="website"
+      />
+      <FootnoteDialog
+        open={openFootnote !== null}
+        onClose={() => setOpenFootnote(null)}
+        title={
+          <span>
+            {nasheed.eng?.slice(
+              selectedFootnote?.range?.[0],
+              selectedFootnote?.range?.[1]
+            )}
+            <sup>{openFootnote + 1}</sup>
+          </span>
+        }
+        content={selectedFootnote?.content}
+        isEditing={editingFootnote}
+        onChange={(val) =>
+          setSelectedFootnote((prev) => ({ ...prev, content: val }))
+        }
+        onCancelEdit={handleCancel}
+        onSave={handleSave}
+        onEditClick={() => setEditingFootnote(true)}
+        onDelete={handleDeleteFootnote}
       />
       <Popover
         open={showPopover}
@@ -379,7 +623,12 @@ const Create = () => {
           </Button>
         </Box>
       </Popover>
-      <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
+      <Box
+        className="create-nasheed-form"
+        component="form"
+        onSubmit={handleSubmit}
+        sx={styles.formContainer}
+      >
         <FootnoteDialog
           open={showFootnoteModal}
           onClose={() => setShowFootnoteModal(false)}
@@ -413,92 +662,85 @@ const Create = () => {
           message={alert.message}
           type={alert.type}
         />{" "}
-        <TextField
-          label="Arabic/Urdu Title"
-          name="arabTitle"
-          value={nasheed.arabTitle}
-          onChange={handleChange}
-          required
-          sx={styles.title}
-        />
-        <TextField
-          label="English Title"
-          name="engTitle"
-          value={nasheed.engTitle}
-          onChange={handleChange}
-          required
-          sx={styles.title}
-        />
+        <Container sx={{ display: "flex", justifyContent: "center" }}>
+          <RichTextField
+            label="Arabic Title"
+            name="arabTitle"
+            placeholder="Enter Arabic Title"
+            required
+            value={nasheed.arabTitle}
+            onChange={handleChange}
+          />
+        </Container>
+        <Container sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <RichTextField
+            label="English Title"
+            name="engTitle"
+            value={nasheed.engTitle}
+            onChange={handleChange}
+            required
+            placeholder="Enter English Title"
+          />
+        </Container>
         <Grid container spacing={2} sx={styles.gridContainer}>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
             <Box sx={{ position: "relative" }}>
-              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
-              {/* Placeholder for alignment */}
-              <TextField
-                label="Arabic/Urdu verses (one per line)"
+              <RichTextField
+                label="Arabic/Urdu verses"
                 name="arab"
                 value={nasheed.arab}
                 onChange={handleChange}
                 multiline
-                minRows={10}
-                sx={styles.lyrics}
+                placeholder="One verse per line"
               />
+              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
+              {/* Placeholder for alignment */}
             </Box>
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
             <Box sx={{ position: "relative" }}>
-              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
-              {/* Placeholder for alignment */}
-              <TextField
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Tooltip
-                        componentsProps={{
-                          tooltip: {
-                            sx: {
-                              fontSize: "12px",
-                              padding: "5px 10px",
-                            },
-                          },
-                        }}
-                        placement="top"
-                        title="Use AI to generate"
-                      >
-                        <span>
-                          {" "}
-                          <IconButton
-                            edge="end"
-                            onClick={getTransliteration}
-                            disabled={loadingTransliteration}
-                          >
-                            <AutoAwesome
-                              fontSize="large"
-                              sx={
-                                loadingTransliteration
-                                  ? {
-                                      animation: `${colorFlash} 2s infinite`,
-                                    }
-                                  : {}
-                              }
-                            />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </InputAdornment>
-                  ),
-                }}
-                label="Transliteration verses (one per line)"
+              <RichTextField
+                label="Transliteration Verses"
                 name="rom"
                 value={nasheed.rom}
                 onChange={handleChange}
                 multiline
-                minRows={10}
-                sx={{
-                  opacity: loadingTransliteration ? 0.6 : 1,
-                  ...styles.lyrics,
-                }}
+                placeholder="One verse per line"
                 disabled={loadingTransliteration}
+                endAdornment={
+                  <Tooltip
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: "12px",
+                          padding: "5px 10px",
+                        },
+                      },
+                    }}
+                    placement="top"
+                    title="Use AI to generate"
+                  >
+                    <span>
+                      {" "}
+                      <IconButton
+                        edge="end"
+                        onClick={getTransliteration}
+                        disabled={loadingTransliteration}
+                      >
+                        <AutoAwesome
+                          fontSize="large"
+                          sx={
+                            loadingTransliteration
+                              ? {
+                                  animation: `${colorFlash} 2s infinite`,
+                                }
+                              : {}
+                          }
+                        />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                }
               />
               {loadingTransliteration && (
                 <Box
@@ -513,10 +755,59 @@ const Create = () => {
                   <CircularProgress size={32} />
                 </Box>
               )}
+              <Box sx={{ mb: 2, height: "1.4rem" }} />{" "}
+              {/* Placeholder for alignment */}
             </Box>
           </Grid>
           <Grid item xs={12} md={4} sx={styles.gridItem}>
             <Box sx={{ position: "relative" }}>
+              <RichTextField
+                label="English Verses"
+                name="eng"
+                value={nasheed.eng}
+                onChange={handleChange}
+                onMouseUp={handleMouseUp}
+                multiline
+                editableRef={editableRef}
+                placeholder="One verse per line"
+                disabled={loadingTranslation}
+                footnotes={nasheed.footnotes}
+                endAdornment={
+                  <Tooltip
+                    componentsProps={{
+                      tooltip: {
+                        sx: {
+                          fontSize: "12px",
+                          padding: "5px 10px",
+                        },
+                      },
+                    }}
+                    placement="top"
+                    title="Use AI to generate"
+                  >
+                    <span>
+                      {" "}
+                      {/* for disabled IconButton workaround */}
+                      <IconButton
+                        edge="end"
+                        onClick={getTranslation}
+                        disabled={loadingTranslation}
+                      >
+                        <AutoAwesome
+                          fontSize="large"
+                          sx={
+                            loadingTranslation
+                              ? {
+                                  animation: `${colorFlash} 2s infinite`,
+                                }
+                              : {}
+                          }
+                        />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                }
+              />
               <Typography
                 variant="body2"
                 sx={{
@@ -531,60 +822,6 @@ const Create = () => {
                 Tip: Highlight part of the English translation to add a
                 footnote.
               </Typography>
-              <TextField
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Tooltip
-                        componentsProps={{
-                          tooltip: {
-                            sx: {
-                              fontSize: "12px",
-                              padding: "5px 10px",
-                            },
-                          },
-                        }}
-                        placement="top"
-                        title="Use AI to generate"
-                      >
-                        <span>
-                          {" "}
-                          {/* for disabled IconButton workaround */}
-                          <IconButton
-                            edge="end"
-                            onClick={getTranslation}
-                            disabled={loadingTranslation}
-                          >
-                            <AutoAwesome
-                              fontSize="large"
-                              sx={
-                                loadingTranslation
-                                  ? {
-                                      animation: `${colorFlash} 2s infinite`,
-                                    }
-                                  : {}
-                              }
-                            />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </InputAdornment>
-                  ),
-                }}
-                label="English verses (one per line)"
-                name="eng"
-                value={nasheed.eng}
-                onChange={handleChange}
-                onMouseUp={handleMouseUp}
-                inputRef={textFieldRef}
-                multiline
-                minRows={10}
-                sx={{
-                  opacity: loadingTranslation ? 0.6 : 1,
-                  ...styles.lyrics,
-                }}
-                disabled={loadingTranslation}
-              />
 
               {loadingTranslation && (
                 <Box
