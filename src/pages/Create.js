@@ -168,12 +168,46 @@ function RichTextField({
           dangerouslySetInnerHTML={{ __html: val }}
           onMouseUp={onMouseUp}
           onInput={() => {}}
-          onBlur={(e) =>
+          onBlur={(e) => {
+            const newVal = htmlToPlainTextWithNewlines(
+              e.currentTarget.innerHTML
+            );
+            const oldVal = val;
+
+            console.log("here is newVal", newVal);
+            console.log("here is oldVal", oldVal);
+
+            let updatedFootnotes = [];
+
+            if (footnotes?.length) {
+              updatedFootnotes = footnotes
+                .map((note) => {
+                  const footnotedText = oldVal.slice(
+                    note.range[0],
+                    note.range[1]
+                  );
+
+                  if (newVal.indexOf(footnotedText) !== -1) {
+                    return {
+                      ...note,
+                      range: [
+                        newVal.indexOf(footnotedText),
+                        newVal.indexOf(footnotedText) + footnotedText.length,
+                      ],
+                    };
+                  } else {
+                    return null;
+                  }
+                })
+                .filter(Boolean);
+            }
+
             onChange?.({
               name,
-              value: htmlToPlainTextWithNewlines(e.currentTarget.innerHTML),
-            })
-          }
+              value: newVal,
+              footnotes: updatedFootnotes,
+            });
+          }}
           sx={{
             textAlign: "left",
             border: "1px solid",
@@ -362,10 +396,11 @@ const Create = () => {
   };
 
   const handleChange = (target) => {
-    const { name, value } = target;
+    const { name, value, footnotes } = target;
     setNasheed((prev) => ({
       ...prev,
       [name]: value,
+      ...(footnotes != null ? { footnotes } : {}),
     }));
   };
 
