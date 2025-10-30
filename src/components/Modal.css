@@ -169,6 +169,24 @@
 		width: 100%;
 	}
 
+	.text-container {
+        padding: 0;
+		min-width: auto;
+        width: 70vw;
+    }
+
+	.text-container .body div p {
+        font-size: 1.4rem;
+        font-family: 'Cormorant', serif !important;
+    }
+
+    .text-container .body div textarea {
+        font-size: 1.4rem;
+        min-width: 220px;
+        margin: 5px 0;
+        font-family: 'Cormorant', serif !important;
+    }
+
 	.slide-number {
         position: absolute !important;
 		bottom: 10px;
