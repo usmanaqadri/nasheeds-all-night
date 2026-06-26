@@ -25,7 +25,7 @@ import { FootnotePopper } from "./FootnotePopper";
 
 export default function MyModal({ open, onClose, nasheed }) {
   const { user } = useAuth();
-  let { arab, arabTitle, engTitle, eng, rom, _id, footnotes } = nasheed;
+  let { arab, arabTitle, engTitle, eng, rom, _id, footnotes = [] } = nasheed;
   const engWFootnote = [...eng];
   const [counter, setCounter] = useState(0);
   const [loadingPDF, setLoadingPDF] = useState(false);
@@ -85,7 +85,7 @@ export default function MyModal({ open, onClose, nasheed }) {
         footnoteDivs.push(
           <div key={footnotes[i].content}>
             <sup>{i + 1}</sup> {footnotes[i].content}
-          </div>
+          </div>,
         );
       }
     }
@@ -128,7 +128,7 @@ export default function MyModal({ open, onClose, nasheed }) {
         setCounter(0);
       }
     },
-    [counter, eng.length, onClose]
+    [counter, eng.length, onClose],
   );
   useEffect(() => {
     if (mode === "presentation") {
@@ -238,7 +238,7 @@ export default function MyModal({ open, onClose, nasheed }) {
                   arab,
                   eng,
                   rom,
-                  footnotes
+                  footnotes,
                 );
 
                 // 2. Mark generation complete
