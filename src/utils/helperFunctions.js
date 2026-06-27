@@ -12,12 +12,18 @@ import {
   Typography,
   Divider,
   Tooltip,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { baseURL } from "./constants";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../components/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { AddCircleOutlineOutlined } from "@mui/icons-material";
+import {
+  AddCircleOutlineOutlined,
+  LibraryAddOutlined,
+  SlideshowOutlined,
+} from "@mui/icons-material";
 
 export const alphabetize = (a, b) =>
   a.engTitle
@@ -137,19 +143,34 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [createAnchorEl, setCreateAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const createOpen = Boolean(createAnchorEl);
 
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleCreateOpen = (event) => {
+    setCreateAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  const handleCreateClose = () => {
+    setCreateAnchorEl(null);
+  };
+
   const handleSignOut = () => {
     handleClose();
     signOut();
+  };
+
+  const handleNavigateToCreate = (path) => {
+    handleCreateClose();
+    navigate(path);
   };
 
   return (
@@ -173,9 +194,9 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
                 },
               },
             }}
-            title="Add Nasheed"
+            title="Create"
           >
-            <IconButton onClick={() => navigate("/create")}>
+            <IconButton onClick={handleCreateOpen}>
               <AddCircleOutlineOutlined
                 sx={{ fontSize: "30px", color: "white" }}
               />
@@ -199,6 +220,41 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
           </IconButton>
         </Tooltip>
       </Box>
+
+      <Menu
+        anchorEl={createAnchorEl}
+        open={createOpen}
+        onClose={handleCreateClose}
+        PaperProps={{
+          sx: {
+            mt: 1,
+            borderRadius: 2,
+            minWidth: 220,
+            backgroundColor: darkMode ? "#222" : "white",
+            color: darkMode ? "white" : "#222",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      >
+        <MenuItem onClick={() => handleNavigateToCreate("/create/nasheed")}>
+          <ListItemIcon>
+            <LibraryAddOutlined
+              fontSize="small"
+              sx={{ color: darkMode ? "white" : "#222" }}
+            />
+          </ListItemIcon>
+          <ListItemText primary="New Nasheed" />
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigateToCreate("/create/slideshow")}>
+          <ListItemIcon>
+            <SlideshowOutlined
+              fontSize="small"
+              sx={{ color: darkMode ? "white" : "#222" }}
+            />
+          </ListItemIcon>
+          <ListItemText primary="New slideshow" />
+        </MenuItem>
+      </Menu>
 
       <Menu
         anchorEl={anchorEl}

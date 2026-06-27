@@ -81,6 +81,19 @@
   font-size: 1.5rem;
 }
 
+.modal-main-title {
+  font-size: 3.4rem;
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.modal-sub-title {
+  margin-top: 0.35rem;
+  font-size: 2rem;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
 .modal .body {
   flex: 50%;
   display: flex;
@@ -164,6 +177,14 @@
 	.modal .title {
 		font-size: 1rem;
 	}
+
+	.modal-main-title {
+		font-size: 2rem;
+	}
+
+	.modal-sub-title {
+		font-size: 1.2rem;
+	}
 	.modal .body {
 		font-size: 1.2rem;
 		width: 100%;
@@ -225,6 +246,14 @@
 	.modal .title {
 		margin-top: -3.0em;
 		font-size: 0.8rem;
+	}
+
+	.modal-main-title {
+		font-size: 1.5rem;
+	}
+
+	.modal-sub-title {
+		font-size: 1rem;
 	}
 	.modal .body {
 		font-size: 1rem;

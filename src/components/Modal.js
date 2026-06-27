@@ -6,6 +6,10 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Button,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import {
@@ -16,16 +20,26 @@ import {
   EditNote,
   CheckCircleOutline,
   ErrorOutline,
+  DeleteOutline,
 } from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
 import { nasheedText, SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "./AuthContext";
 import { FootnotePopper } from "./FootnotePopper";
+import { baseURL } from "../utils/constants";
 
-export default function MyModal({ open, onClose, nasheed }) {
+export default function MyModal({
+  open,
+  onClose,
+  nasheed,
+  onSlideshowDeleted = () => {},
+}) {
   const { user } = useAuth();
   let { arab, arabTitle, engTitle, eng, rom, _id, footnotes = [] } = nasheed;
+  const isSlideshow = nasheed?.type === "slideshow";
+  const slideshowSections = nasheed?.slides || [];
+  const token = localStorage.getItem("token");
   const engWFootnote = [...eng];
   const [counter, setCounter] = useState(0);
   const [loadingPDF, setLoadingPDF] = useState(false);
@@ -38,6 +52,8 @@ export default function MyModal({ open, onClose, nasheed }) {
   const [flashSide, setFlashSide] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   footnotes.forEach((note, i) => {
     const verseIndex = note.verseIndex;
     const original = engWFootnote[verseIndex] || "";
@@ -206,8 +222,111 @@ export default function MyModal({ open, onClose, nasheed }) {
     }
   };
 
+  const currentSlideshowSection = (() => {
+    if (!isSlideshow || slideshowSections.length === 0) {
+      return null;
+    }
+
+    let verseCursor = 0;
+
+    for (const section of slideshowSections) {
+      const sectionLength = section.verses?.length || 0;
+      if (counter >= verseCursor && counter < verseCursor + sectionLength) {
+        return section;
+      }
+      verseCursor += sectionLength;
+    }
+
+    return slideshowSections[slideshowSections.length - 1] || null;
+  })();
+
   const allowEdit =
-    !isMobile && (user?.admin || nasheed.creatorId === user?.id);
+    !isMobile && !isSlideshow && _id && (user?.admin || nasheed.creatorId === user?.id);
+  const allowSlideshowManage =
+    !isMobile && isSlideshow && _id && (user?.admin || nasheed.creatorId === user?.id);
+
+  const getSlideshowSectionForVerse = (verseIndex) => {
+    if (!isSlideshow || slideshowSections.length === 0) {
+      return null;
+    }
+
+    let verseCursor = 0;
+
+    for (const section of slideshowSections) {
+      const sectionLength = section.verses?.length || 0;
+
+      if (verseIndex >= verseCursor && verseIndex < verseCursor + sectionLength) {
+        return section;
+      }
+
+      verseCursor += sectionLength;
+    }
+
+    return null;
+  };
+
+  const renderVerseBlock = (verseIndex) => {
+    if (verseIndex >= eng.length || verseIndex < 0) {
+      return null;
+    }
+
+    const layout =
+      getSlideshowSectionForVerse(verseIndex)?.layout || "arab-rom-eng";
+    const showArab = layout.includes("arab");
+    const showRom = layout.includes("rom");
+    const showEng = layout.includes("eng");
+
+    return (
+      <div className="paragraph">
+        {showArab && <p className="arabText">{arab[verseIndex]}</p>}
+        {showRom && (
+          <p className="engText">
+            <em dangerouslySetInnerHTML={{ __html: rom[verseIndex] }} />
+          </p>
+        )}
+        {showEng && (
+          <p
+            className="engText"
+            dangerouslySetInnerHTML={{
+              __html: engWFootnote[verseIndex],
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const handleDeleteSlideshow = async () => {
+    if (!token || !_id) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const response = await fetch(`${baseURL}/slideshow/${_id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to delete slideshow.");
+      }
+
+      onSlideshowDeleted(_id);
+      setShowDeleteDialog(false);
+    } catch (error) {
+      setAlertMessage(error.message || "Failed to delete slideshow.");
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <Modal
@@ -218,6 +337,28 @@ export default function MyModal({ open, onClose, nasheed }) {
       aria-describedby="modal-modal-description"
     >
       <Box className="modal">
+        <Dialog
+          open={showDeleteDialog}
+          onClose={() => setShowDeleteDialog(false)}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogTitle>
+            Are you sure you want to delete this slideshow?
+          </DialogTitle>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={() => setShowDeleteDialog(false)} color="inherit">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteSlideshow}
+              color="error"
+              variant="contained"
+              disabled={deleting}
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
         {flashSide === "left" && <div className="flash-overlay left-flash" />}
         {flashSide === "right" && <div className="flash-overlay right-flash" />}
         <div className="modal-left-buttons">
@@ -346,6 +487,53 @@ export default function MyModal({ open, onClose, nasheed }) {
           )}
         </div>
         <div className="modal-right-buttons">
+          {allowSlideshowManage && (
+            <Tooltip
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+              title="Edit slideshow"
+            >
+              <IconButton
+                onClick={(e) => e.stopPropagation()}
+                component={Link}
+                to={`/create/slideshow/${_id}`}
+                sx={buttonStyles}
+              >
+                <EditNote fontSize="large" style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+          {allowSlideshowManage && (
+            <Tooltip
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+              title="Delete slideshow"
+            >
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDeleteDialog(true);
+                }}
+                sx={buttonStyles}
+              >
+                <DeleteOutline fontSize="large" style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
+          )}
           {allowEdit && (
             <Tooltip
               placement="top"
@@ -382,7 +570,10 @@ export default function MyModal({ open, onClose, nasheed }) {
             title="Close"
           >
             <IconButton
-              sx={{ ...buttonStyles, marginLeft: allowEdit ? "0" : "30px" }}
+              sx={{
+                ...buttonStyles,
+                marginLeft: allowEdit || allowSlideshowManage ? "0" : "30px",
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 onClose();
@@ -393,39 +584,26 @@ export default function MyModal({ open, onClose, nasheed }) {
           </Tooltip>
         </div>
         <div className="title">
-          <h1 className="arabText">
-            {arabTitle}
-            <br />
-            {engTitle}
-          </h1>
+          {isSlideshow && mode === "presentation" ? (
+            <h1>
+              <div className="modal-main-title">{engTitle}</div>
+              <div className="modal-sub-title">
+                {currentSlideshowSection?.engTitle || arabTitle}
+              </div>
+            </h1>
+          ) : (
+            <h1 className="arabText">
+              {arabTitle}
+              <br />
+              {engTitle}
+            </h1>
+          )}
         </div>
         {mode === "presentation" ? (
           <>
             <div className="body">
-              <div className="paragraph">
-                <p className="arabText">{arab[counter]}</p>
-                <p className="engText">
-                  <em dangerouslySetInnerHTML={{ __html: rom[counter] }} />
-                </p>
-                <p
-                  className="engText"
-                  dangerouslySetInnerHTML={{
-                    __html: engWFootnote[counter],
-                  }}
-                />
-              </div>
-              <div className="paragraph">
-                <p className="arabText">{arab[counter + 1]}</p>
-                <p className="engText">
-                  <em dangerouslySetInnerHTML={{ __html: rom[counter + 1] }} />
-                </p>
-                <p
-                  className="engText"
-                  dangerouslySetInnerHTML={{
-                    __html: engWFootnote[counter + 1],
-                  }}
-                />
-              </div>
+              {renderVerseBlock(counter)}
+              {renderVerseBlock(counter + 1)}
             </div>
             <Footer />
             <div className="slide-number">
@@ -446,7 +624,13 @@ export default function MyModal({ open, onClose, nasheed }) {
               className="text-container"
             >
               <div style={{ border: "1px dotted white" }} className="body">
-                {nasheedText({ arab, eng: engWFootnote, rom })}
+                {isSlideshow
+                  ? eng.map((_, verseIndex) => (
+                      <div key={`${engTitle}-${verseIndex}`} className="translation-container">
+                        {renderVerseBlock(verseIndex)}
+                      </div>
+                    ))
+                  : nasheedText({ arab, eng: engWFootnote, rom })}
               </div>
             </div>
           </>

@@ -3,7 +3,7 @@ import { Card, Typography } from "@mui/material";
 function NasheedBoard({ nasheeds, onClick }) {
   const nasheedDivs = nasheeds.map((nasheed, index) => (
     <Card
-      key={nasheed.engTitle}
+      key={nasheed._id || nasheed.id || `${nasheed.engTitle}-${index}`}
       variant="outlined"
       onClick={onClick(index)}
       sx={{
@@ -45,7 +45,9 @@ function NasheedBoard({ nasheeds, onClick }) {
         }}
         variant="h6"
       >
-        {nasheed.arabTitle}
+        {nasheed.type === "slideshow"
+          ? nasheed.subtitle || nasheed.arabTitle || ""
+          : nasheed.arabTitle || nasheed.subtitle || ""}
       </Typography>
     </Card>
   ));
