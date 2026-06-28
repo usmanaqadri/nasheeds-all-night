@@ -23,6 +23,7 @@ import {
   AddCircleOutlineOutlined,
   LibraryAddOutlined,
   SlideshowOutlined,
+  CastConnectedOutlined,
 } from "@mui/icons-material";
 
 export const alphabetize = (a, b) =>
@@ -253,6 +254,15 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
             />
           </ListItemIcon>
           <ListItemText primary="New slideshow" />
+        </MenuItem>
+        <MenuItem onClick={() => handleNavigateToCreate("/create/session")}>
+          <ListItemIcon>
+            <CastConnectedOutlined
+              fontSize="small"
+              sx={{ color: darkMode ? "white" : "#222" }}
+            />
+          </ListItemIcon>
+          <ListItemText primary="New session" />
         </MenuItem>
       </Menu>
 

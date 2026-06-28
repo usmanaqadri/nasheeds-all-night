@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Edit from "./pages/Edit";
 import Create from "./pages/Create";
 import CreateSlideshow from "./pages/CreateSlideshow";
+import CreateSession from "./pages/CreateSession";
+import LiveSession from "./pages/LiveSession";
 import Layout from "./components/Layout";
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
           <Route path="/create/nasheed" element={<Create />} />
           <Route path="/create/slideshow" element={<CreateSlideshow />} />
           <Route path="/create/slideshow/:id" element={<CreateSlideshow />} />
+          <Route path="/create/session" element={<CreateSession />} />
+          <Route path="/session/:sessionId" element={<LiveSession />} />
         </Routes>
       </Layout>
     </BrowserRouter>

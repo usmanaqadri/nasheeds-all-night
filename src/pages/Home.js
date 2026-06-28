@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Button, Tab, Tabs, TextField } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader.js";
 import MyModal from "../components/Modal.js";
 import NasheedBoard from "../components/NasheedBoard.js";
@@ -15,6 +16,7 @@ import {
 import { buildSlideshowModalData } from "../utils/slideshowHelpers.js";
 
 const Home = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [nasheeds, setNasheeds] = useState([]);
@@ -26,6 +28,7 @@ const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
+  const [sessionCode, setSessionCode] = useState("");
 
   useEffect(() => {
     let queryParam = "";
@@ -109,6 +112,18 @@ const Home = () => {
     setIsOpen(false);
   };
 
+  const handleJoinSession = () => {
+    const trimmedCode = sessionCode.trim();
+
+    if (!trimmedCode) {
+      setAlertMessage("Enter a session code first.");
+      setShowAlert(true);
+      return;
+    }
+
+    navigate(`/session/${trimmedCode}`);
+  };
+
   const handleSlideshowDeleted = (deletedId) => {
     setSlideshows((prev) => prev.filter((slideshow) => slideshow._id !== deletedId));
     setFilteredSlideshows((prev) =>
@@ -189,6 +204,32 @@ const Home = () => {
                 : "Search for a slideshow"
             }
           />
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <TextField
+              label="Join live session"
+              placeholder="Enter session code"
+              value={sessionCode}
+              onChange={(event) => setSessionCode(event.target.value)}
+              size="small"
+              sx={{
+                minWidth: { xs: "260px", sm: "320px" },
+                backgroundColor: "rgba(255,255,255,0.92)",
+                borderRadius: 2,
+              }}
+            />
+            <Button variant="contained" onClick={handleJoinSession}>
+              Join
+            </Button>
+          </Box>
           <NasheedBoard
             nasheeds={
               activeTab === "nasheeds" ? filteredNasheeds : filteredSlideshows

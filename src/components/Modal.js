@@ -21,6 +21,8 @@ import {
   CheckCircleOutline,
   ErrorOutline,
   DeleteOutline,
+  LinkOutlined,
+  SyncOutlined,
 } from "@mui/icons-material";
 import "./Modal.css";
 import { generatePDF } from "../utils/generatePDF";
@@ -34,11 +36,17 @@ export default function MyModal({
   onClose,
   nasheed,
   onSlideshowDeleted = () => {},
+  presentationIndex = null,
+  onPresentationIndexChange = null,
+  forcePresentationMode = false,
+  disablePresentationControls = false,
+  sessionMeta = null,
 }) {
   const { user } = useAuth();
   let { arab, arabTitle, engTitle, eng, rom, _id, footnotes = [] } = nasheed;
   const isSlideshow = nasheed?.type === "slideshow";
   const slideshowSections = nasheed?.slides || [];
+  const isSessionMode = Boolean(sessionMeta);
   const token = localStorage.getItem("token");
   const engWFootnote = [...eng];
   const [counter, setCounter] = useState(0);
@@ -53,7 +61,10 @@ export default function MyModal({
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSessionExitDialog, setShowSessionExitDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const currentIndex =
+    typeof presentationIndex === "number" ? presentationIndex : counter;
   footnotes.forEach((note, i) => {
     const verseIndex = note.verseIndex;
     const original = engWFootnote[verseIndex] || "";
@@ -89,14 +100,15 @@ export default function MyModal({
     const footnoteDivs = [];
 
     if (
-      !(footnoteIdxs.includes(counter) || footnoteIdxs.includes(counter + 1))
+      !(footnoteIdxs.includes(currentIndex) ||
+        footnoteIdxs.includes(currentIndex + 1))
     ) {
       return;
     }
 
     for (let i = 0; i < footnotes.length; i++) {
-      if (footnotes[i].verseIndex < counter) continue;
-      else if (footnotes[i].verseIndex > counter + 1) break;
+      if (footnotes[i].verseIndex < currentIndex) continue;
+      else if (footnotes[i].verseIndex > currentIndex + 1) break;
       else {
         footnoteDivs.push(
           <div key={footnotes[i].content}>
@@ -120,31 +132,64 @@ export default function MyModal({
     },
   };
 
+  const updatePresentationIndex = useCallback(
+    (nextIndex) => {
+      if (typeof presentationIndex === "number") {
+        onPresentationIndexChange?.(nextIndex);
+      } else {
+        setCounter(nextIndex);
+      }
+    },
+    [onPresentationIndexChange, presentationIndex]
+  );
+
+  const handleSessionAwareCloseRequest = useCallback(() => {
+    if (isSessionMode) {
+      setShowSessionExitDialog(true);
+      return;
+    }
+
+    onClose();
+  }, [isSessionMode, onClose]);
+
   const handleUserKeyPress = useCallback(
     (e) => {
+      if (disablePresentationControls) {
+        if (e.code === "Escape") {
+          handleSessionAwareCloseRequest();
+        }
+        return;
+      }
+
       if (e.code === "ArrowLeft") {
         e.preventDefault();
-        if (counter === 0) setCounter(0);
-        else setCounter(counter - 2);
+        if (currentIndex === 0) updatePresentationIndex(0);
+        else updatePresentationIndex(currentIndex - 2);
         setFlashSide("left");
         setTimeout(() => setFlashSide(null), 800);
       }
       if (e.code === "ArrowRight") {
-        if (counter === eng.length) {
-          onClose();
-          setCounter(0);
+        if (currentIndex === eng.length) {
+          handleSessionAwareCloseRequest();
+          updatePresentationIndex(0);
         } else {
-          setCounter(counter + 2);
+          updatePresentationIndex(currentIndex + 2);
         }
         setFlashSide("right");
         setTimeout(() => setFlashSide(null), 800);
       }
       if (e.code === "Escape") {
-        onClose();
-        setCounter(0);
+        handleSessionAwareCloseRequest();
+        updatePresentationIndex(0);
       }
     },
-    [counter, eng.length, onClose],
+    [
+      currentIndex,
+      disablePresentationControls,
+      eng.length,
+      handleSessionAwareCloseRequest,
+      updatePresentationIndex,
+    ]
   );
   useEffect(() => {
     if (mode === "presentation") {
@@ -169,13 +214,13 @@ export default function MyModal({
     container?.addEventListener("click", handler);
 
     return () => container?.removeEventListener("click", handler);
-  }, [counter, mode]);
+  }, [currentIndex, mode]);
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 768) {
         setIsMobile(true);
-        setMode("scroll");
+        setMode(forcePresentationMode ? "presentation" : "scroll");
       } else {
         setIsMobile(false);
       }
@@ -186,25 +231,35 @@ export default function MyModal({
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [forcePresentationMode]);
+
+  useEffect(() => {
+    if (forcePresentationMode) {
+      setMode("presentation");
+    }
+  }, [forcePresentationMode]);
 
   const handleClick = (e) => {
+    if (disablePresentationControls) {
+      return;
+    }
+
     const clickTarget = e.target;
     const clickTargetWidth = clickTarget.offsetWidth;
     const xCoordInClickTarget =
       e.clientX - clickTarget.getBoundingClientRect().left;
     if (clickTargetWidth / 2 > xCoordInClickTarget) {
       e.preventDefault();
-      if (counter === 0) setCounter(0);
-      else setCounter(counter - 2);
+      if (currentIndex === 0) updatePresentationIndex(0);
+      else updatePresentationIndex(currentIndex - 2);
 
       setFlashSide("left");
     } else {
-      if (counter === eng.length) {
-        onClose();
-        setCounter(0);
+      if (currentIndex === eng.length) {
+        handleSessionAwareCloseRequest();
+        updatePresentationIndex(0);
       } else {
-        setCounter(counter + 2);
+        updatePresentationIndex(currentIndex + 2);
       }
       setFlashSide("right");
     }
@@ -213,7 +268,7 @@ export default function MyModal({
   };
 
   const totalScreens = Math.ceil(eng.length / 2);
-  const currentScreen = Math.floor(counter / 2) + 1;
+  const currentScreen = Math.floor(currentIndex / 2) + 1;
 
   const slideNumber = (currentScreen, totalScreens) => {
     if (currentScreen > totalScreens) return "End of Presentation";
@@ -231,7 +286,7 @@ export default function MyModal({
 
     for (const section of slideshowSections) {
       const sectionLength = section.verses?.length || 0;
-      if (counter >= verseCursor && counter < verseCursor + sectionLength) {
+      if (currentIndex >= verseCursor && currentIndex < verseCursor + sectionLength) {
         return section;
       }
       verseCursor += sectionLength;
@@ -243,7 +298,11 @@ export default function MyModal({
   const allowEdit =
     !isMobile && !isSlideshow && _id && (user?.admin || nasheed.creatorId === user?.id);
   const allowSlideshowManage =
-    !isMobile && isSlideshow && _id && (user?.admin || nasheed.creatorId === user?.id);
+    !isMobile &&
+    isSlideshow &&
+    !isSessionMode &&
+    _id &&
+    (user?.admin || nasheed.creatorId === user?.id);
 
   const getSlideshowSectionForVerse = (verseIndex) => {
     if (!isSlideshow || slideshowSections.length === 0) {
@@ -328,6 +387,22 @@ export default function MyModal({
     }
   };
 
+  const handleCloseClick = (e) => {
+    e.stopPropagation();
+    handleSessionAwareCloseRequest();
+  };
+
+  const handleConfirmSessionExit = () => {
+    setShowSessionExitDialog(false);
+
+    if (sessionMeta?.isLeader) {
+      sessionMeta?.onEndSession?.();
+      return;
+    }
+
+    sessionMeta?.onLeaveSession?.();
+  };
+
   return (
     <Modal
       open={open}
@@ -356,6 +431,32 @@ export default function MyModal({
               disabled={deleting}
             >
               Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={showSessionExitDialog}
+          onClose={() => setShowSessionExitDialog(false)}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DialogTitle>
+            {sessionMeta?.isLeader
+              ? "Are you sure you want to end the session?"
+              : "Are you sure you want to leave the session?"}
+          </DialogTitle>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button
+              onClick={() => setShowSessionExitDialog(false)}
+              color="inherit"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmSessionExit}
+              color={sessionMeta?.isLeader ? "error" : "primary"}
+              variant="contained"
+            >
+              {sessionMeta?.isLeader ? "End session" : "Leave session"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -434,7 +535,7 @@ export default function MyModal({
             message={alertMessage}
             type={"error"}
           />
-          {!isMobile && (
+          {!isMobile && !forcePresentationMode && (
             <>
               <Tooltip
                 placement="top"
@@ -487,6 +588,30 @@ export default function MyModal({
           )}
         </div>
         <div className="modal-right-buttons">
+          {isSessionMode && !isMobile && sessionMeta?.onCopyLink && (
+            <Tooltip
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+              title="Copy session link"
+            >
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  sessionMeta.onCopyLink();
+                }}
+                sx={buttonStyles}
+              >
+                <LinkOutlined fontSize="large" style={{ color: "white" }} />
+              </IconButton>
+            </Tooltip>
+          )}
           {allowSlideshowManage && (
             <Tooltip
               placement="top"
@@ -574,10 +699,7 @@ export default function MyModal({
                 ...buttonStyles,
                 marginLeft: allowEdit || allowSlideshowManage ? "0" : "30px",
               }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
+              onClick={handleCloseClick}
             >
               <Close fontSize="large" style={{ color: "white" }} />
             </IconButton>
@@ -590,6 +712,11 @@ export default function MyModal({
               <div className="modal-sub-title">
                 {currentSlideshowSection?.engTitle || arabTitle}
               </div>
+              {isSessionMode && (
+                <div className="modal-session-meta">
+                  Live session {sessionMeta?.sessionCode}
+                </div>
+              )}
             </h1>
           ) : (
             <h1 className="arabText">
@@ -602,10 +729,26 @@ export default function MyModal({
         {mode === "presentation" ? (
           <>
             <div className="body">
-              {renderVerseBlock(counter)}
-              {renderVerseBlock(counter + 1)}
+              {renderVerseBlock(currentIndex)}
+              {renderVerseBlock(currentIndex + 1)}
             </div>
             <Footer />
+            {sessionMeta?.isOutOfSync && (
+              <div className="sync-banner">
+                <span>You are out of sync with the leader.</span>
+                <button
+                  type="button"
+                  className="sync-banner-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sessionMeta?.onSyncToLeader?.();
+                  }}
+                >
+                  <SyncOutlined fontSize="inherit" />
+                  Sync
+                </button>
+              </div>
+            )}
             <div className="slide-number">
               {slideNumber(currentScreen, totalScreens)}
             </div>
