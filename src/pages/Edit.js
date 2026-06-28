@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   DndContext,
@@ -21,8 +22,9 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
+  Box,
 } from "@mui/material";
-import { SnackbarAlert } from "../utils/helperFunctions";
+import { SnackbarAlert, sortFootnotes } from "../utils/helperFunctions";
 import { baseURL } from "../utils/constants";
 import { useAuth } from "../components/AuthContext";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -31,7 +33,7 @@ import FootnoteDialog from "../components/FootnoteDialog";
 import { SortableBlock } from "../components/SortableBlock";
 import { FootnotePopper } from "../components/FootnotePopper";
 
-function Edit() {
+const Edit = () => {
   const { user } = useAuth();
   const [isFetching, setIsFetching] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -44,13 +46,14 @@ function Edit() {
   const [selectedText, setSelectedText] = useState("");
   const [selectedRange, setSelectedRange] = useState(null);
   const [showPopover, setShowPopover] = useState(false);
+  const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
   const [showFootnoteModal, setShowFootnoteModal] = useState(false);
   const [footnoteContent, setFootnoteContent] = useState("");
-  const [selectedBlockIndex, setSelectedBlockIndex] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [editingFootnote, setEditingFootnote] = useState(false);
   const [editedFootnote, setEditedFootnote] = useState(null);
+  const popoverContentRef = useRef(null);
 
   const { id } = useParams();
   const token = localStorage.getItem("token");
@@ -93,19 +96,19 @@ function Edit() {
       setSelectedText(selected);
       setSelectedRange([start, end]);
       setSelectedBlockIndex(blockIdx);
-      setPopoverCoords({
-        top: rect.top - 40 + window.scrollY,
-        left: rect.left,
-      });
-      setShowPopover(true);
-    }
-  };
+      setShowPopover(true); // Must trigger before measuring width
 
-  const sortFootnotes = (a, b) => {
-    if (a.verseIndex !== b.verseIndex) {
-      return a.verseIndex - b.verseIndex;
+      // Wait for the popover to render, then adjust position
+      setTimeout(() => {
+        const width = popoverContentRef.current?.offsetWidth || 0;
+        const centerX = rect.left + rect.width / 2;
+        const topY = rect.top - 40 + window.scrollY;
+        setPopoverCoords({
+          top: topY,
+          left: centerX - width / 2 + window.scrollX,
+        });
+      }, 0);
     }
-    return a.range[0] - b.range[0];
   };
 
   const handleSaveFootnote = () => {
@@ -130,23 +133,37 @@ function Edit() {
   };
 
   useEffect(() => {
-    fetch(`${baseURL}/nasheed/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setNasheed(data.foundNasheed);
+    const fetchNasheed = async () => {
+      try {
+        const res = await fetch(`${baseURL}/nasheed/${id}`);
+        const { foundNasheed } = await res.json();
+
+        setNasheed(foundNasheed);
         setEditedNasheed({
-          arabTitle: data.foundNasheed.arabTitle,
-          engTitle: data.foundNasheed.engTitle,
-          footnotes: data.foundNasheed.footnotes,
-          blocks: data.foundNasheed.arab.map((_, i) => ({
+          arabTitle: foundNasheed.arabTitle,
+          engTitle: foundNasheed.engTitle,
+          footnotes: foundNasheed.footnotes,
+          blocks: foundNasheed.arab.map((_, i) => ({
             id: i.toString(),
-            arab: data.foundNasheed.arab[i],
-            rom: data.foundNasheed.rom[i],
-            eng: data.foundNasheed.eng[i],
+            arab: foundNasheed.arab[i],
+            rom: foundNasheed.rom[i],
+            eng: foundNasheed.eng[i],
           })),
         });
+      } catch (error) {
+        setAlert({
+          type: "error",
+          message: "Error fetching nasheed.",
+        });
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+        console.error("Error fetching nasheed:", error);
+      } finally {
         setIsFetching(false);
-      });
+      }
+    };
+
+    fetchNasheed();
   }, [id]);
 
   const handleChange = (e) => {
@@ -168,6 +185,7 @@ function Edit() {
 
   const nasheedLyrics = nasheed?.arab?.map((arab, index) => {
     let engWFootnote = nasheed?.eng?.[index];
+    let offset = 0;
     nasheed?.footnotes?.forEach((note, i) => {
       if (note.verseIndex !== index) {
         return;
@@ -178,8 +196,14 @@ function Edit() {
         i + 1
       }</sup>`;
 
+      const adjustedEnd = end + offset;
+
       engWFootnote =
-        engWFootnote.slice(0, end) + supTag + engWFootnote.slice(end);
+        engWFootnote.slice(0, adjustedEnd) +
+        supTag +
+        engWFootnote.slice(adjustedEnd);
+
+      offset += supTag.length; // update the offset for future insertions
     });
     return (
       <div key={index}>
@@ -408,14 +432,17 @@ function Edit() {
             }}
             onClose={() => setShowPopover(false)}
           >
-            <Button
-              onClick={() => {
-                setShowFootnoteModal(true);
-                setShowPopover(false);
-              }}
-            >
-              Add Footnote
-            </Button>
+            <Box ref={popoverContentRef}>
+              <Button
+                size="large"
+                onClick={() => {
+                  setShowFootnoteModal(true);
+                  setShowPopover(false);
+                }}
+              >
+                Add Footnote
+              </Button>
+            </Box>
           </Popover>
 
           <FootnoteDialog
@@ -498,6 +525,21 @@ function Edit() {
                 />
               </div>
               <div style={{ marginTop: "-20px" }} className="body">
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      mb: 2,
+                      color: "gray",
+                      fontStyle: "italic",
+                      fontSize: "1.1rem",
+                      textAlign: "left",
+                    }}
+                  >
+                    Tip: Highlight part of the English translation to add a
+                    footnote.
+                  </Typography>
+                </Box>
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -591,6 +633,6 @@ function Edit() {
       )}
     </>
   );
-}
+};
 
 export default Edit;
