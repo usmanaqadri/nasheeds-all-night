@@ -72,7 +72,7 @@ export default function MyModal({
 
     const supTag =
       mode === "scroll"
-        ? `<sup style="cursor:pointer; color:#6faeec" data-idx="${i}">${
+        ? `<sup style="cursor:pointer; color:#6faeec; pointer-events:auto; touch-action:manipulation; padding:0 2px;" data-idx="${i}">${
             i + 1
           }</sup>`
         : `<sup>${i + 1}</sup>`;
@@ -203,17 +203,26 @@ export default function MyModal({
 
   useEffect(() => {
     const handler = (e) => {
-      const target = e.target;
-      if (target.tagName === "SUP" && target.dataset.idx) {
-        setOpenFootnote(parseInt(target.dataset.idx));
-        setAnchorEl(target);
+      const footnoteTarget = e.target?.closest?.("sup[data-idx]");
+
+      if (footnoteTarget?.dataset?.idx) {
+        e.preventDefault?.();
+        e.stopPropagation?.();
+        setOpenFootnote(parseInt(footnoteTarget.dataset.idx, 10));
+        setAnchorEl(footnoteTarget);
       }
     };
 
     const container = document.querySelector(".text-container");
     container?.addEventListener("click", handler);
+    container?.addEventListener("touchend", handler, { passive: false });
+    container?.addEventListener("pointerup", handler);
 
-    return () => container?.removeEventListener("click", handler);
+    return () => {
+      container?.removeEventListener("click", handler);
+      container?.removeEventListener("touchend", handler);
+      container?.removeEventListener("pointerup", handler);
+    };
   }, [currentIndex, mode]);
 
   useEffect(() => {
