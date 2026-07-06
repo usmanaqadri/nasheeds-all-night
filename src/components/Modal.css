@@ -219,7 +219,9 @@
 		font-size: 1rem;
 	} */
 	.modal {
-		height: 70vh;
+		top: 50%;
+		width: 90vw;
+		height: 82vh;
 		padding: 1rem 0.8rem 1.4rem;
 	}
 
@@ -238,51 +240,51 @@
 
 	.modal-left-buttons .MuiIconButton-root,
 	.modal-right-buttons .MuiIconButton-root {
-		padding: 4px;
+		padding: 6px;
 	}
 
 	.modal-left-buttons .MuiSvgIcon-root,
 	.modal-right-buttons .MuiSvgIcon-root {
-		font-size: 1.1rem;
+		font-size: 1.35rem;
 	}
 
 	.modal .title {
 		margin-top: -0.6rem;
 		padding: 0 1.6rem;
-		font-size: 1rem;
+		font-size: 1.15rem;
 	}
 
 	.modal-main-title {
-		font-size: 1.55rem;
+		font-size: 1.85rem;
 	}
 
 	.modal-sub-title {
-		font-size: 0.98rem;
+		font-size: 1.12rem;
 		line-height: 1.2;
 	}
 
 	.modal-session-meta {
-		font-size: 0.65rem;
+		font-size: 0.78rem;
 		letter-spacing: 0.04em;
 	}
 	.modal .body {
-		font-size: 1.2rem;
+		font-size: 1.45rem;
 		width: 100%;
 	}
 
 	.text-container {
         padding: 0;
 		min-width: auto;
-        width: 70vw;
+        width: 100%;
     }
 
 	.text-container .body div p {
-        font-size: 1.4rem;
+        font-size: 1.7rem;
         font-family: 'Cormorant', serif !important;
     }
 
     .text-container .body div textarea {
-        font-size: 1.4rem;
+        font-size: 1.7rem;
         min-width: 220px;
         margin: 5px 0;
         font-family: 'Cormorant', serif !important;
