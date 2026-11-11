@@ -190,17 +190,21 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
             componentsProps={{
               tooltip: {
                 sx: {
-                  fontSize: "12px",
-                  padding: "5px 10px",
+                  fontSize: "15px",
+                  padding: "8px 12px",
                 },
               },
             }}
             title="Create"
           >
-            <IconButton onClick={handleCreateOpen}>
-              <AddCircleOutlineOutlined
-                sx={{ fontSize: "30px", color: "white" }}
-              />
+            <IconButton
+              onClick={handleCreateOpen}
+              sx={{
+                width: 48,
+                height: 48,
+              }}
+            >
+              <AddCircleOutlineOutlined sx={{ fontSize: 36, color: "white" }} />
             </IconButton>
           </Tooltip>
         )}
@@ -216,8 +220,8 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
           }}
           title="Profile"
         >
-          <IconButton onClick={handleOpen} size="small">
-            <Avatar src={picture} alt={name} sx={{ width: 30, height: 30 }} />
+          <IconButton onClick={handleOpen} sx={{ p: 0.75 }}>
+            <Avatar src={picture} alt={name} sx={{ width: 38, height: 38 }} />
           </IconButton>
         </Tooltip>
       </Box>
@@ -230,39 +234,55 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
           sx: {
             mt: 1,
             borderRadius: 2,
-            minWidth: 220,
+            minWidth: 260,
             backgroundColor: darkMode ? "#222" : "white",
             color: darkMode ? "white" : "#222",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+
+            "& .MuiMenuItem-root": {
+              minHeight: 56,
+              padding: "12px 18px",
+              gap: 1,
+              "&:hover": {
+                backgroundColor: darkMode ? "#333" : "#f5f5f5",
+              },
+            },
+
+            "& .MuiListItemIcon-root": {
+              minWidth: 36,
+              color: "inherit",
+            },
+
+            "& .MuiListItemText-primary": {
+              fontSize: "15px",
+              fontWeight: 500,
+            },
+
+            "& .MuiSvgIcon-root": {
+              fontSize: "26px",
+            },
           },
         }}
       >
         <MenuItem onClick={() => handleNavigateToCreate("/create/nasheed")}>
           <ListItemIcon>
-            <LibraryAddOutlined
-              fontSize="small"
-              sx={{ color: darkMode ? "white" : "#222" }}
-            />
+            <LibraryAddOutlined />
           </ListItemIcon>
           <ListItemText primary="New Nasheed" />
         </MenuItem>
+
         <MenuItem onClick={() => handleNavigateToCreate("/create/slideshow")}>
           <ListItemIcon>
-            <SlideshowOutlined
-              fontSize="small"
-              sx={{ color: darkMode ? "white" : "#222" }}
-            />
+            <SlideshowOutlined />
           </ListItemIcon>
-          <ListItemText primary="New slideshow" />
+          <ListItemText primary="New Slideshow" />
         </MenuItem>
+
         <MenuItem onClick={() => handleNavigateToCreate("/create/session")}>
           <ListItemIcon>
-            <CastConnectedOutlined
-              fontSize="small"
-              sx={{ color: darkMode ? "white" : "#222" }}
-            />
+            <CastConnectedOutlined />
           </ListItemIcon>
-          <ListItemText primary="New session" />
+          <ListItemText primary="New Session" />
         </MenuItem>
       </Menu>
 
@@ -282,7 +302,7 @@ export const UserMenu = ({ name, picture, darkMode, isMobile }) => {
         }}
       >
         <Box px={2}>
-          <Typography fontSize="14px" color={"gray"} noWrap>
+          <Typography fontSize="17px" color="gray" noWrap>
             {name}
           </Typography>
         </Box>

@@ -38,7 +38,7 @@ const Home = () => {
 
     const fetchNasheeds = async () => {
       try {
-        const requests = [fetch(`${baseURL}/nasheed${queryParam}`)];
+        const requests = [fetch(`${baseURL}/nasheedV2${queryParam}`)];
 
         if (user?.id) {
           requests.push(fetch(`${baseURL}/slideshow?userId=${user.id}`));
@@ -68,8 +68,8 @@ const Home = () => {
               slideshowData.message || "Failed to fetch slideshows",
             );
           }
-          hydratedSlideshows = (slideshowData.slideshows || []).map((slideshow) =>
-            buildSlideshowModalData(slideshow, nasheedMap),
+          hydratedSlideshows = (slideshowData.slideshows || []).map(
+            (slideshow) => buildSlideshowModalData(slideshow, nasheedMap),
           );
         }
 
@@ -125,7 +125,9 @@ const Home = () => {
   };
 
   const handleSlideshowDeleted = (deletedId) => {
-    setSlideshows((prev) => prev.filter((slideshow) => slideshow._id !== deletedId));
+    setSlideshows((prev) =>
+      prev.filter((slideshow) => slideshow._id !== deletedId),
+    );
     setFilteredSlideshows((prev) =>
       prev.filter((slideshow) => slideshow._id !== deletedId),
     );
@@ -150,13 +152,15 @@ const Home = () => {
             type={"error"}
             message={alertMessage}
           />
+
           <Box
             sx={{
               width: "fit-content",
-              margin: "0 auto 12px",
+              mx: "auto",
+              mb: 2,
               backgroundColor: "rgba(255,255,255,0.88)",
               borderRadius: "16px",
-              padding: "6px",
+              p: 0.75,
               boxShadow: "0 10px 24px rgba(0,0,0,0.08)",
             }}
           >
@@ -164,13 +168,16 @@ const Home = () => {
               value={activeTab}
               onChange={(_, value) => setActiveTab(value)}
               sx={{
-                minHeight: "unset",
+                minHeight: 48,
                 "& .MuiTab-root": {
                   textTransform: "none",
-                  minHeight: "unset",
+                  minHeight: 48,
+                  minWidth: 120,
+                  px: 2.5,
+                  py: 1,
                   borderRadius: "12px",
                   fontWeight: 600,
-                  fontSize: "1rem",
+                  fontSize: "1.15rem",
                 },
               }}
               TabIndicatorProps={{ style: { display: "none" } }}
@@ -179,11 +186,13 @@ const Home = () => {
                 value="nasheeds"
                 label="Nasheeds"
                 sx={{
-                  color: activeTab === "nasheeds" ? "#fff !important" : "#1f2a44",
+                  color:
+                    activeTab === "nasheeds" ? "#fff !important" : "#1f2a44",
                   backgroundColor:
                     activeTab === "nasheeds" ? "#1f4b99" : "transparent",
                 }}
               />
+
               <Tab
                 value="slideshows"
                 label="Slideshows"
@@ -196,6 +205,7 @@ const Home = () => {
               />
             </Tabs>
           </Box>
+
           <Searchbar
             onSearch={handleSearch}
             placeholder={
@@ -204,10 +214,11 @@ const Home = () => {
                 : "Search for a slideshow"
             }
           />
+
           <Box
             sx={{
               display: "flex",
-              gap: 1,
+              gap: 1.5,
               justifyContent: "center",
               alignItems: "center",
               mt: 2,
@@ -219,17 +230,53 @@ const Home = () => {
               placeholder="Enter session code"
               value={sessionCode}
               onChange={(event) => setSessionCode(event.target.value)}
-              size="small"
+              variant="outlined"
               sx={{
-                minWidth: { xs: "260px", sm: "320px" },
+                width: { xs: "260px", sm: "340px" },
                 backgroundColor: "rgba(255,255,255,0.92)",
                 borderRadius: 2,
+
+                "& .MuiOutlinedInput-root": {
+                  height: 56,
+                  fontSize: "1.1rem",
+                },
+
+                "& .MuiOutlinedInput-input": {
+                  padding: "16px 14px",
+                  boxSizing: "border-box",
+                  height: "100%",
+                },
+
+                "& .MuiInputLabel-root": {
+                  fontSize: "1.05rem",
+                },
+
+                "& .MuiInputLabel-root:not(.MuiInputLabel-shrink)": {
+                  transform: "translate(14px, 16px) scale(1)",
+                },
+
+                "& .MuiInputLabel-shrink": {
+                  transform: "translate(14px, -9px) scale(0.75)",
+                },
               }}
             />
-            <Button variant="contained" onClick={handleJoinSession}>
+
+            <Button
+              variant="contained"
+              onClick={handleJoinSession}
+              sx={{
+                height: 56,
+                px: 3,
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                textTransform: "none",
+                borderRadius: 2,
+              }}
+            >
               Join
             </Button>
           </Box>
+
           <NasheedBoard
             nasheeds={
               activeTab === "nasheeds" ? filteredNasheeds : filteredSlideshows

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Modal,
@@ -30,6 +30,62 @@ import { nasheedText, SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "./AuthContext";
 import { FootnotePopper } from "./FootnotePopper";
 import { baseURL } from "../utils/constants";
+import { getNasheedSlides } from "../utils/nasheedSlides";
+import { sanitizeArabic } from "../utils/sanitizeArabic";
+
+const buildSlideshowScreens = (sections = []) => {
+  const screens = [];
+
+  sections.forEach((section, sectionIndex) => {
+    const sectionId = String(section.id || section._id || sectionIndex);
+
+    if (section.type === "custom") {
+      screens.push({
+        type: "custom",
+        section,
+        title: section.title || "",
+        lines: section.lines || [],
+        key: `${sectionId}-custom`,
+      });
+      return;
+    }
+
+    if (section.showTitleIntro) {
+      screens.push({
+        type: "titleIntro",
+        section,
+        title: section.engTitle || "",
+        arabTitle: section.arabTitle || "",
+        key: `${sectionId}-intro`,
+      });
+    }
+
+    // Each stanza/refrain block becomes its own presentation screen.
+    const groups = new Map();
+
+    (section.verses || []).forEach((verse) => {
+      const blockKey = verse.blockIndex ?? 0;
+
+      if (!groups.has(blockKey)) {
+        groups.set(blockKey, []);
+      }
+
+      groups.get(blockKey).push(verse);
+    });
+
+    groups.forEach((lines, blockIndex) => {
+      screens.push({
+        type: "nasheed",
+        section,
+        lines,
+        blockIndex,
+        key: `${sectionId}-block-${blockIndex}`,
+      });
+    });
+  });
+
+  return screens;
+};
 
 export default function MyModal({
   open,
@@ -43,9 +99,27 @@ export default function MyModal({
   sessionMeta = null,
 }) {
   const { user } = useAuth();
-  let { arab, arabTitle, engTitle, eng, rom, _id, footnotes = [] } = nasheed;
+  const isV2 = nasheed?.schemaVersion === 2;
   const isSlideshow = nasheed?.type === "slideshow";
   const slideshowSections = nasheed?.slides || [];
+  const slideshowScreens = useMemo(
+    () => (isSlideshow ? buildSlideshowScreens(slideshowSections) : []),
+    [isSlideshow, slideshowSections],
+  );
+  const isSlideBased = isV2 || isSlideshow;
+
+  const slides = useMemo(() => getNasheedSlides(nasheed), [nasheed]);
+
+  const totalScreens = isSlideshow ? slideshowScreens.length : slides.length;
+  const {
+    arab = [],
+    arabTitle,
+    engTitle,
+    eng = [],
+    rom = [],
+    _id,
+    footnotes = [],
+  } = nasheed;
   const isSessionMode = Boolean(sessionMeta);
   const token = localStorage.getItem("token");
   const engWFootnote = [...eng];
@@ -65,43 +139,101 @@ export default function MyModal({
   const [deleting, setDeleting] = useState(false);
   const currentIndex =
     typeof presentationIndex === "number" ? presentationIndex : counter;
-  footnotes.forEach((note, i) => {
-    const verseIndex = note.verseIndex;
-    const original = engWFootnote[verseIndex] || "";
-    const [_start, end] = note.range;
+  const slideStep = isSlideBased ? 1 : 2;
 
-    const supTag =
-      mode === "scroll"
-        ? `<sup style="cursor:pointer; color:#6faeec; pointer-events:auto; touch-action:manipulation; padding:0 2px;" data-idx="${i}">${
-            i + 1
-          }</sup>`
-        : `<sup>${i + 1}</sup>`;
+  const currentSlideIndex = isSlideBased
+    ? currentIndex
+    : Math.floor(currentIndex / 2);
 
-    // Track offset per verse to avoid interference across verses
-    if (!engWFootnote._offsets) {
-      engWFootnote._offsets = {};
-    }
+  const currentSlide = isSlideshow
+    ? slideshowScreens[currentSlideIndex]
+    : slides[currentSlideIndex];
 
-    if (!engWFootnote._offsets[verseIndex]) {
-      engWFootnote._offsets[verseIndex] = 0;
-    }
+  const currentScreen = currentSlideIndex + 1;
 
-    const offset = engWFootnote._offsets[verseIndex];
-    const adjustedEnd = end + offset;
+  const lastIndex = isSlideBased ? totalScreens : (nasheed.eng || []).length;
+  if (!isV2) {
+    footnotes.forEach((note, i) => {
+      const verseIndex = note.verseIndex;
+      const original = engWFootnote[verseIndex] || "";
+      const [_start, end] = note.range;
 
-    engWFootnote[verseIndex] =
-      original.slice(0, adjustedEnd) + supTag + original.slice(adjustedEnd);
+      const supTag =
+        mode === "scroll"
+          ? `<sup style="cursor:pointer; color:#6faeec; pointer-events:auto; touch-action:manipulation; padding:0 2px;" data-idx="${i}">${
+              i + 1
+            }</sup>`
+          : `<sup>${i + 1}</sup>`;
 
-    engWFootnote._offsets[verseIndex] += supTag.length;
-  });
+      // Track offset per verse to avoid interference across verses
+      if (!engWFootnote._offsets) {
+        engWFootnote._offsets = {};
+      }
+
+      if (!engWFootnote._offsets[verseIndex]) {
+        engWFootnote._offsets[verseIndex] = 0;
+      }
+
+      const offset = engWFootnote._offsets[verseIndex];
+      const adjustedEnd = end + offset;
+
+      engWFootnote[verseIndex] =
+        original.slice(0, adjustedEnd) + supTag + original.slice(adjustedEnd);
+
+      engWFootnote._offsets[verseIndex] += supTag.length;
+    });
+  }
+
+  const v2FootnotesByLine = useMemo(() => {
+    const map = new Map();
+
+    if (!isV2) return map;
+
+    footnotes.forEach((note, index) => {
+      const key = String(note.lineId);
+
+      if (!map.has(key)) {
+        map.set(key, []);
+      }
+
+      map.get(key).push({
+        ...note,
+        footnoteIndex: index,
+      });
+    });
+
+    return map;
+  }, [isV2, footnotes]);
+
+  const v2FirstFootnoteSlide = useMemo(() => {
+    const firstOccurrence = new Map();
+
+    if (!isV2) return firstOccurrence;
+
+    slides.forEach((slide, slideIndex) => {
+      slide.lines.forEach((line) => {
+        const notes = v2FootnotesByLine.get(String(line._id)) || [];
+
+        notes.forEach((note) => {
+          if (!firstOccurrence.has(note.footnoteIndex)) {
+            firstOccurrence.set(note.footnoteIndex, slideIndex);
+          }
+        });
+      });
+    });
+
+    return firstOccurrence;
+  }, [isV2, slides, v2FootnotesByLine]);
 
   const Footer = () => {
     const footnoteIdxs = footnotes.map((note) => note.verseIndex);
     const footnoteDivs = [];
 
     if (
-      !(footnoteIdxs.includes(currentIndex) ||
-        footnoteIdxs.includes(currentIndex + 1))
+      !(
+        footnoteIdxs.includes(currentIndex) ||
+        footnoteIdxs.includes(currentIndex + 1)
+      )
     ) {
       return;
     }
@@ -140,7 +272,7 @@ export default function MyModal({
         setCounter(nextIndex);
       }
     },
-    [onPresentationIndexChange, presentationIndex]
+    [onPresentationIndexChange, presentationIndex, slideStep, lastIndex],
   );
 
   const handleSessionAwareCloseRequest = useCallback(() => {
@@ -163,21 +295,31 @@ export default function MyModal({
 
       if (e.code === "ArrowLeft") {
         e.preventDefault();
-        if (currentIndex === 0) updatePresentationIndex(0);
-        else updatePresentationIndex(currentIndex - 2);
+
+        updatePresentationIndex(Math.max(0, currentIndex - slideStep));
+
         setFlashSide("left");
         setTimeout(() => setFlashSide(null), 800);
       }
+
       if (e.code === "ArrowRight") {
-        if (currentIndex === eng.length) {
+        e.preventDefault();
+
+        if (currentIndex >= lastIndex) {
+          // Already on the End of Presentation screen
           handleSessionAwareCloseRequest();
           updatePresentationIndex(0);
         } else {
-          updatePresentationIndex(currentIndex + 2);
+          // Advance, including to the empty final screen
+          updatePresentationIndex(
+            Math.min(currentIndex + slideStep, lastIndex),
+          );
         }
+
         setFlashSide("right");
         setTimeout(() => setFlashSide(null), 800);
       }
+
       if (e.code === "Escape") {
         handleSessionAwareCloseRequest();
         updatePresentationIndex(0);
@@ -186,11 +328,15 @@ export default function MyModal({
     [
       currentIndex,
       disablePresentationControls,
+      slideStep,
+      isV2,
+      slides.length,
       eng.length,
       handleSessionAwareCloseRequest,
       updatePresentationIndex,
-    ]
+    ],
   );
+
   useEffect(() => {
     if (mode === "presentation") {
       window.addEventListener("keydown", handleUserKeyPress);
@@ -249,35 +395,30 @@ export default function MyModal({
   }, [forcePresentationMode]);
 
   const handleClick = (e) => {
-    if (disablePresentationControls) {
-      return;
-    }
+    if (disablePresentationControls) return;
 
-    const clickTarget = e.target;
-    const clickTargetWidth = clickTarget.offsetWidth;
-    const xCoordInClickTarget =
-      e.clientX - clickTarget.getBoundingClientRect().left;
-    if (clickTargetWidth / 2 > xCoordInClickTarget) {
-      e.preventDefault();
-      if (currentIndex === 0) updatePresentationIndex(0);
-      else updatePresentationIndex(currentIndex - 2);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+
+    if (clickX < rect.width / 2) {
+      // Previous slide
+      updatePresentationIndex(Math.max(0, currentIndex - slideStep));
 
       setFlashSide("left");
     } else {
-      if (currentIndex === eng.length) {
+      // Next slide
+      if (currentIndex >= lastIndex) {
         handleSessionAwareCloseRequest();
         updatePresentationIndex(0);
       } else {
-        updatePresentationIndex(currentIndex + 2);
+        updatePresentationIndex(Math.min(currentIndex + slideStep, lastIndex));
       }
+
       setFlashSide("right");
     }
 
     setTimeout(() => setFlashSide(null), 800);
   };
-
-  const totalScreens = Math.ceil(eng.length / 2);
-  const currentScreen = Math.floor(currentIndex / 2) + 1;
 
   const slideNumber = (currentScreen, totalScreens) => {
     if (currentScreen > totalScreens) return "End of Presentation";
@@ -295,7 +436,10 @@ export default function MyModal({
 
     for (const section of slideshowSections) {
       const sectionLength = section.verses?.length || 0;
-      if (currentIndex >= verseCursor && currentIndex < verseCursor + sectionLength) {
+      if (
+        currentIndex >= verseCursor &&
+        currentIndex < verseCursor + sectionLength
+      ) {
         return section;
       }
       verseCursor += sectionLength;
@@ -305,7 +449,10 @@ export default function MyModal({
   })();
 
   const allowEdit =
-    !isMobile && !isSlideshow && _id && (user?.admin || nasheed.creatorId === user?.id);
+    !isMobile &&
+    !isSlideshow &&
+    _id &&
+    (user?.admin || nasheed.creatorId === user?.id);
   const allowSlideshowManage =
     !isMobile &&
     isSlideshow &&
@@ -323,7 +470,10 @@ export default function MyModal({
     for (const section of slideshowSections) {
       const sectionLength = section.verses?.length || 0;
 
-      if (verseIndex >= verseCursor && verseIndex < verseCursor + sectionLength) {
+      if (
+        verseIndex >= verseCursor &&
+        verseIndex < verseCursor + sectionLength
+      ) {
         return section;
       }
 
@@ -412,6 +562,251 @@ export default function MyModal({
     sessionMeta?.onLeaveSession?.();
   };
 
+  const renderV2EnglishWithFootnotes = (line, slideIndex) => {
+    const text = line.eng || "";
+    const notes = (v2FootnotesByLine.get(String(line._id)) || []).filter(
+      (note) => v2FirstFootnoteSlide.get(note.footnoteIndex) === slideIndex,
+    );
+
+    if (!notes.length) return text;
+
+    const elements = [];
+    let cursor = 0;
+
+    // Insert markers after the selected text range.
+    const sortedNotes = [...notes].sort((a, b) => a.range[1] - b.range[1]);
+
+    sortedNotes.forEach((note) => {
+      const end = Math.max(
+        cursor,
+        Math.min(text.length, note.range?.[1] ?? text.length),
+      );
+
+      elements.push(text.slice(cursor, end));
+
+      elements.push(
+        <sup
+          key={`footnote-${note.footnoteIndex}`}
+          style={{
+            cursor: mode === "scroll" ? "pointer" : "default",
+            color: mode === "scroll" ? "#6faeec" : "inherit",
+            padding: "0 2px",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+
+            if (mode !== "scroll") return;
+
+            setOpenFootnote(note.footnoteIndex);
+            setAnchorEl(e.currentTarget);
+          }}
+        >
+          {note.footnoteIndex + 1}
+        </sup>,
+      );
+
+      cursor = end;
+    });
+
+    elements.push(text.slice(cursor));
+
+    return elements;
+  };
+
+  const renderV2Slide = (slide, slideIndex) => {
+    if (!slide) return null;
+
+    return slide.lines.map((line, index) => (
+      <div className="paragraph" key={`${line._id}-${index}`}>
+        <p className="arabText" dir="rtl">
+          {sanitizeArabic(line.arab)}
+        </p>
+
+        {line.rom && (
+          <p className="engText">
+            <em>{line.rom}</em>
+          </p>
+        )}
+
+        {line.eng && (
+          <p className="engText">
+            {renderV2EnglishWithFootnotes(line, slideIndex)}
+          </p>
+        )}
+      </div>
+    ));
+  };
+
+  const renderV2Footer = () => {
+    if (!currentSlide) return null;
+
+    const seen = new Set();
+    const notes = [];
+
+    currentSlide.lines.forEach((line) => {
+      const lineNotes = (v2FootnotesByLine.get(String(line._id)) || []).filter(
+        (note) =>
+          v2FirstFootnoteSlide.get(note.footnoteIndex) === currentSlideIndex,
+      );
+
+      lineNotes.forEach((note) => {
+        if (seen.has(note.footnoteIndex)) return;
+
+        seen.add(note.footnoteIndex);
+        notes.push(note);
+      });
+    });
+
+    if (!notes.length) return null;
+
+    return (
+      <div style={{ fontSize: "medium" }}>
+        {notes.map((note) => (
+          <div key={note.footnoteIndex}>
+            <sup>{note.footnoteIndex + 1}</sup> {note.content}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderSlideshowScreen = (screen) => {
+    if (!screen) return null;
+
+    if (screen.type === "titleIntro") {
+      return (
+        <Box
+          sx={{
+            minHeight: "60vh",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            gap: 4,
+            px: 4,
+          }}
+        >
+          {screen.arabTitle && (
+            <Box
+              className="arabText"
+              dir="rtl"
+              sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem)" }}
+            >
+              {screen.arabTitle}
+            </Box>
+          )}
+
+          <Box
+            sx={{
+              color: "white",
+              fontSize: "clamp(2rem, 4vw, 4rem)",
+              fontWeight: 600,
+            }}
+          >
+            {screen.title}
+          </Box>
+        </Box>
+      );
+    }
+
+    if (screen.type === "custom") {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            textAlign: "center",
+            minHeight: "55vh",
+            gap: 3,
+            px: 4,
+          }}
+        >
+          {screen.lines.map((line, index) => (
+            <div className="paragraph" key={line._id || index}>
+              {line.arab?.trim() && (
+                <p className="arabText" dir="rtl">
+                  {sanitizeArabic(line.arab)}
+                </p>
+              )}
+
+              {line.rom?.trim() && (
+                <p className="engText">
+                  <em>{line.rom}</em>
+                </p>
+              )}
+
+              {line.eng?.trim() && <p className="engText">{line.eng}</p>}
+            </div>
+          ))}
+        </Box>
+      );
+    }
+
+    const layout = screen.section.layout || "arab-rom-eng";
+
+    return screen.lines.map((line, index) => (
+      <div className="paragraph" key={`${screen.key}-${index}`}>
+        {layout.includes("arab") && line.arab && (
+          <p className="arabText" dir="rtl">
+            {sanitizeArabic(line.arab)}
+          </p>
+        )}
+
+        {layout.includes("rom") && line.rom && (
+          <p className="engText">
+            <em>{line.rom}</em>
+          </p>
+        )}
+
+        {layout.includes("eng") && line.eng && (
+          <p className="engText">{line.eng}</p>
+        )}
+      </div>
+    ));
+  };
+
+  const renderSlideshowReading = () =>
+    slideshowSections.map((section, sectionIndex) => {
+      const isCustom = section.type === "custom";
+      const lines = isCustom ? section.lines || [] : section.verses || [];
+
+      const layout = section.layout || "arab-rom-eng";
+
+      return (
+        <div
+          className="translation-container"
+          key={section.id || section._id || sectionIndex}
+        >
+          <h2 style={{ textAlign: "center" }}>
+            {isCustom ? section.title : section.engTitle}
+          </h2>
+
+          {lines.map((line, index) => (
+            <div className="paragraph" key={line._id || index}>
+              {(isCustom || layout.includes("arab")) && line.arab?.trim() && (
+                <p className="arabText" dir="rtl">
+                  {sanitizeArabic(line.arab)}
+                </p>
+              )}
+
+              {(isCustom || layout.includes("rom")) && line.rom?.trim() && (
+                <p className="engText">
+                  <em>{line.rom}</em>
+                </p>
+              )}
+
+              {(isCustom || layout.includes("eng")) && line.eng?.trim() && (
+                <p className="engText">{line.eng}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    });
+
   return (
     <Modal
       open={open}
@@ -483,14 +878,10 @@ export default function MyModal({
 
               try {
                 // 1. Trigger PDF generation
-                await generatePDF(
-                  arabTitle,
-                  engTitle,
-                  arab,
-                  eng,
-                  rom,
-                  footnotes,
-                );
+                await generatePDF({
+                  ...nasheed,
+                  arrangedBy: user?.name || "Unknown",
+                });
 
                 // 2. Mark generation complete
                 setLoadingPDF(false);
@@ -684,7 +1075,7 @@ export default function MyModal({
               <IconButton
                 onClick={(e) => e.stopPropagation()}
                 component={Link}
-                to={`/${_id}`}
+                to={isV2 ? `/${nasheed.slug}` : `/${_id}`}
                 sx={buttonStyles}
               >
                 <EditNote fontSize="large" style={{ color: "white" }} />
@@ -719,7 +1110,9 @@ export default function MyModal({
             <h1>
               <div className="modal-main-title">{engTitle}</div>
               <div className="modal-sub-title">
-                {currentSlideshowSection?.engTitle || arabTitle}
+                {currentSlide?.type === "custom"
+                  ? currentSlide.title
+                  : currentSlide?.section?.engTitle || arabTitle}
               </div>
               {isSessionMode && (
                 <div className="modal-session-meta">
@@ -738,10 +1131,18 @@ export default function MyModal({
         {mode === "presentation" ? (
           <>
             <div className="body">
-              {renderVerseBlock(currentIndex)}
-              {renderVerseBlock(currentIndex + 1)}
+              {isSlideshow ? (
+                renderSlideshowScreen(currentSlide)
+              ) : isV2 ? (
+                renderV2Slide(currentSlide, currentSlideIndex)
+              ) : (
+                <>
+                  {renderVerseBlock(currentIndex)}
+                  {renderVerseBlock(currentIndex + 1)}
+                </>
+              )}
             </div>
-            <Footer />
+            {isSlideshow ? null : isV2 ? renderV2Footer() : <Footer />}
             {sessionMeta?.isOutOfSync && (
               <div className="sync-banner">
                 <span>You are out of sync with the leader.</span>
@@ -777,12 +1178,18 @@ export default function MyModal({
             >
               <div style={{ border: "1px dotted white" }} className="body">
                 {isSlideshow
-                  ? eng.map((_, verseIndex) => (
-                      <div key={`${engTitle}-${verseIndex}`} className="translation-container">
-                        {renderVerseBlock(verseIndex)}
-                      </div>
-                    ))
-                  : nasheedText({ arab, eng: engWFootnote, rom })}
+                  ? renderSlideshowReading()
+                  : isV2
+                    ? slides.map((slide, index) => (
+                        <div key={index} className="translation-container">
+                          {renderV2Slide(slide, index)}
+                        </div>
+                      ))
+                    : nasheedText({
+                        arab,
+                        eng: engWFootnote,
+                        rom,
+                      })}
               </div>
             </div>
           </>
