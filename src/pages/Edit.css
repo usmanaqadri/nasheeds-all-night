@@ -1,118 +1,119 @@
-*, *::before, *::after {
-    box-sizing: border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-    background-color: #f3f3f3;
-    margin: 0;
-    overflow: hidden;
+  background-color: #f3f3f3;
+  margin: 0;
+  overflow: hidden;
 }
 
 .wrapper {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
 }
 
 .container {
-    width: 8.5in;
-    max-height: 83vh;
-    overflow: auto;
-    overflow-x: hidden;
-    padding: 0in 1in;
-    box-shadow: 0 0 5px 0 rgba(0,0,0,.5);
-    background-color: white;
+  width: 8.5in;
+  max-height: 83vh;
+  overflow: auto;
+  overflow-x: hidden;
+  padding: 0in 1in;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  background-color: white;
 }
 
 .edit-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
 }
 
 .edit-title {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    margin-top: 10px;
-  }
-
-  .edit-title p {
-    margin: 0;
-    font-family: 'Cormorant', serif !important;
-  }
-
-  .container textarea {
-    font-size: 1.5rem;
-    font-family: 'Cormorant', serif;
-    text-align: center;
-    border: none;
-    padding: 0;
-    display: block;
-    min-width: 7in;
-    width: 100%;
-    overflow: hidden;
-    border: none;
-    outline: none;
-
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-
-    resize: none !important;
-  }
-
-  .container textarea {
-    font-size: 1.5rem;
-    font-family: 'Cormorant', serif;
-    text-align: center;
-    border: none;
-    padding: 0;
-    display: block;
-    min-width: 7.0in;
-    width: 100%;
-    overflow: hidden;
-    border: none;
-    outline: none;
-
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-
-    resize: none !important;
-
-  }
-
-  .arab-text {
-    padding: 13px 0 !important;
-  }
-
-  .non-arab-text {
-    background: white;
-    padding: 0.5rem;
-    min-height: 4rem;
-    white-space: pre-wrap;
-    overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  margin-top: 10px;
 }
 
-  .edit-title textarea {
-    font-size: 3rem;
-    font-family: 'Cormorant', serif;
-    margin: 0;
-    text-align: center;
-    border: none;
-    resize: none;
-    padding: 0;
-  }
+.edit-title p {
+  margin: 0;
+  font-family: "Cormorant", serif !important;
+}
 
-  .mui-button {
-    font-size: 14px !important;
-    width: 50px;
-    padding: 10px 40px !important;
-  }
+.container textarea {
+  font-size: 1.5rem;
+  font-family: "Cormorant", serif;
+  text-align: center;
+  border: none;
+  padding: 0;
+  display: block;
+  min-width: 7in;
+  width: 100%;
+  overflow: hidden;
+  border: none;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  resize: none !important;
+}
+
+.container textarea {
+  font-size: 1.5rem;
+  font-family: "Cormorant", serif;
+  text-align: center;
+  border: none;
+  padding: 0;
+  display: block;
+  min-width: 7in;
+  width: 100%;
+  overflow: hidden;
+  border: none;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  resize: none !important;
+}
+
+.arab-text {
+  padding: 13px 0 !important;
+}
+
+.non-arab-text {
+  background: white;
+  padding: 0.5rem;
+  min-height: 4rem;
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+.edit-title textarea {
+  font-size: 3rem;
+  font-family: "Cormorant", serif;
+  margin: 0;
+  text-align: center;
+  border: none;
+  resize: none;
+  padding: 0;
+}
+
+.mui-button {
+  font-size: 14px !important;
+  width: 50px;
+  padding: 10px 40px !important;
+}
 
 .body {
   flex: 50%;
@@ -127,105 +128,553 @@ body {
 }
 
 @media screen and (max-width: 850px) {
+  .mui-button {
+    font-size: 8px !important;
+    min-width: 50px !important;
+    padding: 6px !important;
+  }
 
-    .mui-button {
-        font-size: 8px !important;
-        min-width: 50px !important;
-        padding: 6px !important;
-    }
+  .edit-buttons {
+    margin: 0 5px;
+  }
+  .container {
+    padding: 0;
+    width: 70vw;
+  }
 
-    .edit-buttons {
-        margin: 0 5px;
-    }
-    .container {
-        padding: 0;
-        width: 70vw;
-    }
+  .edit-title p {
+    font-size: 1.4rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .edit-title p {
-        font-size: 1.4rem;
-        font-family: 'Cormorant', serif !important;
-    }
+  .container .edit-title textarea {
+    font-size: 1.4rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .container .edit-title textarea {
-        font-size: 1.4rem;
-        font-family: 'Cormorant', serif !important;
-    }
+  .container .body div p {
+    font-size: 1.4rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .container .body div p {
-        font-size: 1.4rem;
-        font-family: 'Cormorant', serif !important;
-    }
+  .container .body div textarea {
+    font-size: 1.4rem;
+    min-width: 220px;
+    margin: 5px 0;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .container .body div textarea {
-        font-size: 1.4rem;
-        min-width: 220px;
-        margin: 5px 0;
-        font-family: 'Cormorant', serif !important;
-    }
-
-    .modal-confirm {
-        width: 350px !important;
-    }
-
+  .modal-confirm {
+    width: 350px !important;
+  }
 }
 
 @media screen and (max-height: 600px) {
-    .container textarea {
-        font-size: 1.4rem;
-        min-width: 8.0in !important;
-        font-family: 'Cormorant', serif !important;
-    }
-    .container {
-        padding: 0;
-        width: 80vw !important;
-    }
-
+  .container textarea {
+    font-size: 1.4rem;
+    min-width: 8in !important;
+    font-family: "Cormorant", serif !important;
+  }
+  .container {
+    padding: 0;
+    width: 80vw !important;
+  }
 }
 
-@media screen and (min-width: 1550px){
-	.edit-title p {
-        font-size: 3.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
+@media screen and (min-width: 1550px) {
+  .edit-title p {
+    font-size: 3.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .container .edit-title textarea {
-        font-size: 3.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
-	
-    .wrapper .container .body div p {
-        font-size: 2.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
-    
-    .container .body div textarea {
-        font-size: 2.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
-    
-    .container .body div div {
-        font-size: 2.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
+  .container .edit-title textarea {
+    font-size: 3.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .container {
-        padding: 0;
-        width: 70vw !important;
-    }
+  .wrapper .container .body div p {
+    font-size: 2.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .modal-confirm {
-        width: 50vw !important;
-    }
-    .modal-confirm-text {
-        font-size: 3rem !important;
-        margin-bottom: 50px !important;
-    }
+  .container .body div textarea {
+    font-size: 2.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 
-    .mui-button {
-        font-size: 14px !important;
-        min-width: 80px !important;
-        padding: 10px 30px !important;
-    }
+  .container .body div div {
+    font-size: 2.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 
+  .container {
+    padding: 0;
+    width: 70vw !important;
+  }
+
+  .modal-confirm {
+    width: 50vw !important;
+  }
+  .modal-confirm-text {
+    font-size: 3rem !important;
+    margin-bottom: 50px !important;
+  }
+
+  .mui-button {
+    font-size: 14px !important;
+    min-width: 80px !important;
+    padding: 10px 30px !important;
+  }
+}
+
+/* V2 — V1-inspired compact editing layout */
+
+/* V2 page layout */
+
+.v2-editor-layout {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+}
+
+.v2-editor-layout .wrapper {
+  --panel-width: 1050px;
+  --actions-width: 90px;
+  --actions-gap: 24px;
+
+  display: grid !important;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, var(--panel-width))
+    minmax(0, 1fr);
+
+  align-items: start;
+  width: 100%;
+  margin: 0 auto !important;
+  position: relative;
+}
+
+/* White panel always occupies the center column */
+.v2-editor-layout .wrapper > .container {
+  grid-column: 2;
+  grid-row: 1;
+
+  width: 100%;
+  max-width: var(--panel-width);
+  margin: 0 !important;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* Buttons positioned relative to the centered panel */
+.v2-editor-layout .wrapper > .edit-buttons {
+  grid-column: 3;
+  grid-row: 1;
+
+  position: static !important;
+  width: var(--actions-width);
+  margin: 0 0 0 var(--actions-gap) !important;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.v2-editor-layout .edit-buttons button {
+  width: 100%;
+  margin: 0;
+}
+
+/* Responsive layout */
+@media (max-width: 1320px) {
+  .v2-editor-layout .wrapper {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1050px)
+      minmax(0, 1fr);
+  }
+
+  .v2-editor-layout .wrapper > .edit-buttons {
+    grid-column: 2;
+    grid-row: 2;
+
+    width: 100%;
+    margin: 12px 0 0 !important;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .v2-editor-layout .edit-buttons button {
+    width: auto;
+    min-width: 90px;
+  }
+}
+
+.v2-edit-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.v2-sequence-block {
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 8px 14px 12px;
+  border: 2px dashed #d5d5d5;
+  border-radius: 7px;
+  background: #fff;
+  text-align: center;
+}
+
+.v2-block-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 0;
+}
+
+.v2-block-label {
+  margin-right: auto;
+  font-size: 12px;
+  color: #888;
+}
+
+.v2-block-actions {
+  display: flex;
+  gap: 0;
+}
+
+.v2-block-actions .MuiIconButton-root,
+.v2-line-actions .MuiIconButton-root {
+  padding: 4px;
+}
+
+.v2-block-actions .MuiSvgIcon-root,
+.v2-line-actions .MuiSvgIcon-root {
+  font-size: 1.1rem;
+}
+
+/* One verse: Arabic + transliteration + English */
+.v2-edit-line {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 0 8px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.v2-edit-line + .v2-edit-line {
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.v2-line-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 0;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.v2-edit-line:hover .v2-line-actions {
+  opacity: 1;
+}
+
+/* Keep all lyric inputs inside their stanza */
+
+.v2-sequence-block {
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.v2-edit-line {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.v2-lyric-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+.v2-lyric-input .MuiInputBase-root {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box;
+}
+
+.v2-lyric-input textarea.MuiInputBase-input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+/* Arabic needs vertical breathing room for harakat */
+.v2-arab textarea.MuiInputBase-input {
+  font-size: 2rem !important;
+  line-height: 1.8 !important;
+  padding: 10px 8px 6px !important;
+  direction: rtl;
+}
+
+/* Transliteration */
+.v2-rom textarea.MuiInputBase-input {
+  font-size: 1.4rem !important;
+  line-height: 1.4 !important;
+  padding: 2px 8px !important;
+  font-style: italic;
+}
+
+/* English translation */
+.v2-eng textarea.MuiInputBase-input {
+  font-size: 1.3rem !important;
+  line-height: 1.4 !important;
+  padding: 2px 8px !important;
+}
+
+/* Add Line */
+.v2-sequence-block > .MuiButton-root {
+  margin-top: 2px !important;
+  padding: 2px 8px;
+  text-transform: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .v2-sequence-block {
+    padding: 8px 10px;
+  }
+
+  .v2-arab textarea.MuiInputBase-input {
+    font-size: 1.65rem !important;
+    line-height: 1.9 !important;
+  }
+
+  .v2-rom textarea.MuiInputBase-input {
+    font-size: 1.15rem !important;
+  }
+
+  .v2-eng textarea.MuiInputBase-input {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Keep the visible and sizing textareas consistent */
+
+.v2-arab .MuiInputBase-root textarea {
+  font-size: 2rem !important;
+  line-height: 1.8 !important;
+  padding: 10px 8px 6px !important;
+  box-sizing: border-box;
+}
+
+.v2-rom .MuiInputBase-root textarea {
+  font-size: 1.9rem !important;
+  line-height: 1.4 !important;
+  padding: 2px 8px !important;
+  box-sizing: border-box;
+}
+
+.v2-eng .MuiInputBase-root textarea {
+  font-size: 1.9rem !important;
+  line-height: 1.4 !important;
+  padding: 2px 8px !important;
+  box-sizing: border-box;
+}
+
+/* Three-column EditV2 layout */
+
+.v2-three-column-layout {
+  display: grid;
+
+  /*
+   * Equal-width side columns ensure the
+   * nasheed remains centered on the page.
+   */
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 920px)
+    minmax(0, 1fr);
+
+  gap: 20px;
+  width: 100%;
+  align-items: start;
+}
+
+/* Left sidebar */
+
+.v2-metadata-sidebar {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 12px;
+}
+
+.v2-metadata-sidebar .v2-metadata {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 !important;
+}
+
+/* Center nasheed */
+
+.v2-three-column-layout .v2-main-container {
+  width: 100%;
+  min-width: 0;
+  max-width: 920px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+/* Right sidebar */
+
+.v2-actions-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 0;
+}
+
+.v2-actions-sidebar .MuiButton-root {
+  min-width: 90px;
+}
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+  .v2-three-column-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .v2-metadata-sidebar {
+    justify-content: center;
+    padding-top: 0;
+  }
+
+  .v2-metadata-sidebar .v2-metadata {
+    max-width: 920px;
+  }
+
+  .v2-main-container {
+    grid-row: 2;
+  }
+
+  .v2-actions-sidebar {
+    grid-row: 1;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1101px) {
+  .v2-metadata-sidebar,
+  .v2-actions-sidebar {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+  }
+
+  .v2-metadata-sidebar {
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+}
+
+/* =====================================
+   EditV2 typography improvements
+   ===================================== */
+
+/* Metadata sidebar */
+.v2-metadata-sidebar {
+  font-size: 16px;
+}
+
+.v2-metadata-sidebar .MuiTypography-root {
+  font-size: 16px;
+}
+
+.v2-metadata-sidebar .MuiInputBase-input {
+  font-size: 16px;
+}
+
+.v2-metadata-sidebar .MuiInputLabel-root {
+  font-size: 15px;
+}
+
+.v2-metadata-sidebar .MuiFormHelperText-root {
+  font-size: 13px;
+}
+
+.v2-metadata-sidebar .MuiChip-label {
+  font-size: 14px;
+}
+
+/* Edit, Save, Cancel */
+.v2-actions-sidebar .MuiButton-root {
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 110px;
+  min-height: 42px;
+  padding: 8px 18px;
+}
+
+/* Stanza labels */
+.v2-block-label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Stanza toolbar icons */
+.v2-block-actions .MuiSvgIcon-root,
+.v2-line-actions .MuiSvgIcon-root {
+  font-size: 21px;
+}
+
+.v2-block-actions .MuiIconButton-root,
+.v2-line-actions .MuiIconButton-root {
+  padding: 5px;
+}
+
+/* Add Line, Insert Stanza, etc. */
+.v2-edit-body .MuiButton-root {
+  font-size: 15px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+/* Preserve lyric typography */
+.v2-edit-body .v2-rom .MuiInputBase-input,
+.v2-edit-body .v2-eng .MuiInputBase-input {
+  font-size: 23px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.v2-edit-body .v2-arab .MuiInputBase-input {
+  font-size: 30px;
+  line-height: 2;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Box, Button, Container, Stack, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../components/Loader";
 import MyModal from "../components/Modal";
@@ -47,7 +55,7 @@ const LiveSession = () => {
     const fetchSessionData = async () => {
       try {
         const sessionResponse = await fetch(
-          `${baseURL}/live-session/session/${sessionId}`
+          `${baseURL}/live-session/session/${sessionId}`,
         );
         const sessionData = await sessionResponse.json();
 
@@ -62,27 +70,33 @@ const LiveSession = () => {
         }
 
         const slideshowResponse = await fetch(
-          `${baseURL}/slideshow/${foundSession.slideshowId}`
+          `${baseURL}/slideshow/${foundSession.slideshowId}`,
         );
         const slideshowData = await slideshowResponse.json();
 
         if (!slideshowResponse.ok) {
           throw new Error(
-            slideshowData.error || slideshowData.message || "Failed to load slideshow."
+            slideshowData.error ||
+              slideshowData.message ||
+              "Failed to load slideshow.",
           );
         }
 
         const uniqueNasheedIds = [
           ...new Set(
-            (slideshowData.foundSlideshow.slides || []).map((slide) => slide.nasheedId)
+            (slideshowData.foundSlideshow.slides || [])
+              .filter((slide) => slide.type === "nasheed" && slide.nasheedId)
+              .map((slide) => slide.nasheedId),
           ),
         ];
 
         const nasheedResponses = await Promise.all(
-          uniqueNasheedIds.map((nasheedId) => fetch(`${baseURL}/nasheed/${nasheedId}`))
+          uniqueNasheedIds.map((nasheedId) =>
+            fetch(`${baseURL}/nasheed/${nasheedId}`),
+          ),
         );
         const nasheedPayloads = await Promise.all(
-          nasheedResponses.map((response) => response.json())
+          nasheedResponses.map((response) => response.json()),
         );
 
         const nasheedMap = {};
@@ -96,7 +110,9 @@ const LiveSession = () => {
         setLeaderSlideIndex(foundSession.currentSlideIndex || 0);
         setViewerSlideIndex(foundSession.currentSlideIndex || 0);
         setViewerFollowingLeader(true);
-        setModalData(buildSlideshowModalData(slideshowData.foundSlideshow, nasheedMap));
+        setModalData(
+          buildSlideshowModalData(slideshowData.foundSlideshow, nasheedMap),
+        );
       } catch (error) {
         setAlert({
           type: "error",
@@ -132,7 +148,7 @@ const LiveSession = () => {
       setViewerSlideIndex((prev) =>
         isLeaderRef.current || viewerFollowingLeaderRef.current
           ? updatedSession.currentSlideIndex || 0
-          : prev
+          : prev,
       );
     };
 
@@ -179,7 +195,7 @@ const LiveSession = () => {
             isOutOfSync: !isLeader && !viewerFollowingLeader,
           }
         : null,
-    [isLeader, session, shareUrl, viewerFollowingLeader]
+    [isLeader, session, shareUrl, viewerFollowingLeader],
   );
 
   const handlePresentationIndexChange = (nextIndex) => {
@@ -288,7 +304,9 @@ const LiveSession = () => {
         />
         <Stack spacing={2}>
           <Box sx={{ textAlign: "left" }}>
-            <Typography variant="h5">Live session {session.sessionId}</Typography>
+            <Typography variant="h5">
+              Live session {session.sessionId}
+            </Typography>
             <Typography color="text.secondary">
               {isLeader
                 ? "You are leading this session."
@@ -303,7 +321,11 @@ const LiveSession = () => {
               alignItems: "center",
             }}
           >
-            <TextField label="Session link" value={shareUrl} InputProps={{ readOnly: true }} />
+            <TextField
+              label="Session link"
+              value={shareUrl}
+              InputProps={{ readOnly: true }}
+            />
             <Button variant="outlined" onClick={handleCopyLink}>
               Copy link
             </Button>

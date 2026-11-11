@@ -18,7 +18,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/:id" element={<Edit />} />
+          <Route path="/:slug" element={<Edit />} />
           <Route path="/create" element={<Create />} />
           <Route path="/create/nasheed" element={<Create />} />
           <Route path="/create/slideshow" element={<CreateSlideshow />} />

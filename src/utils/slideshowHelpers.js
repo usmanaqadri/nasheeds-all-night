@@ -5,90 +5,174 @@ export const slideshowLayoutOptions = [
   "arab",
 ];
 
-export const buildVerseIndexesFromRange = (startVerse, endVerse) =>
-  Array.from(
-    { length: endVerse - startVerse + 1 },
-    (_, index) => startVerse - 1 + index
-  );
+const idOf = (value) => String(value ?? "");
+const makeId = () =>
+  `slide-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 
-export const getRangeFromVerseIndexes = (verseIndexes = []) => {
-  if (!verseIndexes.length) {
-    return { startVerse: 1, endVerse: 1 };
+const getMaps = (nasheed) => ({
+  stanzas: new Map((nasheed?.stanzas || []).map((s) => [idOf(s._id), s])),
+  refrains: new Map((nasheed?.refrains || []).map((r) => [idOf(r._id), r])),
+});
+
+// Resolve a V2 sequence occurrence to its source lines, preserving source order.
+const sourceLinesForOccurrence = (item, maps) => {
+  if (item.type === "stanza") {
+    return maps.stanzas.get(idOf(item.stanzaId))?.lines || [];
   }
-
-  const sorted = [...verseIndexes].sort((a, b) => a - b);
-
-  return {
-    startVerse: sorted[0] + 1,
-    endVerse: sorted[sorted.length - 1] + 1,
-  };
+  if (item.type === "refrain") {
+    const refrain = maps.refrains.get(idOf(item.refrainId));
+    if (!refrain) return [];
+    const lines = maps.stanzas.get(idOf(refrain.stanzaId))?.lines || [];
+    // Existing V2 convention: [] means all source-stanza lines.
+    if (!refrain.lineIds?.length) return lines;
+    const allowed = new Set(refrain.lineIds.map(idOf));
+    return lines.filter((line) => allowed.has(idOf(line._id)));
+  }
+  return [];
 };
 
+// Create independent slideshow blocks from the original performance sequence.
+// Repeated refrain occurrences become separate blocks with separate line selections.
+export const buildBlocksFromNasheedV2 = (nasheed) => {
+  const maps = getMaps(nasheed);
+  return (nasheed?.sequence || []).flatMap((item) => {
+    if (item.type !== "stanza" && item.type !== "refrain") return [];
+    const lines = sourceLinesForOccurrence(item, maps);
+    if (!lines.length) return [];
+    return [
+      {
+        id: makeId(),
+        type: item.type,
+        ...(item.type === "stanza"
+          ? { stanzaId: idOf(item.stanzaId) }
+          : { refrainId: idOf(item.refrainId) }),
+        lineIds: lines.map((line) => idOf(line._id)),
+      },
+    ];
+  });
+};
+
+// Resolve a customized slideshow block in exactly the order of its lineIds.
+// Missing/deleted source lines are skipped; callers can flag them for repair.
+export const resolveSlideshowBlock = (block, nasheed) => {
+  const maps = getMaps(nasheed);
+  const available = sourceLinesForOccurrence(block, maps);
+  const byId = new Map(available.map((line) => [idOf(line._id), line]));
+  return (block.lineIds || []).flatMap((lineId, lineIndex) => {
+    const line = byId.get(idOf(lineId));
+    if (!line) return [];
+    return [
+      {
+        lineId: idOf(line._id),
+        lineIndex,
+        arab: line.arab || "",
+        rom: line.rom || "",
+        eng: line.eng || "",
+      },
+    ];
+  });
+};
+
+export const resolveSlideshowBlocks = (blocks = [], nasheed) =>
+  blocks
+    .flatMap((block, blockIndex) =>
+      resolveSlideshowBlock(block, nasheed).map((line) => ({
+        ...line,
+        blockId: idOf(block.id || block._id),
+        blockIndex,
+        blockType: block.type,
+        verseNumber: 0, // assigned below after flattening
+      })),
+    )
+    .map((line, index) => ({ ...line, verseNumber: index + 1 }));
+
 export const hydrateSlides = (slides = [], nasheedMap = {}) =>
-  slides
-    .map((slide, index) => {
-      const nasheed = nasheedMap[slide.nasheedId];
-
-      if (!nasheed) {
-        return null;
-      }
-
-      const verseIndexes = [...(slide.verseIndexes || [])].sort((a, b) => a - b);
-      const { startVerse, endVerse } = getRangeFromVerseIndexes(verseIndexes);
-
+  slides.map((slide) => {
+    if (slide.type === "custom") {
       return {
-        id: slide._id || `${slide.nasheedId}-${index}`,
-        nasheedId: slide.nasheedId,
-        engTitle: nasheed.engTitle,
-        arabTitle: nasheed.arabTitle,
-        startVerse,
-        endVerse,
-        layout: slide.layout || "arab-rom-eng",
-        verseIndexes,
-        verses: verseIndexes.map((verseIndex) => ({
-          verseNumber: verseIndex + 1,
-          arab: nasheed.arab[verseIndex],
-          rom: nasheed.rom[verseIndex],
-          eng: nasheed.eng[verseIndex],
+        id: idOf(slide.id || slide._id),
+        type: "custom",
+        title: slide.title || "",
+        showTitleIntro: false,
+        lines: (slide.lines || []).map((line) => ({
+          _id: idOf(line._id || line.id),
+          arab: line.arab || "",
+          rom: line.rom || "",
+          eng: line.eng || "",
         })),
+        verses: [],
       };
-    })
-    .filter(Boolean);
+    }
+    const nasheed = nasheedMap[idOf(slide.nasheedId)];
+    const blocks = (slide.blocks || []).map((block) => ({
+      id: idOf(block.id || block._id) || makeId(),
+      type: block.type,
+      ...(block.type === "stanza"
+        ? { stanzaId: idOf(block.stanzaId) }
+        : { refrainId: idOf(block.refrainId) }),
+      lineIds: (block.lineIds || []).map(idOf),
+    }));
+    return {
+      id: idOf(slide.id || slide._id) || makeId(),
+      type: "nasheed",
+      nasheedId: idOf(slide.nasheedId),
+      engTitle: nasheed?.engTitle || slide.engTitle || "Unavailable nasheed",
+      arabTitle: nasheed?.arabTitle || slide.arabTitle || "",
+      layout: slide.layout || "arab-rom-eng",
+      blocks,
+      showTitleIntro: Boolean(slide.showTitleIntro),
+      missingNasheed: !nasheed,
+      verses: nasheed ? resolveSlideshowBlocks(blocks, nasheed) : [],
+    };
+  });
 
 export const buildSlideshowPayload = ({ title, slides, creatorId }) => ({
   title: title.trim(),
   creatorId,
-  slides: slides.map((slide) => ({
-    nasheedId: slide.nasheedId,
-    verseIndexes: buildVerseIndexesFromRange(slide.startVerse, slide.endVerse),
-    layout: slide.layout || "arab-rom-eng",
-  })),
+  slides: slides.map((slide) =>
+    slide.type === "custom"
+      ? {
+          type: "custom",
+          title: (slide.title || "").trim(),
+          lines: (slide.lines || []).map((line) => ({
+            arab: line.arab || "",
+            rom: line.rom || "",
+            eng: line.eng || "",
+          })),
+        }
+      : {
+          type: "nasheed",
+          nasheedId: idOf(slide.nasheedId),
+          layout: slide.layout || "arab-rom-eng",
+          showTitleIntro: Boolean(slide.showTitleIntro),
+          blocks: (slide.blocks || []).map((block) => ({
+            type: block.type,
+            ...(block.type === "stanza"
+              ? { stanzaId: idOf(block.stanzaId) }
+              : { refrainId: idOf(block.refrainId) }),
+            lineIds: (block.lineIds || []).map(idOf),
+          })),
+        },
+  ),
 });
 
 export const buildSlideshowModalData = (slideshow, nasheedMap = {}) => {
-  const hydratedSlides = hydrateSlides(slideshow.slides, nasheedMap);
-  const flattenedVerses = hydratedSlides.flatMap((slide) => slide.verses);
-
+  const hydratedSlides = hydrateSlides(slideshow.slides || [], nasheedMap);
+  const verses = hydratedSlides.flatMap((slide) => slide.verses);
   return {
     _id: slideshow._id,
     type: "slideshow",
     engTitle: slideshow.title,
     arabTitle: "Slideshow",
-    subtitle: `${hydratedSlides.length} slide${hydratedSlides.length === 1 ? "" : "s"}`,
+    subtitle: `${hydratedSlides.length} item${hydratedSlides.length === 1 ? "" : "s"}`,
     creatorId: slideshow.creatorId,
-    arab: flattenedVerses.map((verse) => verse.arab),
-    rom: flattenedVerses.map((verse) => verse.rom),
-    eng: flattenedVerses.map((verse) => verse.eng),
+    arab: verses.map((verse) => verse.arab),
+    rom: verses.map((verse) => verse.rom),
+    eng: verses.map((verse) => verse.eng),
     footnotes: [],
     slides: hydratedSlides.map((slide, index) => ({
+      ...slide,
       order: index + 1,
-      engTitle: slide.engTitle,
-      arabTitle: slide.arabTitle,
-      startVerse: slide.startVerse,
-      endVerse: slide.endVerse,
-      verseIndexes: slide.verseIndexes,
-      layout: slide.layout,
-      verses: slide.verses,
     })),
   };
 };

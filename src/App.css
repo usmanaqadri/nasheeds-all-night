@@ -23,9 +23,9 @@
 
 .title {
   font-size: 3.7rem;
-  font-family: 'Cormorant', serif;
-  user-select:none;
-  -webkit-user-select:none;
+  font-family: "Cormorant", serif;
+  user-select: none;
+  -webkit-user-select: none;
   text-align: center;
 }
 
@@ -48,7 +48,6 @@ input {
   margin: 10px;
 }
 
-
 /* CSS */
 .button-64 {
   appearance: none;
@@ -58,7 +57,7 @@ input {
   color: #000000;
   cursor: pointer;
   display: inline-block;
-  font-family: Clarkson,Helvetica,sans-serif;
+  font-family: Clarkson, Helvetica, sans-serif;
   font-size: 1.8rem;
   font-weight: 500;
   letter-spacing: 0;
@@ -66,13 +65,16 @@ input {
   margin: 0;
   opacity: 1;
   outline: 0;
-  padding: 1.0em;
+  padding: 1em;
   position: relative;
   text-align: center;
   text-decoration: none;
   text-rendering: geometricprecision;
   text-transform: uppercase;
-  transition: opacity 300ms cubic-bezier(.694, 0, 0.335, 1),background-color 100ms cubic-bezier(.694, 0, 0.335, 1),color 100ms cubic-bezier(.694, 0, 0.335, 1);
+  transition:
+    opacity 300ms cubic-bezier(0.694, 0, 0.335, 1),
+    background-color 100ms cubic-bezier(0.694, 0, 0.335, 1),
+    color 100ms cubic-bezier(0.694, 0, 0.335, 1);
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
@@ -81,9 +83,9 @@ input {
 }
 
 .button-64:before {
-  animation: opacityFallbackOut .5s step-end forwards;
+  animation: opacityFallbackOut 0.5s step-end forwards;
   backface-visibility: hidden;
-  background-color: #EBEBEB;
+  background-color: #ebebeb;
   clip-path: polygon(-1% 0, 0 0, -25% 100%, -1% 100%);
   content: "";
   height: 100%;
@@ -91,7 +93,9 @@ input {
   position: absolute;
   top: 0;
   transform: translateZ(0);
-  transition: clip-path .5s cubic-bezier(.165, 0.84, 0.44, 1), -webkit-clip-path .5s cubic-bezier(.165, 0.84, 0.44, 1);
+  transition:
+    clip-path 0.5s cubic-bezier(0.165, 0.84, 0.44, 1),
+    -webkit-clip-path 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
   width: 100%;
 }
 
@@ -101,7 +105,7 @@ input {
 }
 
 .button-64:after {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .button-64 span {
@@ -109,11 +113,12 @@ input {
   position: relative;
 }
 
-textarea:focus, input:focus{
+textarea:focus,
+input:focus {
   outline: none;
 }
-@media screen and (min-width: 1400px){
-	.title {
+@media screen and (min-width: 1400px) {
+  .title {
     font-size: 3vw;
   }
   .button-64 {
@@ -121,7 +126,7 @@ textarea:focus, input:focus{
   }
 
   .modal .body div p {
-        font-size: 3.3rem;
-        font-family: 'Cormorant', serif !important;
-    }
+    font-size: 3.3rem;
+    font-family: "Cormorant", serif !important;
+  }
 }
