@@ -18,6 +18,8 @@ jobs:
           echo "REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
 
       - name: Build React app
+        env:
+          CI: false
         run: |
           npm install
           npm run build
