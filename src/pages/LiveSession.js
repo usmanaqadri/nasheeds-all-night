@@ -85,26 +85,42 @@ const LiveSession = () => {
         const uniqueNasheedIds = [
           ...new Set(
             (slideshowData.foundSlideshow.slides || [])
-              .filter((slide) => slide.type === "nasheed" && slide.nasheedId)
-              .map((slide) => slide.nasheedId),
+              .map((slide) => slide.nasheedId)
+              .filter(Boolean)
+              .map(String),
           ),
         ];
 
-        const nasheedResponses = await Promise.all(
-          uniqueNasheedIds.map((nasheedId) =>
-            fetch(`${baseURL}/nasheed/${nasheedId}`),
-          ),
-        );
-        const nasheedPayloads = await Promise.all(
-          nasheedResponses.map((response) => response.json()),
+        const nasheedEntries = await Promise.all(
+          uniqueNasheedIds.map(async (nasheedId) => {
+            const response = await fetch(
+              `${baseURL}/nasheedV2/id/${nasheedId}`,
+            );
+
+            if (!response.ok) {
+              throw new Error(
+                `Failed to load NasheedV2 ${nasheedId}: ${response.status}`,
+              );
+            }
+
+            const payload = await response.json();
+
+            // Adjust this field to match the actual V2 endpoint response.
+            const nasheed =
+              payload.foundNasheedV2 ??
+              payload.foundNasheed ??
+              payload.nasheed ??
+              payload;
+
+            if (!nasheed?._id) {
+              throw new Error(`Invalid NasheedV2 response for ${nasheedId}`);
+            }
+
+            return [String(nasheed._id), nasheed];
+          }),
         );
 
-        const nasheedMap = {};
-        nasheedPayloads.forEach((payload) => {
-          if (payload.foundNasheed?._id) {
-            nasheedMap[payload.foundNasheed._id] = payload.foundNasheed;
-          }
-        });
+        const nasheedMap = Object.fromEntries(nasheedEntries);
 
         setSession(foundSession);
         setLeaderSlideIndex(foundSession.currentSlideIndex || 0);
