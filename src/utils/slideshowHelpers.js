@@ -1,3 +1,5 @@
+import { sanitizeArabic } from "./sanitizeArabic";
+
 export const slideshowLayoutOptions = [
   "arab-rom-eng",
   "arab-eng",
@@ -65,7 +67,7 @@ export const resolveSlideshowBlock = (block, nasheed) => {
       {
         lineId: idOf(line._id),
         lineIndex,
-        arab: line.arab || "",
+        arab: sanitizeArabic(line.arab) || "",
         rom: line.rom || "",
         eng: line.eng || "",
       },
@@ -96,7 +98,7 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
         showTitleIntro: false,
         lines: (slide.lines || []).map((line) => ({
           _id: idOf(line._id || line.id),
-          arab: line.arab || "",
+          arab: sanitizeArabic(line.arab) || "",
           rom: line.rom || "",
           eng: line.eng || "",
         })),
@@ -117,7 +119,10 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
       type: "nasheed",
       nasheedId: idOf(slide.nasheedId),
       engTitle: nasheed?.engTitle || slide.engTitle || "Unavailable nasheed",
-      arabTitle: nasheed?.arabTitle || slide.arabTitle || "",
+      arabTitle:
+        sanitizeArabic(nasheed?.arabTitle) ||
+        sanitizeArabic(slide.arabTitle) ||
+        "",
       layout: slide.layout || "arab-rom-eng",
       blocks,
       showTitleIntro: Boolean(slide.showTitleIntro),
@@ -135,7 +140,7 @@ export const buildSlideshowPayload = ({ title, slides, creatorId }) => ({
           type: "custom",
           title: (slide.title || "").trim(),
           lines: (slide.lines || []).map((line) => ({
-            arab: line.arab || "",
+            arab: sanitizeArabic(line.arab) || "",
             rom: line.rom || "",
             eng: line.eng || "",
           })),
@@ -166,7 +171,7 @@ export const buildSlideshowModalData = (slideshow, nasheedMap = {}) => {
     arabTitle: "Slideshow",
     subtitle: `${hydratedSlides.length} item${hydratedSlides.length === 1 ? "" : "s"}`,
     creatorId: slideshow.creatorId,
-    arab: verses.map((verse) => verse.arab),
+    arab: verses.map((verse) => sanitizeArabic(verse.arab)),
     rom: verses.map((verse) => verse.rom),
     eng: verses.map((verse) => verse.eng),
     footnotes: [],
