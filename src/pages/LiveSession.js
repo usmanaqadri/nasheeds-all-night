@@ -38,25 +38,15 @@ const LiveSession = () => {
   const isLeader = Boolean(user?.id && session?.leaderUserId === user.id);
 
   useEffect(() => {
-    isLeaderRef.current = isLeader;
-  }, [isLeader]);
-
-  useEffect(() => {
-    viewerFollowingLeaderRef.current = viewerFollowingLeader;
-  }, [viewerFollowingLeader]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setShareUrl(window.location.href);
-    }
-  }, []);
-
-  useEffect(() => {
     const fetchSessionData = async () => {
+      setLoading(true);
+
       try {
+        // 1. Fetch live session using the URL code
         const sessionResponse = await fetch(
-          `${baseURL}/live-session/session/${sessionId}`,
+          `${baseURL}/live-session/session/${encodeURIComponent(sessionId)}`,
         );
+
         const sessionData = await sessionResponse.json();
 
         if (!sessionResponse.ok) {
@@ -65,13 +55,19 @@ const LiveSession = () => {
 
         const foundSession = sessionData.foundLiveSession;
 
+        if (!foundSession) {
+          throw new Error("Live session not found.");
+        }
+
         if (!foundSession.isActive) {
           throw new Error("This live session is no longer active.");
         }
 
+        // 2. Fetch the associated slideshow
         const slideshowResponse = await fetch(
           `${baseURL}/slideshow/${foundSession.slideshowId}`,
         );
+
         const slideshowData = await slideshowResponse.json();
 
         if (!slideshowResponse.ok) {
@@ -82,38 +78,65 @@ const LiveSession = () => {
           );
         }
 
+        const slideshow = slideshowData.foundSlideshow;
+
+        // 3. Collect unique nasheed IDs
         const uniqueNasheedIds = [
           ...new Set(
-            (slideshowData.foundSlideshow.slides || [])
-              .filter((slide) => slide.type === "nasheed" && slide.nasheedId)
-              .map((slide) => slide.nasheedId),
+            (slideshow.slides || [])
+              .map((slide) => slide.nasheedId)
+              .filter(Boolean)
+              .map(String),
           ),
         ];
 
-        const nasheedResponses = await Promise.all(
-          uniqueNasheedIds.map((nasheedId) =>
-            fetch(`${baseURL}/nasheed/${nasheedId}`),
-          ),
-        );
-        const nasheedPayloads = await Promise.all(
-          nasheedResponses.map((response) => response.json()),
+        // 4. Fetch NasheedV2 documents
+        const nasheedEntries = await Promise.all(
+          uniqueNasheedIds.map(async (nasheedId) => {
+            const response = await fetch(
+              `${baseURL}/nasheedV2/id/${nasheedId}`,
+            );
+
+            if (!response.ok) {
+              throw new Error(
+                `Failed to load NasheedV2 ${nasheedId}: ${response.status}`,
+              );
+            }
+
+            const payload = await response.json();
+
+            const nasheed =
+              payload.foundNasheedV2 ??
+              payload.foundNasheed ??
+              payload.nasheed ??
+              payload;
+
+            if (!nasheed?._id) {
+              throw new Error(`Invalid NasheedV2 response for ${nasheedId}`);
+            }
+
+            return [String(nasheed._id), nasheed];
+          }),
         );
 
-        const nasheedMap = {};
-        nasheedPayloads.forEach((payload) => {
-          if (payload.foundNasheed?._id) {
-            nasheedMap[payload.foundNasheed._id] = payload.foundNasheed;
-          }
-        });
+        const nasheedMap = Object.fromEntries(nasheedEntries);
 
+        // 5. Build the slideshow presentation
+        const builtModalData = buildSlideshowModalData(slideshow, nasheedMap);
+
+        // 6. Initialize live session state
         setSession(foundSession);
         setLeaderSlideIndex(foundSession.currentSlideIndex || 0);
         setViewerSlideIndex(foundSession.currentSlideIndex || 0);
         setViewerFollowingLeader(true);
-        setModalData(
-          buildSlideshowModalData(slideshowData.foundSlideshow, nasheedMap),
-        );
+        setModalData(builtModalData);
+
+        console.log("Live session loaded:", foundSession.sessionId);
+        console.log("Nasheeds loaded:", uniqueNasheedIds.length);
+        console.log("Built slideshow:", builtModalData);
       } catch (error) {
+        console.error("Failed to load live session:", error);
+
         setAlert({
           type: "error",
           message: error.message || "Failed to load live session.",
@@ -124,16 +147,34 @@ const LiveSession = () => {
       }
     };
 
-    fetchSessionData();
+    if (sessionId) {
+      fetchSessionData();
+    } else {
+      setLoading(false);
+    }
   }, [sessionId]);
 
   useEffect(() => {
-    if (!sessionId) {
+    isLeaderRef.current = isLeader;
+  }, [isLeader]);
+
+  useEffect(() => {
+    viewerFollowingLeaderRef.current = viewerFollowingLeader;
+  }, [viewerFollowingLeader]);
+
+  useEffect(() => {
+    if (session?.sessionId) {
+      setShareUrl(`${window.location.origin}/session/${session.sessionId}`);
+    }
+  }, [session?.sessionId]);
+
+  useEffect(() => {
+    if (!session?.sessionId) {
       return undefined;
     }
 
+    const canonicalSessionId = session.sessionId;
     const socket = getSocket();
-    socket.connect();
 
     const handleJoined = (joinedSession) => {
       setSession((prev) => ({ ...prev, ...joinedSession }));
@@ -173,17 +214,28 @@ const LiveSession = () => {
     socket.on("session-updated", handleUpdated);
     socket.on("session-ended", handleEnded);
     socket.on("session-error", handleError);
-    socket.emit("join-session", { sessionId });
+
+    const joinSession = () => {
+      socket.emit("join-session", { sessionId: canonicalSessionId });
+    };
+
+    socket.on("connect", joinSession);
+    socket.connect();
+
+    if (socket.connected) {
+      joinSession();
+    }
 
     return () => {
-      socket.emit("leave-session", { sessionId });
+      socket.emit("leave-session", { sessionId: canonicalSessionId });
+      socket.off("connect", joinSession);
       socket.off("session-joined", handleJoined);
       socket.off("session-updated", handleUpdated);
       socket.off("session-ended", handleEnded);
       socket.off("session-error", handleError);
       socket.disconnect();
     };
-  }, [navigate, sessionId]);
+  }, [navigate, session?.sessionId]);
 
   const sessionMeta = useMemo(
     () =>
@@ -209,7 +261,7 @@ const LiveSession = () => {
 
     const socket = getSocket();
     socket.emit("update-current-slide", {
-      sessionId,
+      sessionId: session.sessionId,
       currentSlideIndex: nextIndex,
       leaderUserId: user?.id,
     });
