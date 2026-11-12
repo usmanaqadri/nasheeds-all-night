@@ -125,6 +125,7 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
         "",
       layout: slide.layout || "arab-rom-eng",
       blocks,
+      footnotes: nasheed?.footnotes || [],
       showTitleIntro: Boolean(slide.showTitleIntro),
       missingNasheed: !nasheed,
       verses: nasheed ? resolveSlideshowBlocks(blocks, nasheed) : [],

@@ -134,6 +134,8 @@ export default function MyModal({
   const [flashSide, setFlashSide] = useState(null);
   const [openFootnote, setOpenFootnote] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [activeFootnoteSectionIndex, setActiveFootnoteSectionIndex] =
+    useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showSessionExitDialog, setShowSessionExitDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -224,6 +226,32 @@ export default function MyModal({
 
     return firstOccurrence;
   }, [isV2, slides, v2FootnotesByLine]);
+
+  const slideshowFirstFootnoteScreen = useMemo(() => {
+    const firstOccurrence = new Map();
+
+    if (!isSlideshow) return firstOccurrence;
+
+    slideshowScreens.forEach((screen, screenIndex) => {
+      if (screen.type !== "nasheed") return;
+
+      const footnotes = screen.section?.footnotes || [];
+
+      const lineIds = new Set(screen.lines.map((line) => String(line.lineId)));
+
+      footnotes.forEach((note, noteIndex) => {
+        if (!lineIds.has(String(note.lineId))) return;
+
+        const key = `${screen.section.id}:${note._id || noteIndex}`;
+
+        if (!firstOccurrence.has(key)) {
+          firstOccurrence.set(key, screenIndex);
+        }
+      });
+    });
+
+    return firstOccurrence;
+  }, [isSlideshow, slideshowScreens]);
 
   const Footer = () => {
     const footnoteIdxs = footnotes.map((note) => note.verseIndex);
@@ -670,6 +698,87 @@ export default function MyModal({
     );
   };
 
+  const renderSlideshowEnglishWithFootnotes = (line, screen) => {
+    const text = line.eng || "";
+    const footnotes = screen.section?.footnotes || [];
+
+    const notes = footnotes
+      .map((note, index) => ({
+        ...note,
+        footnoteIndex: index,
+      }))
+      .filter((note) => {
+        if (String(note.lineId) !== String(line.lineId)) return false;
+
+        const key = `${screen.section.id}:${note._id || note.footnoteIndex}`;
+
+        return slideshowFirstFootnoteScreen.get(key) === currentSlideIndex;
+      })
+      .sort((a, b) => (a.range?.[1] ?? 0) - (b.range?.[1] ?? 0));
+
+    if (!notes.length) return text;
+
+    const elements = [];
+    let cursor = 0;
+
+    notes.forEach((note) => {
+      const end = Math.max(
+        cursor,
+        Math.min(text.length, note.range?.[1] ?? text.length),
+      );
+
+      elements.push(text.slice(cursor, end));
+
+      elements.push(
+        <sup
+          key={`slideshow-footnote-${note.footnoteIndex}`}
+          style={{ padding: "0 2px" }}
+        >
+          {note.footnoteIndex + 1}
+        </sup>,
+      );
+
+      cursor = end;
+    });
+
+    elements.push(text.slice(cursor));
+
+    return elements;
+  };
+
+  const renderSlideshowFooter = (screen) => {
+    if (!screen || screen.type !== "nasheed") return null;
+
+    const footnotes = screen.section?.footnotes || [];
+
+    const lineIds = new Set(screen.lines.map((line) => String(line.lineId)));
+
+    const notes = footnotes
+      .map((note, index) => ({
+        ...note,
+        footnoteIndex: index,
+      }))
+      .filter((note) => {
+        if (!lineIds.has(String(note.lineId))) return false;
+
+        const key = `${screen.section.id}:${note._id || note.footnoteIndex}`;
+
+        return slideshowFirstFootnoteScreen.get(key) === currentSlideIndex;
+      });
+
+    if (!notes.length) return null;
+
+    return (
+      <div style={{ fontSize: "medium" }}>
+        {notes.map((note) => (
+          <div key={note._id || note.footnoteIndex}>
+            <sup>{note.footnoteIndex + 1}</sup> {note.content}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderSlideshowScreen = (screen) => {
     if (!screen) return null;
 
@@ -762,18 +871,88 @@ export default function MyModal({
         )}
 
         {layout.includes("eng") && line.eng && (
-          <p className="engText">{line.eng}</p>
+          <p className="engText">
+            {renderSlideshowEnglishWithFootnotes(line, screen)}
+          </p>
         )}
       </div>
     ));
+  };
+
+  const renderSlideshowReadingEnglish = (
+    line,
+    section,
+    sectionIndex,
+    shownNotes,
+  ) => {
+    const text = line.eng || "";
+    const footnotes = section.footnotes || [];
+
+    const notes = footnotes
+      .map((note, index) => ({
+        ...note,
+        footnoteIndex: index,
+      }))
+      .filter((note) => {
+        const key = String(note._id || note.footnoteIndex);
+
+        if (String(note.lineId) !== String(line.lineId)) return false;
+        if (shownNotes.has(key)) return false;
+
+        shownNotes.add(key);
+        return true;
+      })
+      .sort((a, b) => (a.range?.[1] ?? 0) - (b.range?.[1] ?? 0));
+
+    if (!notes.length) return text;
+
+    const elements = [];
+    let cursor = 0;
+
+    notes.forEach((note) => {
+      const end = Math.max(
+        cursor,
+        Math.min(text.length, note.range?.[1] ?? text.length),
+      );
+
+      elements.push(text.slice(cursor, end));
+
+      elements.push(
+        <sup
+          key={`reading-footnote-${note.footnoteIndex}`}
+          style={{
+            cursor: "pointer",
+            color: "#6faeec",
+            padding: "0 2px",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveFootnoteSectionIndex(sectionIndex);
+            setOpenFootnote(note.footnoteIndex);
+            setAnchorEl(e.currentTarget);
+          }}
+        >
+          {note.footnoteIndex + 1}
+        </sup>,
+      );
+
+      cursor = end;
+    });
+
+    elements.push(text.slice(cursor));
+
+    return elements;
   };
 
   const renderSlideshowReading = () =>
     slideshowSections.map((section, sectionIndex) => {
       const isCustom = section.type === "custom";
       const lines = isCustom ? section.lines || [] : section.verses || [];
-
       const layout = section.layout || "arab-rom-eng";
+
+      const shownNotes = new Set();
+
+      const sectionFootnotes = section.footnotes || [];
 
       return (
         <div
@@ -784,28 +963,68 @@ export default function MyModal({
             {isCustom ? section.title : section.engTitle}
           </h2>
 
-          {lines.map((line, index) => (
-            <div className="paragraph" key={line._id || index}>
-              {(isCustom || layout.includes("arab")) && line.arab?.trim() && (
-                <p className="arabText" dir="rtl">
-                  {sanitizeArabic(line.arab)}
-                </p>
-              )}
+          {lines.map((line, index) => {
+            const lineNotes = sectionFootnotes
+              .map((note, noteIndex) => ({
+                ...note,
+                footnoteIndex: noteIndex,
+              }))
+              .filter(
+                (note) =>
+                  String(note.lineId) === String(line.lineId) &&
+                  !shownNotes.has(String(note._id || note.footnoteIndex)),
+              );
 
-              {(isCustom || layout.includes("rom")) && line.rom?.trim() && (
-                <p className="engText">
-                  <em>{line.rom}</em>
-                </p>
-              )}
+            // Mark these notes as used after rendering this line.
+            lineNotes.forEach((note) =>
+              shownNotes.add(String(note._id || note.footnoteIndex)),
+            );
 
-              {(isCustom || layout.includes("eng")) && line.eng?.trim() && (
-                <p className="engText">{line.eng}</p>
-              )}
-            </div>
-          ))}
+            return (
+              <div
+                className="paragraph"
+                key={`${sectionIndex}-${index}-${line.lineId || line._id || "line"}`}
+              >
+                {(isCustom || layout.includes("arab")) && line.arab?.trim() && (
+                  <p className="arabText" dir="rtl">
+                    {sanitizeArabic(line.arab)}
+                  </p>
+                )}
+
+                {(isCustom || layout.includes("rom")) && line.rom?.trim() && (
+                  <p className="engText">
+                    <em>{line.rom}</em>
+                  </p>
+                )}
+
+                {(isCustom || layout.includes("eng")) && line.eng?.trim() && (
+                  <p className="engText">
+                    {renderSlideshowReadingEnglish(
+                      line,
+                      section,
+                      sectionIndex,
+                      new Set(
+                        [...shownNotes].filter(
+                          (key) =>
+                            !lineNotes.some(
+                              (note) =>
+                                String(note._id || note.footnoteIndex) === key,
+                            ),
+                        ),
+                      ),
+                    )}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       );
     });
+
+  const activeFootnotes = isSlideshow
+    ? slideshowSections[activeFootnoteSectionIndex]?.footnotes || []
+    : footnotes;
 
   return (
     <Modal
@@ -1106,14 +1325,18 @@ export default function MyModal({
           </Tooltip>
         </div>
         <div className="title">
-          {isSlideshow && mode === "presentation" ? (
+          {isSlideshow ? (
             <h1>
               <div className="modal-main-title">{engTitle}</div>
-              <div className="modal-sub-title">
-                {currentSlide?.type === "custom"
-                  ? currentSlide.title
-                  : currentSlide?.section?.engTitle || arabTitle}
-              </div>
+
+              {mode === "presentation" && (
+                <div className="modal-sub-title">
+                  {currentSlide?.type === "custom"
+                    ? currentSlide.title
+                    : currentSlide?.section?.engTitle || ""}
+                </div>
+              )}
+
               {isSessionMode && (
                 <div className="modal-session-meta">
                   Live session {sessionMeta?.sessionCode}
@@ -1142,7 +1365,13 @@ export default function MyModal({
                 </>
               )}
             </div>
-            {isSlideshow ? null : isV2 ? renderV2Footer() : <Footer />}
+            {isSlideshow ? (
+              renderSlideshowFooter(currentSlide)
+            ) : isV2 ? (
+              renderV2Footer()
+            ) : (
+              <Footer />
+            )}
             {sessionMeta?.isOutOfSync && (
               <div className="sync-banner">
                 <span>You are out of sync with the leader.</span>
@@ -1170,7 +1399,7 @@ export default function MyModal({
               anchorEl={anchorEl}
               setOpenFootnote={setOpenFootnote}
               setAnchorEl={setAnchorEl}
-              footnotes={footnotes}
+              footnotes={activeFootnotes}
             />
             <div
               style={{ backgroundColor: "inherit", margin: "0 auto" }}
