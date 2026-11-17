@@ -91,7 +91,7 @@ export default function MyModal({
   open,
   onClose,
   nasheed,
-  onSlideshowDeleted = () => {},
+  onSlideshowDeleted = () => { },
   presentationIndex = null,
   onPresentationIndexChange = null,
   forcePresentationMode = false,
@@ -162,9 +162,8 @@ export default function MyModal({
 
       const supTag =
         mode === "scroll"
-          ? `<sup style="cursor:pointer; color:#6faeec; pointer-events:auto; touch-action:manipulation; padding:0 2px;" data-idx="${i}">${
-              i + 1
-            }</sup>`
+          ? `<sup style="cursor:pointer; color:#6faeec; pointer-events:auto; touch-action:manipulation; padding:0 2px;" data-idx="${i}">${i + 1
+          }</sup>`
           : `<sup>${i + 1}</sup>`;
 
       // Track offset per verse to avoid interference across verses
@@ -278,7 +277,7 @@ export default function MyModal({
       }
     }
 
-    return <div style={{ fontSize: "medium" }}>{footnoteDivs}</div>;
+    return <div className="presentation-footnote-list">{footnoteDivs}</div>;
   };
 
   const buttonStyles = {
@@ -641,12 +640,32 @@ export default function MyModal({
     return elements;
   };
 
+  const isUrduTitle = (language) => {
+    const languages = Array.isArray(language)
+      ? language
+      : [language || "ar"];
+
+    return !languages.includes("ar");
+  };
+
+  const isUrduLine = (line) => {
+    const languages = Array.isArray(line.language)
+      ? line.language
+      : [line.language || "ar"];
+
+    return languages.includes("ur");
+  };
+
   const renderV2Slide = (slide, slideIndex) => {
     if (!slide) return null;
 
     return slide.lines.map((line, index) => (
       <div className="paragraph" key={`${line._id}-${index}`}>
-        <p className="arabText" dir="rtl">
+        <p
+          className={`arabText ${isUrduLine(line) ? "urduText" : ""}`}
+          lang={isUrduLine(line) ? "ur" : "ar"}
+          dir="rtl"
+        >
           {sanitizeArabic(line.arab)}
         </p>
 
@@ -688,7 +707,7 @@ export default function MyModal({
     if (!notes.length) return null;
 
     return (
-      <div style={{ fontSize: "medium" }}>
+      <div className="presentation-footnote-list">
         {notes.map((note) => (
           <div key={note.footnoteIndex}>
             <sup>{note.footnoteIndex + 1}</sup> {note.content}
@@ -769,7 +788,7 @@ export default function MyModal({
     if (!notes.length) return null;
 
     return (
-      <div style={{ fontSize: "medium" }}>
+      <div className="presentation-footnote-list">
         {notes.map((note) => (
           <div key={note._id || note.footnoteIndex}>
             <sup>{note.footnoteIndex + 1}</sup> {note.content}
@@ -798,7 +817,9 @@ export default function MyModal({
         >
           {screen.arabTitle && (
             <Box
-              className="arabText"
+              className={`modal-title-arab ${isUrduTitle(nasheed.language) ? "modal-title-urdu" : ""
+                }`}
+              lang={isUrduTitle(nasheed.language) ? "ur" : "ar"}
               dir="rtl"
               sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem)" }}
             >
@@ -836,7 +857,11 @@ export default function MyModal({
           {screen.lines.map((line, index) => (
             <div className="paragraph" key={line._id || index}>
               {line.arab?.trim() && (
-                <p className="arabText" dir="rtl">
+                <p
+                  className={`arabText ${isUrduLine(line) ? "urduText" : ""}`}
+                  lang={isUrduLine(line) ? "ur" : "ar"}
+                  dir="rtl"
+                >
                   {sanitizeArabic(line.arab)}
                 </p>
               )}
@@ -859,7 +884,11 @@ export default function MyModal({
     return screen.lines.map((line, index) => (
       <div className="paragraph" key={`${screen.key}-${index}`}>
         {layout.includes("arab") && line.arab && (
-          <p className="arabText" dir="rtl">
+          <p
+            className={`arabText ${isUrduLine(line) ? "urduText" : ""}`}
+            lang={isUrduLine(line) ? "ur" : "ar"}
+            dir="rtl"
+          >
             {sanitizeArabic(line.arab)}
           </p>
         )}
@@ -986,7 +1015,11 @@ export default function MyModal({
                 key={`${sectionIndex}-${index}-${line.lineId || line._id || "line"}`}
               >
                 {(isCustom || layout.includes("arab")) && line.arab?.trim() && (
-                  <p className="arabText" dir="rtl">
+                  <p
+                    className={`arabText ${isUrduLine(line) ? "urduText" : ""}`}
+                    lang={isUrduLine(line) ? "ur" : "ar"}
+                    dir="rtl"
+                  >
                     {sanitizeArabic(line.arab)}
                   </p>
                 )}
@@ -1030,7 +1063,7 @@ export default function MyModal({
     <Modal
       open={open}
       onClose={onClose}
-      onClick={mode === "presentation" ? handleClick : () => {}}
+      onClick={mode === "presentation" ? handleClick : () => { }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -1344,16 +1377,22 @@ export default function MyModal({
               )}
             </h1>
           ) : (
-            <h1 className="arabText">
-              {arabTitle}
-              <br />
-              {engTitle}
-            </h1>
+            <div className="modal-nasheed-title">
+              <div
+                className={`modal-title-arab ${isUrduTitle(nasheed.language) ? "modal-title-urdu" : ""
+                  }`}
+                lang={isUrduTitle(nasheed.language) ? "ur" : "ar"}
+                dir="rtl"
+              >
+                {arabTitle}
+              </div>
+              <div className="modal-title-eng">{engTitle}</div>
+            </div>
           )}
         </div>
         {mode === "presentation" ? (
-          <>
-            <div className="body">
+          <div className="presentation-layout">
+            <div className="body presentation-body">
               {isSlideshow ? (
                 renderSlideshowScreen(currentSlide)
               ) : isV2 ? (
@@ -1365,33 +1404,47 @@ export default function MyModal({
                 </>
               )}
             </div>
-            {isSlideshow ? (
-              renderSlideshowFooter(currentSlide)
-            ) : isV2 ? (
-              renderV2Footer()
-            ) : (
-              <Footer />
-            )}
-            {sessionMeta?.isOutOfSync && (
-              <div className="sync-banner">
-                <span>You are out of sync with the leader.</span>
-                <button
-                  type="button"
-                  className="sync-banner-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sessionMeta?.onSyncToLeader?.();
-                  }}
-                >
-                  <SyncOutlined fontSize="inherit" />
-                  Sync
-                </button>
+
+            <div
+              className="presentation-footer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="presentation-footnotes">
+                {isSlideshow ? (
+                  renderSlideshowFooter(currentSlide)
+                ) : isV2 ? (
+                  renderV2Footer()
+                ) : (
+                  <Footer />
+                )}
               </div>
-            )}
-            <div className="slide-number">
-              {slideNumber(currentScreen, totalScreens)}
+
+              <div className="presentation-footer-bottom">
+                <div className="presentation-sync">
+                  {sessionMeta?.isOutOfSync && (
+                    <div className="sync-banner">
+                      <span>You are out of sync with the leader.</span>
+                      <button
+                        type="button"
+                        className="sync-banner-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          sessionMeta?.onSyncToLeader?.();
+                        }}
+                      >
+                        <SyncOutlined fontSize="inherit" />
+                        Sync
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="slide-number">
+                  {slideNumber(currentScreen, totalScreens)}
+                </div>
+              </div>
             </div>
-          </>
+          </div>
         ) : (
           <>
             <FootnotePopper
@@ -1410,15 +1463,15 @@ export default function MyModal({
                   ? renderSlideshowReading()
                   : isV2
                     ? slides.map((slide, index) => (
-                        <div key={index} className="translation-container">
-                          {renderV2Slide(slide, index)}
-                        </div>
-                      ))
+                      <div key={index} className="translation-container">
+                        {renderV2Slide(slide, index)}
+                      </div>
+                    ))
                     : nasheedText({
-                        arab,
-                        eng: engWFootnote,
-                        rom,
-                      })}
+                      arab,
+                      eng: engWFootnote,
+                      rom,
+                    })}
               </div>
             </div>
           </>
