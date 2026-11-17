@@ -67,6 +67,7 @@ const newLine = () => ({
   arab: "",
   rom: "",
   eng: "",
+  language: "ar",
 });
 
 const newStanza = () => ({
@@ -256,11 +257,32 @@ function SortableSequenceBlock({
               </IconButton>
             )}
           </div>
-
+          <TextField
+            select
+            size="small"
+            label="Language"
+            value={line.language || "ar"}
+            onChange={(e) =>
+              onUpdateLine(line._id, "language", e.target.value)
+            }
+            disabled={isRefrain}
+            sx={{
+              width: { xs: "100%", sm: 160 },
+              alignSelf: "flex-start",
+              mb: 1,
+            }}
+          >
+            <MenuItem value="ar">Arabic</MenuItem>
+            <MenuItem value="ur">Urdu</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+          </TextField>
           {["arab", "rom", "eng"].map((field) => (
             <TextField
               key={field}
-              className={`v2-lyric-input v2-${field}`}
+              className={`v2-lyric-input v2-${field} ${field === "arab" && line.language === "ur"
+                ? "v2-edit-urdu"
+                : ""
+                }`}
               variant="standard"
               fullWidth
               multiline
@@ -377,7 +399,7 @@ const emptyNasheed = () => {
     collections: [],
     poet: "",
     description: "",
-    language: "ar",
+    language: ["ar"],
     performers: [],
     tags: [],
     alternateTitles: [],
@@ -477,21 +499,21 @@ export default function NasheedV2Editor({ mode = "edit" }) {
         s._id !== stanzaId
           ? s
           : {
-              ...s,
-              lines: s.lines.map((l) =>
-                l._id === lineId ? { ...l, [field]: value } : l,
-              ),
-            },
+            ...s,
+            lines: s.lines.map((l) =>
+              l._id === lineId ? { ...l, [field]: value } : l,
+            ),
+          },
       );
 
       const footnotes =
         field === "eng"
           ? updateFootnotesForTextChange(
-              prev.footnotes,
-              lineId,
-              oldValue,
-              value,
-            )
+            prev.footnotes,
+            lineId,
+            oldValue,
+            value,
+          )
           : prev.footnotes;
 
       return {
@@ -574,17 +596,17 @@ export default function NasheedV2Editor({ mode = "edit" }) {
       stanzas: prev.stanzas.map((s) =>
         s._id === stanzaId
           ? {
-              ...s,
-              lines: s.lines.filter((l) => l._id !== lineId),
-            }
+            ...s,
+            lines: s.lines.filter((l) => l._id !== lineId),
+          }
           : s,
       ),
       refrains: prev.refrains.map((r) =>
         r.stanzaId === stanzaId
           ? {
-              ...r,
-              lineIds: r.lineIds.filter((id) => id !== lineId),
-            }
+            ...r,
+            lineIds: r.lineIds.filter((id) => id !== lineId),
+          }
           : r,
       ),
       footnotes: prev.footnotes.filter((note) => note.lineId !== lineId),
@@ -731,11 +753,13 @@ export default function NasheedV2Editor({ mode = "edit" }) {
     setSaving(true);
     setMessage(null);
 
-    const cleanedStanzas = draft.stanzas.map((stanza) => {
-      const cleanedArabic = sanitizeArabic(stanza.lines.arab);
-      stanza.lines.arab = cleanedArabic;
-      return stanza;
-    });
+    const cleanedStanzas = draft.stanzas.map((stanza) => ({
+      ...stanza,
+      lines: stanza.lines.map((line) => ({
+        ...line,
+        arab: sanitizeArabic(line.arab || ""),
+      })),
+    }));
 
     try {
       // Only send editable fields; preserve IDs and references.
@@ -750,18 +774,18 @@ export default function NasheedV2Editor({ mode = "edit" }) {
         // Metadata
         poet: draft.poet || "",
         description: draft.description || "",
-        language: draft.language || "ar",
+        language: draft.language || ["ar"],
         performers: draft.performers || [],
         tags: draft.tags || [],
         alternateTitles: draft.alternateTitles || [],
         ...(isCreating
           ? {
-              creatorId: user.id,
-              isPublic: false,
-              schemaVersion: 2,
-              recordings: draft.recordings || [],
-              collections: draft.collections || [],
-            }
+            creatorId: user.id,
+            isPublic: false,
+            schemaVersion: 2,
+            recordings: draft.recordings || [],
+            collections: draft.collections || [],
+          }
           : {}),
       };
 
@@ -1032,6 +1056,14 @@ export default function NasheedV2Editor({ mode = "edit" }) {
     return true;
   };
 
+  const isUrduTitle = (language) => {
+    const languages = Array.isArray(language)
+      ? language
+      : [language || "ar"];
+
+    return !languages.includes("ar");
+  };
+
   return (
     <Box
       sx={{
@@ -1064,7 +1096,8 @@ export default function NasheedV2Editor({ mode = "edit" }) {
             {!editing ? (
               <>
                 <div className="edit-title">
-                  <p>{draft.arabTitle}</p>
+                  <p className={`v2-title-arab ${isUrduTitle(draft.language) ? "v2-title-urdu" : ""
+                    }`}>{draft.arabTitle}</p>
                   <p>{draft.engTitle}</p>
                 </div>
 
@@ -1076,7 +1109,7 @@ export default function NasheedV2Editor({ mode = "edit" }) {
                       const lines = resolveSequenceItem(item);
 
                       return (
-                        <div key={index} className="translation-container">
+                        <div key={index} className="translation-container v2-display-stanza">
                           {lines.map((line) => {
                             const lineId = String(line._id);
                             const showFootnotes = !seenLineIds.has(lineId);
@@ -1084,20 +1117,27 @@ export default function NasheedV2Editor({ mode = "edit" }) {
                             seenLineIds.add(lineId);
 
                             return (
-                              <div key={`${index}-${lineId}`}>
-                                <p>{line.arab}</p>
+                              <div key={`${index}-${lineId}`} className="v2-display-line">
+                                <p
+                                  className={`v2-display-arab ${line.language === "ur" ? "v2-display-urdu" : ""
+                                    }`}
+                                  lang={line.language === "ur" ? "ur" : "ar"}
+                                  dir="rtl"
+                                >
+                                  {line.arab}
+                                </p>
 
-                                <p>
+                                <p className="v2-display-rom">
                                   <em>{line.rom}</em>
                                 </p>
 
-                                <FootnotedTranslation
-                                  text={line.eng}
-                                  lineId={line._id}
-                                  footnotes={
-                                    showFootnotes ? draft.footnotes : []
-                                  }
-                                />
+                                <div className="v2-display-eng">
+                                  <FootnotedTranslation
+                                    text={line.eng}
+                                    lineId={line._id}
+                                    footnotes={showFootnotes ? draft.footnotes : []}
+                                  />
+                                </div>
                               </div>
                             );
                           })}
@@ -1109,14 +1149,20 @@ export default function NasheedV2Editor({ mode = "edit" }) {
               </>
             ) : (
               <>
-                <div className="edit-title">
+                <div className="edit-title v2-edit-title">
                   <textarea
+                    className={`v2-title-arab ${isUrduTitle(draft.language) ? "v2-title-urdu" : ""
+                      }`}
+                    rows={1}
                     value={draft.arabTitle}
                     onChange={(e) => change("arabTitle", e.target.value)}
                     placeholder="Arabic / Urdu title"
+                    dir="rtl"
                   />
 
                   <textarea
+                    className="v2-title-eng"
+                    rows={1}
                     value={draft.engTitle}
                     onChange={(e) => change("engTitle", e.target.value)}
                     placeholder="English title"
@@ -1150,7 +1196,7 @@ export default function NasheedV2Editor({ mode = "edit" }) {
                         const isFirstRefrain =
                           item.type === "refrain" &&
                           firstRefrainOccurrence.get(String(item.refrainId)) ===
-                            index;
+                          index;
 
                         // Only subsequent occurrences are read-only.
                         const isRefrain =
@@ -1172,13 +1218,13 @@ export default function NasheedV2Editor({ mode = "edit" }) {
                                   items.map((s) =>
                                     s._id === stanzaId
                                       ? {
-                                          ...s,
-                                          lines: move(
-                                            s.lines,
-                                            lineIndex,
-                                            lineIndex + direction,
-                                          ),
-                                        }
+                                        ...s,
+                                        lines: move(
+                                          s.lines,
+                                          lineIndex,
+                                          lineIndex + direction,
+                                        ),
+                                      }
                                       : s,
                                   ),
                                 )

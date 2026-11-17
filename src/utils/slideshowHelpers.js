@@ -28,7 +28,7 @@ const sourceLinesForOccurrence = (item, maps) => {
     // Existing V2 convention: [] means all source-stanza lines.
     if (!refrain.lineIds?.length) return lines;
     const allowed = new Set(refrain.lineIds.map(idOf));
-    return lines.filter((line) => allowed.has(idOf(line._id)));
+    return lines.filter((line) => allowed.has(idOf(line.id || line._id)));
   }
   return [];
 };
@@ -48,7 +48,7 @@ export const buildBlocksFromNasheedV2 = (nasheed) => {
         ...(item.type === "stanza"
           ? { stanzaId: idOf(item.stanzaId) }
           : { refrainId: idOf(item.refrainId) }),
-        lineIds: lines.map((line) => idOf(line._id)),
+        lineIds: lines.map((line) => idOf(line.id || line._id)),
       },
     ];
   });
@@ -59,10 +59,16 @@ export const buildBlocksFromNasheedV2 = (nasheed) => {
 export const resolveSlideshowBlock = (block, nasheed) => {
   const maps = getMaps(nasheed);
   const available = sourceLinesForOccurrence(block, maps);
-  const byId = new Map(available.map((line) => [idOf(line._id), line]));
+
+  const byId = new Map(
+    available.map((line) => [idOf(line._id), line])
+  );
+
   return (block.lineIds || []).flatMap((lineId, lineIndex) => {
     const line = byId.get(idOf(lineId));
+
     if (!line) return [];
+
     return [
       {
         lineId: idOf(line._id),
@@ -70,6 +76,7 @@ export const resolveSlideshowBlock = (block, nasheed) => {
         arab: sanitizeArabic(line.arab) || "",
         rom: line.rom || "",
         eng: line.eng || "",
+        language: line.language || "ar",
       },
     ];
   });
@@ -101,6 +108,7 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
           arab: sanitizeArabic(line.arab) || "",
           rom: line.rom || "",
           eng: line.eng || "",
+          language: line.language || "ar",
         })),
         verses: [],
       };
@@ -125,6 +133,7 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
         "",
       layout: slide.layout || "arab-rom-eng",
       blocks,
+      language: nasheed?.language || "ar",
       footnotes: nasheed?.footnotes || [],
       showTitleIntro: Boolean(slide.showTitleIntro),
       missingNasheed: !nasheed,
@@ -138,27 +147,28 @@ export const buildSlideshowPayload = ({ title, slides, creatorId }) => ({
   slides: slides.map((slide) =>
     slide.type === "custom"
       ? {
-          type: "custom",
-          title: (slide.title || "").trim(),
-          lines: (slide.lines || []).map((line) => ({
-            arab: sanitizeArabic(line.arab) || "",
-            rom: line.rom || "",
-            eng: line.eng || "",
-          })),
-        }
+        type: "custom",
+        title: (slide.title || "").trim(),
+        lines: (slide.lines || []).map((line) => ({
+          arab: sanitizeArabic(line.arab) || "",
+          rom: line.rom || "",
+          eng: line.eng || "",
+          language: line.language || "ar",
+        })),
+      }
       : {
-          type: "nasheed",
-          nasheedId: idOf(slide.nasheedId),
-          layout: slide.layout || "arab-rom-eng",
-          showTitleIntro: Boolean(slide.showTitleIntro),
-          blocks: (slide.blocks || []).map((block) => ({
-            type: block.type,
-            ...(block.type === "stanza"
-              ? { stanzaId: idOf(block.stanzaId) }
-              : { refrainId: idOf(block.refrainId) }),
-            lineIds: (block.lineIds || []).map(idOf),
-          })),
-        },
+        type: "nasheed",
+        nasheedId: idOf(slide.nasheedId),
+        layout: slide.layout || "arab-rom-eng",
+        showTitleIntro: Boolean(slide.showTitleIntro),
+        blocks: (slide.blocks || []).map((block) => ({
+          type: block.type,
+          ...(block.type === "stanza"
+            ? { stanzaId: idOf(block.stanzaId) }
+            : { refrainId: idOf(block.refrainId) }),
+          lineIds: (block.lineIds || []).map(idOf),
+        })),
+      },
   ),
 });
 

@@ -8,6 +8,7 @@ import {
   Typography,
   Box,
   Paper,
+  MenuItem,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
@@ -47,6 +48,21 @@ export function MetadataEditor({ draft, setDraft, readOnly = false }) {
       [field]: (prev[field] || []).filter((_, i) => i !== index),
     }));
   };
+
+  const languageNames = {
+    ar: "Arabic",
+    ur: "Urdu",
+    en: "English",
+  };
+
+  const formattedLanguage = (
+    Array.isArray(draft.language)
+      ? draft.language
+      : [draft.language || "ar"]
+  )
+    .map((lang) => languageNames[lang] || lang)
+    .join(", ");
+
 
   const renderListField = (field, label) => (
     <Box>
@@ -90,7 +106,7 @@ export function MetadataEditor({ draft, setDraft, readOnly = false }) {
       { label: "Description", value: draft.description },
       {
         label: "Language",
-        value: draft.language || "ar",
+        value: formattedLanguage,
       },
       {
         label: "Performers",
@@ -215,12 +231,28 @@ export function MetadataEditor({ draft, setDraft, readOnly = false }) {
             />
 
             <TextField
-              label="Language"
-              value={draft.language ?? "ar"}
+              select
+              label="Languages"
+              SelectProps={{
+                multiple: true,
+                renderValue: (selected) =>
+                  selected.map((lang) => ({
+                    ar: "Arabic",
+                    ur: "Urdu",
+                  })[lang]).join(", "),
+              }}
+              value={
+                Array.isArray(draft.language)
+                  ? draft.language
+                  : [draft.language || "ar"]
+              }
               onChange={(e) => updateField("language", e.target.value)}
-              helperText="Language code, e.g. ar, ur, en"
               fullWidth
-            />
+            >
+              <MenuItem value="ar">Arabic</MenuItem>
+              <MenuItem value="ur">Urdu</MenuItem>
+              <MenuItem value="en">English</MenuItem>
+            </TextField>
 
             {renderListField("performers", "Performers")}
             {renderListField("tags", "Tags")}

@@ -1,8 +1,11 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/*
+ * Edit.css — cleaned legacy editor + NasheedV2Editor styles
+ * Arabic/Urdu, transliteration and translation share typography tokens
+ * across read-only and edit modes.
+ */
+
+/* Base / legacy editor */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   background-color: #f3f3f3;
@@ -19,18 +22,18 @@ body {
 .container {
   width: 8.5in;
   max-height: 83vh;
-  overflow: auto;
   overflow-x: hidden;
-  padding: 0in 1in;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
-  background-color: white;
+  overflow-y: auto;
+  padding: 0 1in;
+  background: #fff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .edit-buttons {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
-  flex: 1;
 }
 
 .edit-title {
@@ -38,244 +41,187 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
   margin-top: 10px;
+  font-size: 3rem;
 }
 
 .edit-title p {
   margin: 0;
-  font-family: "Cormorant", serif !important;
+  font-family: "Cormorant Garamond", "Cormorant", serif;
 }
 
 .container textarea {
-  font-size: 1.5rem;
-  font-family: "Cormorant", serif;
-  text-align: center;
-  border: none;
-  padding: 0;
   display: block;
-  min-width: 7in;
   width: 100%;
-  overflow: hidden;
-  border: none;
-  outline: none;
-
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-
-  resize: none !important;
-}
-
-.container textarea {
-  font-size: 1.5rem;
-  font-family: "Cormorant", serif;
-  text-align: center;
-  border: none;
+  min-width: 0;
   padding: 0;
-  display: block;
-  min-width: 7in;
-  width: 100%;
   overflow: hidden;
-  border: none;
-  outline: none;
-
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
+  border: 0;
+  outline: 0;
   box-shadow: none;
-
-  resize: none !important;
+  resize: none;
+  text-align: center;
+  font: 1.5rem "Cormorant Garamond", "Cormorant", serif;
 }
 
-.arab-text {
-  padding: 13px 0 !important;
+.edit-title textarea {
+  margin: 0;
+  font-size: 3rem;
 }
+
+.arab-text { padding: 13px 0; }
 
 .non-arab-text {
-  background: white;
+  background: #fff;
   padding: 0.5rem;
   min-height: 4rem;
   white-space: pre-wrap;
   overflow-y: auto;
 }
 
-.edit-title textarea {
-  font-size: 3rem;
-  font-family: "Cormorant", serif;
-  margin: 0;
-  text-align: center;
-  border: none;
-  resize: none;
-  padding: 0;
-}
-
 .mui-button {
   font-size: 14px !important;
-  width: 50px;
-  padding: 10px 40px !important;
+  min-width: 50px;
+  padding: 10px 20px !important;
 }
 
 .body {
-  flex: 50%;
   display: flex;
+  flex: 1 1 50%;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 10px;
+  padding-bottom: 1.5rem;
   font-size: 1.5rem;
   text-align: center;
-  padding-bottom: 1.5rem;
-  margin-top: 10px;
 }
 
-@media screen and (max-width: 850px) {
-  .mui-button {
-    font-size: 8px !important;
-    min-width: 50px !important;
-    padding: 6px !important;
-  }
+.modal-confirm { max-width: calc(100vw - 32px); }
 
-  .edit-buttons {
-    margin: 0 5px;
-  }
-  .container {
-    padding: 0;
-    width: 70vw;
-  }
-
-  .edit-title p {
-    font-size: 1.4rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .edit-title textarea {
-    font-size: 1.4rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .body div p {
-    font-size: 1.4rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .body div textarea {
-    font-size: 1.4rem;
-    min-width: 220px;
-    margin: 5px 0;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .modal-confirm {
-    width: 350px !important;
-  }
-}
-
-@media screen and (max-height: 600px) {
-  .container textarea {
-    font-size: 1.4rem;
-    min-width: 8in !important;
-    font-family: "Cormorant", serif !important;
-  }
-  .container {
-    padding: 0;
-    width: 80vw !important;
-  }
-}
-
-@media screen and (min-width: 1550px) {
-  .edit-title p {
-    font-size: 3.3rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .edit-title textarea {
-    font-size: 3.3rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .wrapper .container .body div p {
-    font-size: 2.3rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .body div textarea {
-    font-size: 2.3rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container .body div div {
-    font-size: 2.3rem;
-    font-family: "Cormorant", serif !important;
-  }
-
-  .container {
-    padding: 0;
-    width: 70vw !important;
-  }
-
-  .modal-confirm {
-    width: 50vw !important;
-  }
-  .modal-confirm-text {
-    font-size: 3rem !important;
-    margin-bottom: 50px !important;
-  }
-
-  .mui-button {
-    font-size: 14px !important;
-    min-width: 80px !important;
-    padding: 10px 30px !important;
-  }
-}
-
-/* V2 — V1-inspired compact editing layout */
-
-/* V2 page layout */
-
+/* V2: layout and shared typography */
 .v2-editor-layout {
+  --v2-arab-size: 2rem;
+  --v2-rom-size: 1.9rem;
+  --v2-eng-size: 1.9rem;
+  --v2-arab-leading: 1.8;
+  --v2-rom-leading: 1.4;
+  --v2-eng-leading: 1.4;
+  --v2-arab-font: "Amiri", serif;
+  --v2-urdu-font: "Noto Nastaliq Urdu", serif;
+  --v2-latin-font: "Cormorant Garamond", "Cormorant", serif;
+
   width: 100%;
   max-width: none;
   margin: 0 auto;
 }
 
+/* Current three-column layout */
+.v2-three-column-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 920px) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+}
+
+.v2-metadata-sidebar {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  padding-top: 12px;
+  font-size: 16px;
+}
+
+.v2-metadata-sidebar .v2-metadata {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 !important;
+}
+
+.v2-three-column-layout .v2-main-container {
+  width: 100%;
+  min-width: 0;
+  max-width: 920px;
+  margin: 0 auto;
+  padding-right: clamp(16px, 5vw, 72px);
+  padding-left: clamp(16px, 5vw, 72px);
+}
+
+/* Same title spacing in BOTH modes. Do not depend on an optional
+   v2-edit-title class being present. */
+.v2-main-container > .edit-title {
+  padding-top: 2rem;
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.v2-main-container .edit-title p,
+.v2-main-container .edit-title textarea {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--v2-latin-font);
+  font-size: clamp(1.9rem, 3vw, 3rem);
+  line-height: 1.3;
+}
+
+/* Titles written in Arabic script */
+.v2-main-container .edit-title p:first-child,
+.v2-main-container .edit-title textarea:first-child {
+  font-family: var(--v2-arab-font);
+  line-height: 1.65;
+}
+
+.v2-actions-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.v2-actions-sidebar .MuiButton-root {
+  min-width: 110px;
+  min-height: 42px;
+  padding: 8px 18px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.v2-metadata-sidebar .MuiTypography-root,
+.v2-metadata-sidebar .MuiInputBase-input { font-size: 16px; }
+.v2-metadata-sidebar .MuiInputLabel-root { font-size: 15px; }
+.v2-metadata-sidebar .MuiFormHelperText-root { font-size: 13px; }
+.v2-metadata-sidebar .MuiChip-label { font-size: 14px; }
+
+/* Legacy V2 wrapper layout, retained for any older V2 pages */
 .v2-editor-layout .wrapper {
   --panel-width: 1050px;
   --actions-width: 90px;
   --actions-gap: 24px;
-
-  display: grid !important;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, var(--panel-width))
-    minmax(0, 1fr);
-
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--panel-width)) minmax(0, 1fr);
   align-items: start;
-  width: 100%;
-  margin: 0 auto !important;
   position: relative;
+  width: 100%;
+  margin: 0 auto;
 }
 
-/* White panel always occupies the center column */
 .v2-editor-layout .wrapper > .container {
   grid-column: 2;
   grid-row: 1;
-
   width: 100%;
   max-width: var(--panel-width);
-  margin: 0 !important;
-  box-sizing: border-box;
   min-width: 0;
+  margin: 0;
 }
 
-/* Buttons positioned relative to the centered panel */
 .v2-editor-layout .wrapper > .edit-buttons {
   grid-column: 3;
   grid-row: 1;
-
-  position: static !important;
+  position: static;
   width: var(--actions-width);
-  margin: 0 0 0 var(--actions-gap) !important;
-
+  margin: 0 0 0 var(--actions-gap);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -287,31 +233,7 @@ body {
   margin: 0;
 }
 
-/* Responsive layout */
-@media (max-width: 1320px) {
-  .v2-editor-layout .wrapper {
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(0, 1050px)
-      minmax(0, 1fr);
-  }
-
-  .v2-editor-layout .wrapper > .edit-buttons {
-    grid-column: 2;
-    grid-row: 2;
-
-    width: 100%;
-    margin: 12px 0 0 !important;
-    flex-direction: row;
-    justify-content: flex-end;
-  }
-
-  .v2-editor-layout .edit-buttons button {
-    width: auto;
-    min-width: 90px;
-  }
-}
-
+/* V2 stanza editor */
 .v2-edit-body {
   display: flex;
   flex-direction: column;
@@ -322,7 +244,7 @@ body {
 .v2-sequence-block {
   width: 100%;
   max-width: 600px;
-  box-sizing: border-box;
+  min-width: 0;
   margin: 0 auto;
   padding: 8px 14px 12px;
   border: 2px dashed #d5d5d5;
@@ -341,34 +263,27 @@ body {
 
 .v2-block-label {
   margin-right: auto;
-  font-size: 12px;
+  font-size: 15px;
+  font-weight: 500;
   color: #888;
 }
 
-.v2-block-actions {
-  display: flex;
-  gap: 0;
-}
+.v2-block-actions { display: flex; gap: 0; }
 
 .v2-block-actions .MuiIconButton-root,
-.v2-line-actions .MuiIconButton-root {
-  padding: 4px;
-}
+.v2-line-actions .MuiIconButton-root { padding: 5px; }
 
 .v2-block-actions .MuiSvgIcon-root,
-.v2-line-actions .MuiSvgIcon-root {
-  font-size: 1.1rem;
-}
+.v2-line-actions .MuiSvgIcon-root { font-size: 21px; }
 
-/* One verse: Arabic + transliteration + English */
 .v2-edit-line {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  min-width: 0;
   padding: 0 0 8px;
-  box-sizing: border-box;
   text-align: center;
 }
 
@@ -387,179 +302,132 @@ body {
   z-index: 1;
 }
 
-.v2-edit-line:hover .v2-line-actions {
-  opacity: 1;
-}
+.v2-edit-line:hover .v2-line-actions,
+.v2-edit-line:focus-within .v2-line-actions { opacity: 1; }
 
-/* Keep all lyric inputs inside their stanza */
-
-.v2-sequence-block {
+/* MUI multiline fields can contain visible and autosize shadow textareas.
+   Apply identical metrics to both so autosizing remains stable. */
+.v2-edit-body .v2-lyric-input,
+.v2-edit-body .v2-lyric-input .MuiInputBase-root {
   width: 100%;
-  max-width: 600px;
-  box-sizing: border-box;
+  max-width: 100%;
   min-width: 0;
 }
 
-.v2-edit-line {
+.v2-edit-body .v2-lyric-input textarea.MuiInputBase-input {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  text-align: center;
 }
 
-.v2-lyric-input {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box;
-}
-
-.v2-lyric-input .MuiInputBase-root {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box;
-}
-
-.v2-lyric-input textarea.MuiInputBase-input {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  box-sizing: border-box !important;
-  text-align: center !important;
-}
-
-/* Arabic needs vertical breathing room for harakat */
-.v2-arab textarea.MuiInputBase-input {
-  font-size: 2rem !important;
-  line-height: 1.8 !important;
-  padding: 10px 8px 6px !important;
+.v2-edit-body .v2-arab textarea.MuiInputBase-input {
+  font-family: var(--v2-arab-font);
+  font-size: var(--v2-arab-size);
+  line-height: var(--v2-arab-leading);
+  padding: 10px 8px 6px;
   direction: rtl;
 }
 
-/* Transliteration */
-.v2-rom textarea.MuiInputBase-input {
-  font-size: 1.4rem !important;
-  line-height: 1.4 !important;
-  padding: 2px 8px !important;
+/* JSX sx may choose Nastaliq for Urdu; !important is intentionally
+   avoided so that line-specific MUI font selection can take precedence. */
+.v2-edit-body .v2-rom textarea.MuiInputBase-input {
+  font-family: var(--v2-latin-font);
+  font-size: var(--v2-rom-size);
+  line-height: var(--v2-rom-leading);
+  padding: 2px 8px;
   font-style: italic;
 }
 
-/* English translation */
-.v2-eng textarea.MuiInputBase-input {
-  font-size: 1.3rem !important;
-  line-height: 1.4 !important;
-  padding: 2px 8px !important;
+.v2-edit-body .v2-eng textarea.MuiInputBase-input {
+  font-family: var(--v2-latin-font);
+  font-size: var(--v2-eng-size);
+  line-height: var(--v2-eng-leading);
+  padding: 2px 8px;
 }
 
-/* Add Line */
-.v2-sequence-block > .MuiButton-root {
-  margin-top: 2px !important;
-  padding: 2px 8px;
+.v2-edit-body .MuiButton-root {
+  font-size: 15px;
+  font-weight: 500;
   text-transform: none;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .v2-sequence-block {
-    padding: 8px 10px;
-  }
-
-  .v2-arab textarea.MuiInputBase-input {
-    font-size: 1.65rem !important;
-    line-height: 1.9 !important;
-  }
-
-  .v2-rom textarea.MuiInputBase-input {
-    font-size: 1.15rem !important;
-  }
-
-  .v2-eng textarea.MuiInputBase-input {
-    font-size: 1.1rem !important;
-  }
+.v2-sequence-block > .MuiButton-root {
+  margin-top: 2px;
+  padding: 2px 8px;
 }
 
-/* Keep the visible and sizing textareas consistent */
-
-.v2-arab .MuiInputBase-root textarea {
-  font-size: 2rem !important;
-  line-height: 1.8 !important;
-  padding: 10px 8px 6px !important;
-  box-sizing: border-box;
-}
-
-.v2-rom .MuiInputBase-root textarea {
-  font-size: 1.9rem !important;
-  line-height: 1.4 !important;
-  padding: 2px 8px !important;
-  box-sizing: border-box;
-}
-
-.v2-eng .MuiInputBase-root textarea {
-  font-size: 1.9rem !important;
-  line-height: 1.4 !important;
-  padding: 2px 8px !important;
-  box-sizing: border-box;
-}
-
-/* Three-column EditV2 layout */
-
-.v2-three-column-layout {
-  display: grid;
-
-  /*
-   * Equal-width side columns ensure the
-   * nasheed remains centered on the page.
-   */
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 920px)
-    minmax(0, 1fr);
-
-  gap: 20px;
+/* Read-only V2 lyric lines: match editor typography exactly */
+.v2-main-container .v2-display-line {
   width: 100%;
-  align-items: start;
+  text-align: center;
+  margin-bottom: 1.75rem;
 }
 
-/* Left sidebar */
-
-.v2-metadata-sidebar {
-  min-width: 0;
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 12px;
+.v2-main-container .v2-display-arab {
+  font-family: var(--v2-arab-font);
+  font-size: var(--v2-arab-size);
+  font-weight: 400;
+  line-height: var(--v2-arab-leading);
+  margin: 0 0 0.5rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
-.v2-metadata-sidebar .v2-metadata {
-  width: 100%;
-  max-width: 320px;
-  margin: 0 !important;
+.v2-main-container .v2-display-arab.v2-display-urdu {
+  font-family: var(--v2-urdu-font);
+  line-height: 2.3;
 }
 
-/* Center nasheed */
-
-.v2-three-column-layout .v2-main-container {
-  width: 100%;
-  min-width: 0;
-  max-width: 920px;
-  box-sizing: border-box;
-  margin: 0 auto;
+.v2-main-container .v2-display-rom {
+  font-family: var(--v2-latin-font);
+  font-size: var(--v2-rom-size);
+  font-weight: 400;
+  line-height: var(--v2-rom-leading);
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
 }
 
-/* Right sidebar */
-
-.v2-actions-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding-top: 0;
+.v2-main-container .v2-display-rom em {
+  font-style: italic;
+  font-family: inherit;
 }
 
-.v2-actions-sidebar .MuiButton-root {
-  min-width: 90px;
+.v2-main-container .v2-display-eng,
+.v2-main-container .v2-display-eng p,
+.v2-main-container .v2-display-eng span {
+  font-family: var(--v2-latin-font);
+  font-size: var(--v2-eng-size);
+  font-weight: 400;
+  line-height: var(--v2-eng-leading);
 }
 
-/* Responsive */
+.v2-main-container .v2-display-eng p { margin: 0; }
+
+/* For read-only lyrics, avoid older generic .body p selectors.
+   FootnotedTranslation can return wrappers other than <p>. */
+.v2-main-container .v2-display-eng {
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* Responsive layout */
+@media (max-width: 1320px) {
+  .v2-editor-layout .wrapper > .edit-buttons {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    margin: 12px 0 0;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .v2-editor-layout .edit-buttons button {
+    width: auto;
+    min-width: 90px;
+  }
+}
 
 @media (max-width: 1100px) {
   .v2-three-column-layout {
@@ -572,13 +440,8 @@ body {
     padding-top: 0;
   }
 
-  .v2-metadata-sidebar .v2-metadata {
-    max-width: 920px;
-  }
-
-  .v2-main-container {
-    grid-row: 2;
-  }
+  .v2-metadata-sidebar .v2-metadata { max-width: 920px; }
+  .v2-three-column-layout .v2-main-container { grid-row: 2; }
 
   .v2-actions-sidebar {
     grid-row: 1;
@@ -601,80 +464,311 @@ body {
   }
 }
 
-/* =====================================
-   EditV2 typography improvements
-   ===================================== */
+@media (max-width: 850px) {
+  .container {
+    width: 70vw;
+    padding: 0;
+  }
 
-/* Metadata sidebar */
-.v2-metadata-sidebar {
-  font-size: 16px;
+  .edit-title p,
+  .container .edit-title textarea { font-size: 1.4rem; }
+
+  .mui-button {
+    font-size: 12px !important;
+    min-width: 50px;
+    padding: 6px !important;
+  }
+
+  .edit-buttons { margin: 0 5px; }
+
+  .v2-editor-layout {
+    --v2-arab-size: 1.65rem;
+    --v2-rom-size: 1.15rem;
+    --v2-eng-size: 1.1rem;
+    --v2-arab-leading: 1.9;
+  }
+
+  .v2-three-column-layout .v2-main-container {
+    width: 100%;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .v2-main-container > .edit-title { padding-top: 1.5rem; }
+
+  .v2-main-container .edit-title p,
+  .v2-main-container .edit-title textarea {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .v2-sequence-block { padding: 8px 10px; }
+  .modal-confirm { width: min(350px, calc(100vw - 32px)); }
 }
 
-.v2-metadata-sidebar .MuiTypography-root {
-  font-size: 16px;
+@media (max-height: 600px) {
+  .container { max-height: 80vh; }
 }
 
-.v2-metadata-sidebar .MuiInputBase-input {
-  font-size: 16px;
+@media (min-width: 1550px) {
+  .modal-confirm { width: 50vw; }
+  .modal-confirm-text {
+    font-size: 3rem;
+    margin-bottom: 50px;
+  }
 }
 
-.v2-metadata-sidebar .MuiInputLabel-root {
-  font-size: 15px;
+/* =============================================================
+   V2 reading/editing consistency — component-specific overrides
+   ============================================================= */
+
+/* Reading mode: one sequence item = one stanza/refrain. */
+.v2-editor-layout .v2-main-container .body:not(.v2-edit-body) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
 }
 
-.v2-metadata-sidebar .MuiFormHelperText-root {
-  font-size: 13px;
+.v2-editor-layout .v2-display-stanza {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 24px;
 }
 
-.v2-metadata-sidebar .MuiChip-label {
-  font-size: 14px;
+/* Within a stanza, keep lines close together; separate stanzas more. */
+.v2-editor-layout .v2-display-stanza .v2-display-line {
+  margin: 0 0 12px;
+}
+.v2-editor-layout .v2-display-stanza .v2-display-line:last-child {
+  margin-bottom: 0;
 }
 
-/* Edit, Save, Cancel */
-.v2-actions-sidebar .MuiButton-root {
-  font-size: 16px;
-  font-weight: 500;
-  min-width: 110px;
-  min-height: 42px;
-  padding: 8px 18px;
+/* Match the read-only typography to the actual edit-mode textareas. */
+.v2-editor-layout .v2-main-container .v2-display-arab {
+  font-family: var(--v2-arab-font);
+  font-size: var(--v2-arab-size);
+  line-height: var(--v2-arab-leading);
+  margin: 0 0 4px;
+}
+.v2-editor-layout .v2-main-container .v2-display-arab.v2-display-urdu {
+  font-family: var(--v2-urdu-font);
+  line-height: 2.3;
+}
+.v2-editor-layout .v2-main-container .v2-display-rom {
+  font-family: var(--v2-latin-font);
+  font-size: var(--v2-rom-size);
+  line-height: var(--v2-rom-leading);
+  margin: 0 0 4px;
 }
 
-/* Stanza labels */
-.v2-block-label {
-  font-size: 15px;
-  font-weight: 500;
+/* FootnotedTranslation contains MUI Typography, whose generated
+   .css-...-MuiTypography-root styles otherwise force Roboto/23px.
+   This selector intentionally wins over that component's MUI styles. */
+.v2-editor-layout .v2-main-container .v2-display-eng,
+.v2-editor-layout .v2-main-container .v2-display-eng .MuiTypography-root,
+.v2-editor-layout .v2-main-container .v2-display-eng p,
+.v2-editor-layout .v2-main-container .v2-display-eng span {
+  font-family: var(--v2-latin-font) !important;
+  font-size: var(--v2-eng-size) !important;
+  font-weight: 400;
+  line-height: var(--v2-eng-leading) !important;
+  letter-spacing: normal;
+}
+.v2-editor-layout .v2-main-container .v2-display-eng p,
+.v2-editor-layout .v2-main-container .v2-display-eng .MuiTypography-root {
+  margin: 0;
 }
 
-/* Stanza toolbar icons */
-.v2-block-actions .MuiSvgIcon-root,
-.v2-line-actions .MuiSvgIcon-root {
-  font-size: 21px;
+/* Match the gap between edit-mode stanza blocks. */
+.v2-editor-layout .v2-edit-body .v2-sequence-block {
+  margin: 0 auto;
+}
+.v2-editor-layout .v2-edit-body .v2-sequence-block + .MuiBox-root {
+  margin-top: 4px;
 }
 
-.v2-block-actions .MuiIconButton-root,
-.v2-line-actions .MuiIconButton-root {
-  padding: 5px;
+/* Textarea typography must override the generic .container textarea,
+   while preserving language-specific MUI sx fonts for Urdu. */
+.v2-editor-layout .v2-edit-body .v2-arab textarea.MuiInputBase-input {
+  font-size: var(--v2-arab-size);
+  line-height: var(--v2-arab-leading);
+}
+.v2-editor-layout .v2-edit-body .v2-rom textarea.MuiInputBase-input {
+  font-size: var(--v2-rom-size);
+  line-height: var(--v2-rom-leading);
+}
+.v2-editor-layout .v2-edit-body .v2-eng textarea.MuiInputBase-input {
+  font-size: var(--v2-eng-size);
+  line-height: var(--v2-eng-leading);
 }
 
-/* Add Line, Insert Stanza, etc. */
-.v2-edit-body .MuiButton-root {
-  font-size: 15px;
-  font-weight: 500;
-  text-transform: none;
+@media (max-width: 850px) {
+  .v2-editor-layout .v2-display-stanza { margin-bottom: 20px; }
+  .v2-editor-layout .v2-display-stanza .v2-display-line { margin-bottom: 10px; }
 }
 
-/* Preserve lyric typography */
-.v2-edit-body .v2-rom .MuiInputBase-input,
-.v2-edit-body .v2-eng .MuiInputBase-input {
-  font-size: 23px;
-  line-height: 1.5;
+/* =========================================
+   V2 EDIT MODE — TITLE SPACING
+   ========================================= */
+
+/* Keep the Arabic and English titles close together */
+.v2-main-container .v2-edit-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding-top: 2rem;
+  margin-bottom: 0;
+}
+
+/* Override the generic textarea styling */
+.v2-main-container .v2-edit-title textarea {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  resize: none;
+  overflow: hidden;
+}
+
+/* Arabic title */
+.v2-main-container .v2-edit-title textarea:first-child {
+  font-family: "Amiri", serif;
+}
+
+/* English / transliterated title */
+.v2-main-container .v2-edit-title textarea:nth-child(2) {
+  font-family: "Cormorant Garamond", serif;
+  line-height: 1.2;
+}
+
+/* Add breathing room between the title and first stanza */
+.v2-main-container .v2-edit-body {
+  margin-top: 2.5rem;
+}
+
+/* Avoid extra spacing inherited from the generic body */
+.v2-main-container .v2-edit-body {
+  padding-top: 0;
+}
+
+/* Arabic and English title spacing */
+.v2-edit-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0 !important;
+}
+
+/* Remove spacing from MUI TextField wrappers */
+.v2-edit-title .MuiFormControl-root,
+.v2-edit-title .MuiInputBase-root {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0;
+}
+
+/* Consistent textarea styling */
+.v2-edit-title textarea.MuiInputBase-input {
+  display: block;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  font-weight: 400 !important;
   text-align: center;
+  resize: none;
 }
 
-.v2-edit-body .v2-arab .MuiInputBase-input {
-  font-size: 30px;
+/* Arabic title */
+.v2-edit-title .v2-arab textarea {
+  font-family: "Amiri", serif !important;
+  font-size: 2rem !important;
+  line-height: 1.4 !important;
+}
+
+/* English title */
+.v2-edit-title .v2-eng textarea {
+  font-family: "Cormorant Garamond", serif !important;
+  font-size: 2rem !important;
+  font-weight: 400 !important;
+  line-height: 1.15 !important;
+}
+
+/* Match edit-mode title styling to display mode */
+
+.v2-edit-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0 !important;
+  margin-bottom: 0;
+}
+
+.v2-edit-title textarea {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+
+  color: #000;
+  text-align: center;
+  font-weight: 400 !important;
+  resize: none;
+  overflow: hidden;
+}
+
+/* Arabic title */
+.v2-edit-title textarea.v2-title-arab {
+  font-family: "Amiri", serif !important;
+  font-size: clamp(1.9rem, 3vw, 3rem);
+  font-weight: 400 !important;
+  line-height: 1.65 !important;
+}
+
+/* English / transliterated title */
+.v2-edit-title textarea.v2-title-eng {
+  font-family: "Cormorant Garamond", "Cormorant", serif !important;
+  font-size: clamp(1.9rem, 3vw, 3rem);
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+}
+
+/* Space between title and first editable stanza */
+.v2-edit-body {
+  margin-top: 2.5rem;
+}
+
+/* Arabic lyrics in edit mode */
+.v2-edit-line .v2-arab .MuiInputBase-input {
+  font-family: "Amiri", serif !important;
+  font-weight: 400;
+  line-height: 1.8;
+}
+
+/* Urdu lyrics in edit mode */
+.v2-edit-line .v2-arab.v2-edit-urdu .MuiInputBase-input {
+  font-family: "Noto Nastaliq Urdu", serif !important;
+  font-weight: 400;
+  line-height: 2.4;
+}
+
+.v2-edit-title textarea.v2-title-arab.v2-title-urdu {
+  font-family: "Noto Nastaliq Urdu", serif !important;
   line-height: 2;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+}
+
+p.v2-title-arab.v2-title-urdu {
+  font-family: "Noto Nastaliq Urdu", serif !important;
+  line-height: 2;
 }
