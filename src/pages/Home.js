@@ -31,64 +31,99 @@ const Home = () => {
   const [sessionCode, setSessionCode] = useState("");
 
   useEffect(() => {
-    let queryParam = "";
-    if (user?.id) {
-      queryParam = `?userId=${user?.id}`;
-    }
+    let cancelled = false;
 
     const fetchNasheeds = async () => {
-      try {
-        const requests = [fetch(`${baseURL}/nasheedV2${queryParam}`)];
+      setLoading(true);
 
-        if (user?.id) {
-          requests.push(fetch(`${baseURL}/slideshow?userId=${user.id}`));
+      try {
+        const userId = user?.id;
+        const queryParam = userId
+          ? `?userId=${encodeURIComponent(userId)}`
+          : "";
+
+        const requests = [
+          fetch(`${baseURL}/nasheedV2${queryParam}`),
+        ];
+
+        if (userId) {
+          requests.push(
+            fetch(`${baseURL}/slideshow?userId=${encodeURIComponent(userId)}`)
+          );
         }
 
         const responses = await Promise.all(requests);
+
         const [nasheedResponse, slideshowResponse] = responses;
-        const nasheedData = await nasheedResponse.json();
 
         if (!nasheedResponse.ok) {
-          throw new Error(nasheedData.message || "Failed to fetch nasheeds");
+          throw new Error("Failed to fetch nasheeds");
         }
 
-        const { nasheeds } = nasheedData;
+        const nasheedData = await nasheedResponse.json();
 
-        const sorted = [...nasheeds].sort(alphabetize);
-        const nasheedMap = sorted.reduce((accumulator, nasheed) => {
-          accumulator[nasheed._id] = nasheed;
-          return accumulator;
-        }, {});
+        const nasheedList = Array.isArray(nasheedData)
+          ? nasheedData
+          : nasheedData.nasheeds || [];
+
+        const sorted = [...nasheedList].sort(alphabetize);
+
+        const nasheedMap = Object.fromEntries(
+          sorted.map((nasheed) => [String(nasheed._id), nasheed])
+        );
+
         let hydratedSlideshows = [];
 
         if (slideshowResponse) {
-          const slideshowData = await slideshowResponse.json();
           if (!slideshowResponse.ok) {
-            throw new Error(
-              slideshowData.message || "Failed to fetch slideshows",
-            );
+            throw new Error("Failed to fetch slideshows");
           }
-          hydratedSlideshows = (slideshowData.slideshows || []).map(
-            (slideshow) => buildSlideshowModalData(slideshow, nasheedMap),
-          );
+
+          const slideshowData = await slideshowResponse.json();
+
+          const rawSlideshows = slideshowData.slideshows || [];
+
+          hydratedSlideshows = rawSlideshows
+            .map((slideshow) => {
+              try {
+                return buildSlideshowModalData(slideshow, nasheedMap);
+              } catch (error) {
+                console.error(
+                  `Failed to hydrate slideshow: ${slideshow.title}`,
+                  error
+                );
+                return null;
+              }
+            })
+            .filter(Boolean);
         }
+
+        // Ignore results from outdated requests.
+        if (cancelled) return;
 
         setNasheeds(sorted);
         setFilteredNasheeds(sorted);
         setSlideshows(hydratedSlideshows);
         setFilteredSlideshows(hydratedSlideshows);
+
       } catch (error) {
-        console.error("Failed to fetch nasheeds:", error);
-        setAlertMessage(error.message || "Failed to fetch nasheeds");
-        setShowAlert(true);
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 3000);
+        if (!cancelled) {
+          console.error("Failed to fetch homepage data:", error);
+          setAlertMessage(error.message || "Failed to fetch homepage data");
+          setShowAlert(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
 
     fetchNasheeds();
+
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id]);
 
   const handleSearch = (search) => {

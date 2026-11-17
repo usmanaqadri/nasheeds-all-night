@@ -195,9 +195,9 @@ const CreateSlideshow = () => {
         const list = Array.isArray(data[0])
           ? data[0]
           : data[0].nasheeds ||
-            data[0].nasheedsV2 ||
-            data[0].foundNasheeds ||
-            [];
+          data[0].nasheedsV2 ||
+          data[0].foundNasheeds ||
+          [];
         if (!Array.isArray(list))
           throw new Error("Unexpected V2 nasheed response");
         const sorted = [...list].sort(alphabetize);
@@ -304,7 +304,15 @@ const CreateSlideshow = () => {
       id: makeId(),
       type: "custom",
       title: "Untitled custom slide",
-      lines: [{ id: makeId(), arab: "", rom: "", eng: "" }],
+      lines: [
+        {
+          id: makeId(),
+          arab: "",
+          rom: "",
+          eng: "",
+          language: "ar",
+        },
+      ],
     };
     pendingNavigation.current = nextIndex;
     setSlides((prev) => [...prev, slide]);
@@ -329,8 +337,8 @@ const CreateSlideshow = () => {
       event.clientY < rect.top + rect.height / 2 ? "before" : "after";
     setCustomDrop((previous) =>
       previous?.slideId === slideId &&
-      previous.index === index &&
-      previous.position === position
+        previous.index === index &&
+        previous.position === position
         ? previous
         : { slideId, index, position },
     );
@@ -400,11 +408,11 @@ const CreateSlideshow = () => {
       event.clientY < rect.top + rect.height / 2 ? "before" : "after";
     setDropTarget((previous) =>
       previous &&
-      previous.kind === target.kind &&
-      previous.slideId === target.slideId &&
-      previous.blockId === target.blockId &&
-      previous.index === target.index &&
-      previous.position === position
+        previous.kind === target.kind &&
+        previous.slideId === target.slideId &&
+        previous.blockId === target.blockId &&
+        previous.index === target.index &&
+        previous.position === position
         ? previous
         : { ...target, position },
     );
@@ -415,13 +423,13 @@ const CreateSlideshow = () => {
     const source = dragging;
     const position =
       dropTarget?.kind === target.kind &&
-      dropTarget?.slideId === target.slideId &&
-      dropTarget?.blockId === target.blockId &&
-      dropTarget?.index === target.index
+        dropTarget?.slideId === target.slideId &&
+        dropTarget?.blockId === target.blockId &&
+        dropTarget?.index === target.index
         ? dropTarget.position
         : event.clientY <
-            event.currentTarget.getBoundingClientRect().top +
-              event.currentTarget.getBoundingClientRect().height / 2
+          event.currentTarget.getBoundingClientRect().top +
+          event.currentTarget.getBoundingClientRect().height / 2
           ? "before"
           : "after";
     clearDrag();
@@ -1330,26 +1338,26 @@ const CreateSlideshow = () => {
                                                   position: "relative",
                                                   ...(customDrop?.slideId ===
                                                     slide.id &&
-                                                  customDrop.index === lineIndex
+                                                    customDrop.index === lineIndex
                                                     ? {
-                                                        [`&::${customDrop.position === "before" ? "before" : "after"}`]:
-                                                          {
-                                                            content: '""',
-                                                            position:
-                                                              "absolute",
-                                                            left: 8,
-                                                            right: 8,
-                                                            [customDrop.position ===
-                                                            "before"
-                                                              ? "top"
-                                                              : "bottom"]: -5,
-                                                            height: 3,
-                                                            bgcolor:
-                                                              "primary.main",
-                                                            borderRadius: 2,
-                                                            zIndex: 2,
-                                                          },
-                                                      }
+                                                      [`&::${customDrop.position === "before" ? "before" : "after"}`]:
+                                                      {
+                                                        content: '""',
+                                                        position:
+                                                          "absolute",
+                                                        left: 8,
+                                                        right: 8,
+                                                        [customDrop.position ===
+                                                          "before"
+                                                          ? "top"
+                                                          : "bottom"]: -5,
+                                                        height: 3,
+                                                        bgcolor:
+                                                          "primary.main",
+                                                        borderRadius: 2,
+                                                        zIndex: 2,
+                                                      },
+                                                    }
                                                     : {}),
                                                 }}
                                               >
@@ -1367,9 +1375,13 @@ const CreateSlideshow = () => {
                                                     />
                                                     <Typography
                                                       sx={{
-                                                        flex: 1,
+                                                        position: "absolute",
+                                                        left: "50%",
+                                                        transform: "translateX(-50%)",
                                                         fontSize: "1.1rem",
                                                         fontWeight: 600,
+                                                        whiteSpace: "nowrap",
+                                                        pointerEvents: "none",
                                                       }}
                                                     >
                                                       Line {lineIndex + 1}
@@ -1402,7 +1414,7 @@ const CreateSlideshow = () => {
                                                           disabled={
                                                             lineIndex ===
                                                             slide.lines.length -
-                                                              1
+                                                            1
                                                           }
                                                           onClick={() =>
                                                             updateCustomLines(
@@ -1445,17 +1457,45 @@ const CreateSlideshow = () => {
                                                       </span>
                                                     </Tooltip>
                                                   </Stack>
+                                                  <FormControl size="small" sx={{ width: 180 }}>
+                                                    <InputLabel>Language</InputLabel>
+                                                    <Select
+                                                      label="Language"
+                                                      value={line.language || "ar"}
+                                                      onChange={(e) =>
+                                                        updateCustomLine(
+                                                          slide.id,
+                                                          line.id,
+                                                          "language",
+                                                          e.target.value,
+                                                        )
+                                                      }
+                                                    >
+                                                      <MenuItem value="ar">Arabic</MenuItem>
+                                                      <MenuItem value="ur">Urdu</MenuItem>
+                                                      <MenuItem value="en">English</MenuItem>
+                                                    </Select>
+                                                  </FormControl>
                                                   <TextField
-                                                    label="Arabic (optional)"
+                                                    label={
+                                                      line.language === "ur"
+                                                        ? "Urdu (optional)"
+                                                        : "Arabic (optional)"
+                                                    }
                                                     multiline
                                                     minRows={2}
                                                     fullWidth
                                                     value={line.arab || ""}
                                                     inputProps={{
                                                       dir: "rtl",
+                                                      lang: line.language === "ur" ? "ur" : "ar",
                                                       style: {
+                                                        fontFamily:
+                                                          line.language === "ur"
+                                                            ? '"Noto Nastaliq Urdu", serif'
+                                                            : '"Amiri", serif',
                                                         fontSize: "1.6rem",
-                                                        lineHeight: 1.8,
+                                                        lineHeight: line.language === "ur" ? 2.4 : 1.8,
                                                       },
                                                     }}
                                                     onChange={(e) =>
@@ -1569,9 +1609,9 @@ const CreateSlideshow = () => {
                                             (block, blockIndex) => {
                                               const lines = nasheed
                                                 ? resolveSlideshowBlock(
-                                                    block,
-                                                    nasheed,
-                                                  )
+                                                  block,
+                                                  nasheed,
+                                                )
                                                 : [];
                                               const expandedKey = `${slide.id}:${block.id}`;
                                               const expanded =
@@ -1648,7 +1688,7 @@ const CreateSlideshow = () => {
                                                     >
                                                       <Typography variant="h6">
                                                         {block.type ===
-                                                        "refrain"
+                                                          "refrain"
                                                           ? "Refrain"
                                                           : "Stanza"}{" "}
                                                         {blockIndex + 1}
@@ -1681,7 +1721,7 @@ const CreateSlideshow = () => {
                                                                   b,
                                                                   blockIndex,
                                                                   blockIndex -
-                                                                    1,
+                                                                  1,
                                                                 ),
                                                             )
                                                           }
@@ -1698,7 +1738,7 @@ const CreateSlideshow = () => {
                                                             blockIndex ===
                                                             slide.blocks
                                                               .length -
-                                                              1
+                                                            1
                                                           }
                                                           onClick={() =>
                                                             updateBlocks(
@@ -1708,7 +1748,7 @@ const CreateSlideshow = () => {
                                                                   b,
                                                                   blockIndex,
                                                                   blockIndex +
-                                                                    1,
+                                                                  1,
                                                                 ),
                                                             )
                                                           }
@@ -1919,7 +1959,7 @@ const CreateSlideshow = () => {
                                                                                   b.lineIds,
                                                                                   lineIndex,
                                                                                   lineIndex -
-                                                                                    1,
+                                                                                  1,
                                                                                 ),
                                                                             }),
                                                                           )
@@ -1938,7 +1978,7 @@ const CreateSlideshow = () => {
                                                                           block
                                                                             .lineIds
                                                                             .length -
-                                                                            1
+                                                                          1
                                                                         }
                                                                         onClick={() =>
                                                                           updateBlock(
@@ -1953,7 +1993,7 @@ const CreateSlideshow = () => {
                                                                                   b.lineIds,
                                                                                   lineIndex,
                                                                                   lineIndex +
-                                                                                    1,
+                                                                                  1,
                                                                                 ),
                                                                             }),
                                                                           )
@@ -1995,12 +2035,12 @@ const CreateSlideshow = () => {
                                                                                   );
                                                                                 return next.length
                                                                                   ? [
-                                                                                      {
-                                                                                        ...b,
-                                                                                        lineIds:
-                                                                                          next,
-                                                                                      },
-                                                                                    ]
+                                                                                    {
+                                                                                      ...b,
+                                                                                      lineIds:
+                                                                                        next,
+                                                                                    },
+                                                                                  ]
                                                                                   : [];
                                                                               },
                                                                             ),

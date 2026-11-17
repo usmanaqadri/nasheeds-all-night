@@ -1189,53 +1189,57 @@ export default function MyModal({
           />
           {!isMobile && !forcePresentationMode && (
             <>
-              <Tooltip
-                placement="top"
-                title="Presentation Mode"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
+              {mode === "scroll" && (
+                <Tooltip
+                  placement="top"
+                  title="Presentation Mode"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: "12px",
+                        padding: "5px 10px",
+                      },
                     },
-                  },
-                }}
-              >
-                <IconButton
-                  sx={buttonStyles}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setMode("presentation");
                   }}
                 >
-                  <Tv fontSize="large" style={{ color: "white" }} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                placement="top"
-                title="Reading Mode"
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      fontSize: "12px",
-                      padding: "5px 10px",
+                  <IconButton
+                    sx={buttonStyles}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMode("presentation");
+                    }}
+                  >
+                    <Tv fontSize="large" style={{ color: "white" }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {mode === "presentation" && (
+                <Tooltip
+                  placement="top"
+                  title="Reading Mode"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: "12px",
+                        padding: "5px 10px",
+                      },
                     },
-                  },
-                }}
-              >
-                <IconButton
-                  sx={buttonStyles}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setMode("scroll");
                   }}
                 >
-                  <ArticleOutlined
-                    fontSize="large"
-                    style={{ color: "white" }}
-                  />
-                </IconButton>
-              </Tooltip>
+                  <IconButton
+                    sx={buttonStyles}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMode("scroll");
+                    }}
+                  >
+                    <ArticleOutlined
+                      fontSize="large"
+                      style={{ color: "white" }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
             </>
           )}
         </div>
