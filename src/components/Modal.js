@@ -32,6 +32,7 @@ import { FootnotePopper } from "./FootnotePopper";
 import { baseURL } from "../utils/constants";
 import { getNasheedSlides } from "../utils/nasheedSlides";
 import { sanitizeArabic } from "../utils/sanitizeArabic";
+import FormattedLine from "./FormattedLine";
 
 const buildSlideshowScreens = (sections = []) => {
   const screens = [];
@@ -671,7 +672,12 @@ export default function MyModal({
 
         {line.rom && (
           <p className="engText">
-            <em>{line.rom}</em>
+            <em>{
+              <FormattedLine
+                text={line.rom}
+                formatting={line.formatting?.rom || []}
+              />
+            }</em>
           </p>
         )}
 
@@ -817,11 +823,11 @@ export default function MyModal({
         >
           {screen.arabTitle && (
             <Box
-              className={`modal-title-arab ${isUrduTitle(nasheed.language) ? "modal-title-urdu" : ""
+              className={`modal-title-arab ${isUrduTitle(screen.section.language) ? "modal-title-urdu" : ""
                 }`}
-              lang={isUrduTitle(nasheed.language) ? "ur" : "ar"}
+              lang={isUrduTitle(screen.section.language) ? "ur" : "ar"}
               dir="rtl"
-              sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem)" }}
+              sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem) !important" }}
             >
               {screen.arabTitle}
             </Box>
@@ -830,7 +836,7 @@ export default function MyModal({
           <Box
             sx={{
               color: "white",
-              fontSize: "clamp(2rem, 4vw, 4rem)",
+              fontSize: "clamp(2rem, 4vw, 4rem) !important",
               fontWeight: 600,
             }}
           >
@@ -868,7 +874,12 @@ export default function MyModal({
 
               {line.rom?.trim() && (
                 <p className="engText">
-                  <em>{line.rom}</em>
+                  <em>{
+                    <FormattedLine
+                      text={line.rom}
+                      formatting={line.formatting?.rom || []}
+                    />
+                  }</em>
                 </p>
               )}
 
@@ -895,7 +906,12 @@ export default function MyModal({
 
         {layout.includes("rom") && line.rom && (
           <p className="engText">
-            <em>{line.rom}</em>
+            <em>{
+              <FormattedLine
+                text={line.rom}
+                formatting={line.formatting?.rom || []}
+              />
+            }</em>
           </p>
         )}
 
@@ -1026,7 +1042,12 @@ export default function MyModal({
 
                 {(isCustom || layout.includes("rom")) && line.rom?.trim() && (
                   <p className="engText">
-                    <em>{line.rom}</em>
+                    <em>{
+                      <FormattedLine
+                        text={line.rom}
+                        formatting={line.formatting?.rom || []}
+                      />
+                    }</em>
                   </p>
                 )}
 

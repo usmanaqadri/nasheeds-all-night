@@ -73,8 +73,8 @@ const LiveSession = () => {
         if (!slideshowResponse.ok) {
           throw new Error(
             slideshowData.error ||
-              slideshowData.message ||
-              "Failed to load slideshow.",
+            slideshowData.message ||
+            "Failed to load slideshow.",
           );
         }
 
@@ -130,10 +130,6 @@ const LiveSession = () => {
         setViewerSlideIndex(foundSession.currentSlideIndex || 0);
         setViewerFollowingLeader(true);
         setModalData(builtModalData);
-
-        console.log("Live session loaded:", foundSession.sessionId);
-        console.log("Nasheeds loaded:", uniqueNasheedIds.length);
-        console.log("Built slideshow:", builtModalData);
       } catch (error) {
         console.error("Failed to load live session:", error);
 
@@ -241,11 +237,11 @@ const LiveSession = () => {
     () =>
       session
         ? {
-            sessionCode: session.sessionId,
-            shareUrl,
-            isLeader,
-            isOutOfSync: !isLeader && !viewerFollowingLeader,
-          }
+          sessionCode: session.sessionId,
+          shareUrl,
+          isLeader,
+          isOutOfSync: !isLeader && !viewerFollowingLeader,
+        }
         : null,
     [isLeader, session, shareUrl, viewerFollowingLeader],
   );

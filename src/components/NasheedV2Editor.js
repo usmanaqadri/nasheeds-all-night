@@ -56,6 +56,7 @@ import { updateFootnotesForTextChange } from "../utils/footnoteOffsets";
 import FootnotedTranslation from "./FootnotedTranslation";
 import { MetadataEditor } from "./MetadataEditor";
 import { sanitizeArabic } from "../utils/sanitizeArabic";
+import FormattedLine from "./FormattedLine";
 
 const newId = () =>
   Array.from(crypto.getRandomValues(new Uint8Array(12)))
@@ -1128,7 +1129,12 @@ export default function NasheedV2Editor({ mode = "edit" }) {
                                 </p>
 
                                 <p className="v2-display-rom">
-                                  <em>{line.rom}</em>
+                                  <em>{
+                                    <FormattedLine
+                                      text={line.rom}
+                                      formatting={line.formatting?.rom || []}
+                                    />
+                                  }</em>
                                 </p>
 
                                 <div className="v2-display-eng">

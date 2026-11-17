@@ -1,432 +1,170 @@
+/* Modal.css — consolidated layout and typography */
+
+/* Overlay and modal shell */
 .overlay {
-	position: fixed;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	z-index: 1000;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.7);
 }
 
-.modal-left-buttons {
-	position: absolute !important;
-    top: 10px;
-    left: 10px;
-    width: auto;
-	display: flex;
-	gap: 0.35rem;
-	align-items: flex-start;
-}
-
-.modal-right-buttons {
-	position: absolute !important;
-	top: 10px;
-	right: 10px;
-	width: auto;
-	display: flex;
-	gap: 0.35rem;
-	align-items: flex-start;
-}
-
-.close-button:hover {
-	color: lightgrey; 
-  }
-
-  .close-button:active {
-	transform: scale(0.9);
-  }
-  
 .modal {
-	color: white;
-	position: relative;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: linear-gradient(#021d37, #021019);
-	background-size: cover;
-	padding: 50px;
-	z-index: 1000;
-	width: 85vw;
-  	height: 90vh;
-  	border-radius: 1.5em;
-	box-sizing: content-box;
-  	border-width: 8px;
-  	border-style: solid;
-  	border-image: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
-  	border-image-slice: 1;
-	box-shadow: rgba(0,0,0,0.35) 0em 0.3em 0.9em;
-	display: flex;
-	flex-direction: column;
-	padding: 1.5em;
-	font-family: 'Cormorant', sans-serif;
-	user-select:none;
-	-webkit-user-select:none;
-}
-
-.text-container {
-    min-width: 8.5in;
-    max-height: 83vh;
-    overflow: auto;
-    overflow-x: hidden;
-    padding: 0in 1in;
-    background-color: white;
-}
-
-.translation-container {
-	padding: 0 0.5in;
-	margin-bottom: 15px;
-}
-
-.modal .title{
-  display: block;
-  flex: 0 0 auto;
-  text-align: center;
-  margin: 0;
-  padding: 0.4rem 4.5rem 0.25rem;
-  font-size: 1.5rem;
-}
-
-.modal-main-title {
-  font-size: 3.4rem;
-  line-height: 1.1;
-  font-weight: 600;
-}
-
-.modal-sub-title {
-  margin-top: 0.35rem;
-  font-size: 2rem;
-  font-weight: 500;
-  opacity: 0.95;
-}
-
-.modal-session-meta {
-  margin-top: 0.5rem;
-  font-size: 1.05rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.82;
-}
-
-.modal .body {
-  flex: 50%;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 3rem;
-  text-align: center;
-  padding-bottom: 1.5rem;
-  width: 100%;
-}
-.modal .body p {
-  margin: 1vh;
-
-}
-
-.modal .body .paragraph {
-  margin: 0;
-
-}
-.arabText {
-	font-weight: 300;
-	word-spacing: 0.5rem;
-}
-.engText {
-	font-weight: 500;
-}
-
-.flash-overlay {
-  position: absolute;
-  top: 10px;
-  bottom: 0;
-  width: 48%;
-  background-color: rgba(255, 255, 255, 0.4); /* Light flash */
-  animation: flash 0.8s ease-out;
-  pointer-events: none; /* So clicks pass through */
-  z-index: 5;
-}
-
-.left-flash {
-  left: 10px;
-  border-top-left-radius: 50%; 
-  border-bottom-left-radius: 50%;
-}
-
-.right-flash {
-  right: 10px;
-  border-top-right-radius: 50%;
-  border-bottom-right-radius: 50%;
-}
-
-.slide-number {
-	position: absolute !important;
-	bottom: 10px;
-	right: 10px;
-	padding: 5px 10px;
-	font-size: 2rem;
-    text-align: right;
-    color: white;
-}
-
-.sync-banner {
-	position: absolute;
-	left: 50%;
-	bottom: 14px;
-	transform: translateX(-50%);
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.65rem 1rem;
-	border-radius: 999px;
-	background: rgba(7, 19, 34, 0.92);
-	border: 1px solid rgba(255, 255, 255, 0.14);
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-	font-size: 1rem;
-	color: #f5f0e6;
-	z-index: 6;
-}
-
-.sync-banner-button {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.4rem;
-	border: 0;
-	border-radius: 999px;
-	padding: 0.45rem 0.8rem;
-	background: #d8b04a;
-	color: #08233f;
-	font: inherit;
-	font-weight: 700;
-	cursor: pointer;
-}
-
-.sync-banner-button:hover {
-	background: #e8c363;
-}
-
-@keyframes flash {
-  from {
-    opacity: 0.6;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@media screen and (max-width: 850px) {
-	/* .modal .title {
-		font-size: 0.6rem;
-	}
-	.modal .body {
-		font-size: 1rem;
-	} */
-	.modal {
-		top: 50%;
-		width: 90vw;
-		height: 82vh;
-		padding: 1rem 0.8rem 1.4rem;
-	}
-
-	.modal-left-buttons,
-	.modal-right-buttons {
-		top: 6px;
-	}
-
-	.modal-left-buttons {
-		left: 6px;
-	}
-
-	.modal-right-buttons {
-		right: 6px;
-	}
-
-	.modal-left-buttons .MuiIconButton-root,
-	.modal-right-buttons .MuiIconButton-root {
-		padding: 6px;
-	}
-
-	.modal-left-buttons .MuiSvgIcon-root,
-	.modal-right-buttons .MuiSvgIcon-root {
-		font-size: 1.35rem;
-	}
-
-	.modal .title {
-		margin-top: 0;
-		padding: 0 1.6rem;
-		font-size: 1.15rem;
-	}
-
-	.modal-main-title {
-		font-size: 1.85rem;
-	}
-
-	.modal-sub-title {
-		font-size: 1.12rem;
-		line-height: 1.2;
-	}
-
-	.modal-session-meta {
-		font-size: 0.78rem;
-		letter-spacing: 0.04em;
-	}
-	.modal .body {
-		font-size: 1.45rem;
-		width: 100%;
-	}
-
-	.text-container {
-        padding: 0;
-		min-width: auto;
-        width: 100%;
-    }
-
-	.text-container .body div p {
-        font-size: 1.7rem;
-        font-family: inherit;
-    }
-
-    .text-container .body div textarea {
-        font-size: 1.7rem;
-        min-width: 220px;
-        margin: 5px 0;
-        font-family: inherit;
-    }
-
-	.slide-number {
-        position: absolute !important;
-		bottom: 10px;
-		right: 10px;
-		font-size: 1rem;
-        margin-top: -10px;
-        text-align: right;
-        color: white;
-    }
-
-	.sync-banner {
-		bottom: 8px;
-		width: calc(100% - 1rem);
-		max-width: 300px;
-		padding: 0.5rem 0.75rem;
-		font-size: 0.75rem;
-		gap: 0.5rem;
-		justify-content: center;
-		text-align: center;
-		flex-wrap: wrap;
-	}
-
-	.sync-banner-button {
-		padding: 0.35rem 0.65rem;
-		font-size: 0.72rem;
-	}
-}
- /* @media (max-height: 550px) {
-	
-
-} */
- 
-
-/* @media (min-height: 900px) {
-	.modal .title {
-		font-size: 1.7vw;
-	}
-	.modal .body {
-		font-size: 3.2vw;
-	}
-} */
-@media screen and (max-height: 600px) {
-	/* .modal .title {
-		font-size: 2.4vh;
-	}
-	.modal .body {
-		font-size: 4.0vh;
-	} */
-	.modal {
-		height: 60vh;
-		padding-bottom: 3rem;
-	}
-	.modal .title {
-		margin-top: 0;
-		font-size: 0.8rem;
-	}
-
-	.modal-main-title {
-		font-size: 1.5rem;
-	}
-
-	.modal-sub-title {
-		font-size: 1rem;
-	}
-
-	.modal-session-meta {
-		font-size: 0.72rem;
-	}
-	.modal .body {
-		font-size: 1rem;
-	}
-	.modal .body .engText {
-		font-size: 1.4rem;
-	}
-
-	.sync-banner {
-		bottom: 6px;
-		font-size: 0.68rem;
-	}
-}
-@media screen and (min-width: 1400px){
-	.modal .title {
-		font-size: 1.1vw;
-	}
-	.modal .body {
-		font-size: 2.4vw;
-	}
-}
-
-
-/* =========================================
-   RESPONSIVE PRESENTATION LAYOUT
-   ========================================= */
-
-.modal {
   box-sizing: border-box;
   min-height: 0;
   overflow: hidden;
+  width: 85vw;
+  height: 90vh;
+  padding: 1.5em;
+  color: white;
+  background: linear-gradient(#021d37, #021019);
+  border: 8px solid;
+  border-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c) 1;
+  border-radius: 1.5em;
+  box-shadow: 0 0.3em 0.9em rgba(0, 0, 0, 0.35);
+  font-family: 'Cormorant', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* Header stays above the slide content */
+/* Toolbar and navigation */
+.modal-left-buttons,
+.modal-right-buttons {
+  position: absolute !important;
+  top: 10px;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  width: auto;
+  pointer-events: auto;
+}
+.modal-left-buttons { left: 10px; }
+.modal-right-buttons { right: 10px; }
+.close-button:hover { color: lightgrey; }
+.close-button:active { transform: scale(0.9); }
+
+/* Header */
 .modal > .title {
+  position: relative;
+  z-index: 1;
+  display: block;
   flex: 0 0 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0.8rem 4.5rem 0.35rem;
+  text-align: center;
+  font-size: 1.5rem;
 }
+.modal > .title h1 { margin: 0; font-weight: 400; }
+.modal-main-title { font-size: 3.4rem; line-height: 1.1; font-weight: 600; }
+.modal-sub-title { margin-top: 0.35rem; font-size: 2rem; font-weight: 500; opacity: 0.95; }
+.modal-session-meta { margin-top: 0.5rem; font-size: 1.05rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.82; }
 
-/* Presentation content + footer */
-.presentation-layout {
+.modal .modal-nasheed-title {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  text-align: center;
+}
+.modal .modal-title-arab {
+  font-family: 'Amiri', serif;
+  font-size: clamp(2.2rem, 3vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.55;
+}
+.modal .modal-title-arab.modal-title-urdu {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 2.2;
+  padding-bottom: 0.15em;
+}
+.modal .modal-title-arab.modal-title-urdu + .modal-title-eng { margin-top: 0.3em; }
+.modal .modal-title-eng {
+  font-family: 'Cormorant Garamond', 'Cormorant', serif;
+  font-size: clamp(2rem, 2.8vw, 3rem);
+  font-weight: 300;
+  line-height: 1.15;
+}
+
+/* Reading mode */
+.text-container {
+  min-width: 8.5in;
+  max-height: 83vh;
+  overflow: auto;
+  overflow-x: hidden;
+  padding: 0 1in;
+  background: white;
+}
+.translation-container { padding: 0 0.5in; margin-bottom: 15px; }
+.modal .text-container .arabText {
+  font-family: 'Amiri', serif;
+  font-weight: 400;
+  line-height: 1.8;
+}
+.modal .text-container .arabText.urduText {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 2.4;
+}
+
+/* Shared verse content */
+.modal .body {
+  display: flex;
+  flex: 50%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 1.5rem;
+  font-size: 3rem;
+  text-align: center;
+}
+.modal .body p { margin: 1vh; }
+.modal .body .paragraph { margin: 0; }
+.arabText { font-weight: 300; word-spacing: 0.5rem; }
+.engText { font-weight: 500; }
+.modal .arabText {
+  font-family: 'Amiri', serif;
+  font-weight: 400;
+  line-height: 1.8;
+}
+.modal .arabText.urduText {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 2.3;
+}
+
+/* Presentation mode */
+.modal > .presentation-layout,
+.presentation-layout {
+  position: relative;
+  z-index: 0;
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   min-height: 0;
   width: 100%;
 }
-
-/* Main lyrics area */
 .modal .body.presentation-body {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: clamp(1rem, 3vh, 2.5rem);
   min-height: 0;
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-
-  gap: clamp(1rem, 3vh, 2.5rem);
   padding: 1rem 0.5rem;
   box-sizing: border-box;
-
   scrollbar-width: thin;
 }
-
-/* Individual verse groups */
 .presentation-body .paragraph {
   flex: 0 0 auto;
   width: 100%;
@@ -435,53 +173,46 @@
   text-align: center;
   overflow-wrap: break-word;
 }
-
-/* Typography */
 .presentation-body .arabText {
-  font-size: clamp(2rem, 3.5vw, 4rem);
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
   line-height: 1.75;
   font-weight: 400;
   word-spacing: 0.15em;
 }
-
+.modal .presentation-body .arabText.urduText {
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-family: 'Noto Nastaliq Urdu', serif;
+  font-weight: 400;
+  line-height: 2.4;
+}
 .presentation-body .engText {
   font-size: clamp(1.5rem, 2.6vw, 3rem);
   line-height: 1.35;
   font-weight: 500;
 }
+.presentation-body .engText em { font-size: 0.95em; }
 
-.presentation-body .engText em {
-  font-size: 0.95em;
-}
-
-/* =========================================
-   FOOTER
-   ========================================= */
-
+/* Presentation footer and footnotes */
 .presentation-footer {
   flex: 0 0 auto;
   min-height: 0;
   width: 100%;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(255,255,255,0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
-
-/* Footnotes get their own scrollable area */
 .presentation-footnotes {
   max-height: 18vh;
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 0 0.5rem;
   font-size: 1.1rem;
   line-height: 1.35;
-  padding: 0 0.5rem;
   overflow-wrap: anywhere;
 }
-
-.presentation-footnotes:empty {
-  display: none;
-}
-
-/* Counter and sync status share a footer row */
+.presentation-footnotes:empty { display: none; }
+.presentation-footnote-list { font-size: inherit; line-height: inherit; }
+.presentation-footnote-list > div { margin-bottom: 0.35rem; }
+.presentation-footnote-list sup { font-size: 0.7em; vertical-align: super; margin-right: 0.15rem; }
 .presentation-footer-bottom {
   display: flex;
   align-items: center;
@@ -489,24 +220,55 @@
   gap: 0.5rem;
   min-height: 2.5rem;
 }
-
-.presentation-sync {
-  flex: 1 1 auto;
-  min-width: 0;
+.presentation-sync { flex: 1 1 auto; min-width: 0; }
+.slide-number {
+  position: absolute !important;
+  right: 10px;
+  bottom: 10px;
+  padding: 5px 10px;
+  color: white;
+  font-size: 2rem;
+  text-align: right;
 }
-
-/* Override previous absolute positioning */
 .presentation-footer .slide-number {
   position: static !important;
   flex: 0 0 auto;
-  padding: 0.25rem;
   margin: 0;
-  font-size: 1.25rem;
+  padding: 0.25rem;
+  font-size: 1.5rem;
   white-space: nowrap;
-  text-align: right;
 }
-
-/* Sync notification stays in the footer */
+.sync-banner {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  z-index: 6;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(7, 19, 34, 0.92);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: #f5f0e6;
+  font-size: 1rem;
+}
+.sync-banner-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: #d8b04a;
+  color: #08233f;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sync-banner-button:hover { background: #e8c363; }
 .presentation-footer .sync-banner {
   position: static;
   transform: none;
@@ -517,10 +279,22 @@
   box-shadow: none;
 }
 
-/* =========================================
-   MOBILE PRESENTATION
-   ========================================= */
+/* Swipe feedback */
+.flash-overlay {
+  position: absolute;
+  top: 10px;
+  bottom: 0;
+  z-index: 5;
+  width: 48%;
+  background: rgba(255, 255, 255, 0.4);
+  animation: flash 0.8s ease-out;
+  pointer-events: none;
+}
+.left-flash { left: 10px; border-radius: 50% 0 0 50%; }
+.right-flash { right: 10px; border-radius: 0 50% 50% 0; }
+@keyframes flash { from { opacity: 0.6; } to { opacity: 0; } }
 
+/* Small screens */
 @media screen and (max-width: 850px) {
   .modal {
     width: 94vw;
@@ -529,248 +303,79 @@
     max-height: calc(100dvh - 1rem);
     padding: 0.8rem;
   }
-
+  .modal-left-buttons, .modal-right-buttons { top: 6px; }
+  .modal-left-buttons { left: 6px; }
+  .modal-right-buttons { right: 6px; }
+  .modal-left-buttons .MuiIconButton-root,
+  .modal-right-buttons .MuiIconButton-root { padding: 6px; }
+  .modal-left-buttons .MuiSvgIcon-root,
+  .modal-right-buttons .MuiSvgIcon-root { font-size: 1.35rem; }
+  .modal > .title { padding: 0.9rem 2.5rem 0.3rem; }
+  .modal-main-title { font-size: 1.85rem; }
+  .modal-sub-title { font-size: 1.12rem; line-height: 1.2; }
+  .modal-session-meta { font-size: 0.78rem; letter-spacing: 0.04em; }
+  .modal .modal-title-arab { font-size: clamp(1.9rem, 6vw, 2.7rem); }
+  .modal .modal-title-eng { font-size: clamp(1.7rem, 5vw, 2.4rem); }
+  .modal .body { font-size: 1.45rem; width: 100%; }
+  .text-container { min-width: auto; width: 100%; padding: 0; }
+  .text-container .body div p { font-size: 1.7rem; font-family: inherit; }
+  .text-container .body div textarea {
+    min-width: 220px;
+    margin: 5px 0;
+    font-size: 1.7rem;
+    font-family: inherit;
+  }
+  .slide-number { font-size: 1rem; margin-top: -10px; }
   .modal .body.presentation-body {
     gap: clamp(1.5rem, 4vh, 3rem);
     padding: 0.5rem 0.25rem;
   }
-
-  /* Larger Arabic */
   .presentation-body .arabText {
     font-size: clamp(1.9rem, 7vw, 2.8rem);
     line-height: 1.8;
     word-spacing: 0.08em;
   }
-
-  /* Larger transliteration and English */
-  .presentation-body .engText {
-    font-size: clamp(1.5rem, 5.4vw, 2rem);
-    line-height: 1.35;
-  }
-
-  .presentation-body .engText em {
-    font-size: 0.95em;
-  }
-
-  /* Footnotes */
-  .presentation-footnotes {
-    max-height: 20dvh;
-    font-size: 1rem;
-    line-height: 1.3;
-    padding: 0.25rem;
-  }
-
-  .presentation-footer-bottom {
-    min-height: 2rem;
-  }
-
-  .presentation-footer .slide-number {
-    font-size: 0.95rem;
-  }
-
-  .presentation-footer .sync-banner {
-    padding: 0.4rem 0.5rem;
-    font-size: 0.75rem;
-    gap: 0.4rem;
-  }
-
-  .presentation-footer .sync-banner-button {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.75rem;
-  }
-}
-
-/* Short screens / landscape */
-@media screen and (max-height: 600px) {
-  .modal .body.presentation-body {
-    gap: 0.75rem;
-    padding: 0.25rem;
-  }
-
-  .presentation-body .arabText {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-  }
-
-  .presentation-body .engText {
-    font-size: clamp(1.1rem, 3vw, 1.8rem);
-  }
-
-  .presentation-footnotes {
-    max-height: 15dvh;
-  }
-}
-
-.presentation-footnote-list {
-  font-size: inherit;
-  line-height: inherit;
-}
-
-.presentation-footnote-list > div {
-  margin-bottom: 0.35rem;
-}
-
-.presentation-footnote-list sup {
-  font-size: 0.7em;
-  vertical-align: super;
-  margin-right: 0.15rem;
-}
-
-/* Arabic */
-.modal .arabText {
-  font-family: 'Amiri', serif;
-  font-weight: 400;
-  line-height: 1.8;
-}
-
-/* Urdu */
-.modal .arabText.urduText {
-  font-family: 'Noto Nastaliq Urdu', serif;
-  font-weight: 400;
-  line-height: 2.3;
-}
-
-/* Mobile */
-@media screen and (max-width: 850px) {
-  .presentation-body .arabText {
-    font-size: clamp(1.9rem, 7vw, 2.8rem);
-  }
-
   .presentation-body .arabText.urduText {
     font-size: clamp(1.7rem, 6.2vw, 2.5rem);
     line-height: 2.4;
   }
+  .presentation-body .engText { font-size: clamp(1.5rem, 5.4vw, 2rem); line-height: 1.35; }
+  .presentation-footnotes { max-height: 20dvh; padding: 0.25rem; font-size: 1rem; line-height: 1.3; }
+  .presentation-footer-bottom { min-height: 2rem; }
+  .presentation-footer .slide-number { font-size: 0.95rem; }
+  .sync-banner {
+    bottom: 8px;
+    width: calc(100% - 1rem);
+    max-width: 300px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+    justify-content: center;
+    text-align: center;
+    flex-wrap: wrap;
+  }
+  .sync-banner-button { padding: 0.35rem 0.65rem; font-size: 0.72rem; }
+  .presentation-footer .sync-banner { padding: 0.4rem 0.5rem; font-size: 0.75rem; gap: 0.4rem; }
+  .presentation-footer .sync-banner-button { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
 }
 
-/* Nasheed title */
-.modal .modal-nasheed-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  text-align: center;
-}
-
-.modal .modal-title-arab {
-  font-family: "Amiri", serif;
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-.modal .modal-title-eng {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 2rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
-/* Final scoped header layout: never lift the title into the clipped border. */
-.modal > .title {
-  position: relative;
-  flex: 0 0 auto;
-  min-height: 0;
-  margin: 0;
-  padding: 0.4rem 4.5rem 0.35rem;
-  text-align: center;
-}
-.modal > .title h1 { margin: 0; font-weight: 400; }
-.modal .modal-nasheed-title { gap: 0.1rem; }
-.modal .modal-title-arab { font-weight: 400; line-height: 1.45; }
-.modal .modal-title-eng { font-weight: 300; line-height: 1.15; }
-/* Keep verse area scrollable rather than clipping the title. */
-.modal .presentation-layout { min-height: 0; }
-.modal .presentation-body .paragraph { margin: 0; }
-/* Preserve Arabic and Urdu fonts in reading mode on mobile. */
-@media screen and (max-width: 850px) {
-  .modal > .title { padding: 0.65rem 3rem 0.3rem; margin: 0; }
-  .modal .modal-title-arab, .modal .modal-title-eng { font-size: 1.55rem; }
-  .modal .text-container .arabText { font-family: "Amiri", serif; }
-  .modal .text-container .arabText.urduText { font-family: "Noto Nastaliq Urdu", serif; }
-}
+/* Short screens and landscape: intentionally after width rules */
 @media screen and (max-height: 600px) {
-  .modal > .title { margin: 0; padding-top: 0.25rem; }
+  .modal { height: 60vh; padding-bottom: 3rem; }
+  .modal > .title { padding-top: 0.25rem; }
+  .modal-main-title { font-size: 1.5rem; }
+  .modal-sub-title { font-size: 1rem; }
+  .modal-session-meta { font-size: 0.72rem; }
+  .modal .body { font-size: 1rem; }
+  .modal .body .engText { font-size: 1.4rem; }
+  .modal .body.presentation-body { gap: 0.75rem; padding: 0.25rem; }
+  .presentation-body .arabText { font-size: clamp(1.5rem, 4vw, 2.5rem); }
+  .presentation-body .engText { font-size: clamp(1.1rem, 3vw, 1.8rem); }
+  .presentation-footnotes { max-height: 15dvh; }
+  .sync-banner { bottom: 6px; font-size: 0.68rem; }
 }
 
-/* Final title styling: targets actual V2 title markup. */
-.modal > .title { padding: 0.8rem 4.5rem 0.35rem; margin: 0; }
-.modal .modal-nasheed-title { gap: 0.1rem; }
-.modal .modal-title-arab {
-  font-family: "Amiri", serif;
-  font-size: clamp(2.2rem, 3vw, 3.2rem);
-  font-weight: 400;
-  line-height: 1.55;
-}
-.modal .modal-title-eng {
-  font-family: "Cormorant Garamond", "Cormorant", serif;
-  font-size: clamp(2rem, 2.8vw, 3rem);
-  font-weight: 300;
-  line-height: 1.15;
-}
-/* Language-specific styling for V2 verse lines. */
-.modal .presentation-body .arabText.urduText {
-  font-family: "Noto Nastaliq Urdu", serif !important;
-  font-weight: 400;
-  line-height: 2.4;
-}
-@media screen and (max-width: 850px) {
-  .modal > .title { padding: 0.9rem 2.5rem 0.3rem; }
-  .modal .modal-title-arab { font-size: clamp(1.9rem, 6vw, 2.7rem); }
-  .modal .modal-title-eng { font-size: clamp(1.7rem, 5vw, 2.4rem); }
-}
-
-.modal > .modal-left-buttons,
-.modal > .modal-right-buttons {
-  position: absolute !important;
-  z-index: 30;
-  pointer-events: auto;
-}
-
-.modal > .title {
-  z-index: 1;
-}
-
-.modal > .presentation-layout {
-  position: relative;
-  z-index: 0;
-}
-
-/* Reading mode: Arabic */
-.modal .text-container .arabText {
-  font-family: "Amiri", serif !important;
-  font-weight: 400;
-  line-height: 1.8;
-}
-
-/* Reading mode: Urdu */
-.modal .text-container .arabText.urduText {
-  font-family: "Noto Nastaliq Urdu", serif !important;
-  font-weight: 400;
-  line-height: 2.4;
-}
-
-.modal .modal-title-arab {
-  font-family: "Amiri", serif;
-  font-weight: 400;
-}
-
-.modal .modal-title-arab.modal-title-urdu {
-  font-family: "Noto Nastaliq Urdu", serif;
-  font-weight: 400;
-  line-height: 2;
-}
-
-/* Space between Urdu title and English title */
-.modal .modal-nasheed-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.modal .modal-title-arab.modal-title-urdu {
-  font-family: "Noto Nastaliq Urdu", serif;
-  line-height: 2.2;
-  padding-bottom: 0.15em;
-}
-
-.modal .modal-title-arab.modal-title-urdu + .modal-title-eng {
-  margin-top: 0.3em;
+@media screen and (min-width: 1400px) {
+  .modal > .title { font-size: 1.1vw; }
+  .modal .body { font-size: 2.4vw; }
 }
