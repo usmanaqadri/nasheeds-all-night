@@ -32,6 +32,7 @@ import { FootnotePopper } from "./FootnotePopper";
 import { baseURL } from "../utils/constants";
 import { getNasheedSlides } from "../utils/nasheedSlides";
 import { sanitizeArabic } from "../utils/sanitizeArabic";
+import FormattedLine from "./FormattedLine";
 
 const buildSlideshowScreens = (sections = []) => {
   const screens = [];
@@ -671,7 +672,12 @@ export default function MyModal({
 
         {line.rom && (
           <p className="engText">
-            <em>{line.rom}</em>
+            <em>{
+              <FormattedLine
+                text={line.rom}
+                formatting={line.formatting?.rom || []}
+              />
+            }</em>
           </p>
         )}
 
@@ -868,7 +874,12 @@ export default function MyModal({
 
               {line.rom?.trim() && (
                 <p className="engText">
-                  <em>{line.rom}</em>
+                  <em>{
+                    <FormattedLine
+                      text={line.rom}
+                      formatting={line.formatting?.rom || []}
+                    />
+                  }</em>
                 </p>
               )}
 
@@ -895,7 +906,12 @@ export default function MyModal({
 
         {layout.includes("rom") && line.rom && (
           <p className="engText">
-            <em>{line.rom}</em>
+            <em>{
+              <FormattedLine
+                text={line.rom}
+                formatting={line.formatting?.rom || []}
+              />
+            }</em>
           </p>
         )}
 
@@ -1026,7 +1042,12 @@ export default function MyModal({
 
                 {(isCustom || layout.includes("rom")) && line.rom?.trim() && (
                   <p className="engText">
-                    <em>{line.rom}</em>
+                    <em>{
+                      <FormattedLine
+                        text={line.rom}
+                        formatting={line.formatting?.rom || []}
+                      />
+                    }</em>
                   </p>
                 )}
 

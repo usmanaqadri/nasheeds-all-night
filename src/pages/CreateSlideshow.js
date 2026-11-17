@@ -206,7 +206,6 @@ const CreateSlideshow = () => {
         if (isEditMode) {
           const found = data[1]?.foundSlideshow || data[1];
           if (!found) throw new Error("Slideshow not found");
-          console.log("here is found", found);
           setTitle(found.title || "");
           setSlides(
             hydrateSlides(

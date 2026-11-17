@@ -77,6 +77,7 @@ export const resolveSlideshowBlock = (block, nasheed) => {
         rom: line.rom || "",
         eng: line.eng || "",
         language: line.language || "ar",
+        formatting: line.formatting || {},
       },
     ];
   });
@@ -109,6 +110,7 @@ export const hydrateSlides = (slides = [], nasheedMap = {}) =>
           rom: line.rom || "",
           eng: line.eng || "",
           language: line.language || "ar",
+          formatting: line.formatting || {},
         })),
         verses: [],
       };
@@ -154,6 +156,7 @@ export const buildSlideshowPayload = ({ title, slides, creatorId }) => ({
           rom: line.rom || "",
           eng: line.eng || "",
           language: line.language || "ar",
+          formatting: line.formatting || {},
         })),
       }
       : {
