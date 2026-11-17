@@ -817,11 +817,11 @@ export default function MyModal({
         >
           {screen.arabTitle && (
             <Box
-              className={`modal-title-arab ${isUrduTitle(nasheed.language) ? "modal-title-urdu" : ""
+              className={`modal-title-arab ${isUrduTitle(screen.section.language) ? "modal-title-urdu" : ""
                 }`}
-              lang={isUrduTitle(nasheed.language) ? "ur" : "ar"}
+              lang={isUrduTitle(screen.section.language) ? "ur" : "ar"}
               dir="rtl"
-              sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem)" }}
+              sx={{ fontSize: "clamp(2.5rem, 5vw, 5rem) !important" }}
             >
               {screen.arabTitle}
             </Box>
@@ -830,7 +830,7 @@ export default function MyModal({
           <Box
             sx={{
               color: "white",
-              fontSize: "clamp(2rem, 4vw, 4rem)",
+              fontSize: "clamp(2rem, 4vw, 4rem) !important",
               fontWeight: 600,
             }}
           >

@@ -124,9 +124,31 @@ input:focus {
   .button-64 {
     font-size: 1.3vw;
   }
+}
 
-  .modal .body div p {
-    font-size: 3.3rem;
-    font-family: "Cormorant", serif !important;
-  }
+/* Global Material UI Alert styling */
+
+.MuiAlert-root {
+  font-size: 1.3rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  align-items: center;
+}
+
+.MuiAlert-message {
+  font-size: 1.3rem;
+  line-height: 1.6;
+}
+
+.MuiAlert-icon {
+  font-size: 1.5rem;
+  align-items: center;
+}
+
+.MuiAlert-icon .MuiSvgIcon-root {
+  font-size: 1.5rem;
+}
+
+.MuiAlert-action {
+  align-items: center;
 }
