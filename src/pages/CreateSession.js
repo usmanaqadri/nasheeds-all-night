@@ -15,6 +15,7 @@ import Loader from "../components/Loader";
 import SeoHelmet from "../components/SeoHelmet";
 import { useAuth } from "../components/AuthContext";
 import { SnackbarAlert } from "../utils/helperFunctions";
+import { createLiveSession } from "../utils/liveSession";
 import { baseURL } from "../utils/constants";
 
 const CreateSession = () => {
@@ -70,22 +71,8 @@ const CreateSession = () => {
     setCreatingId(slideshowId);
 
     try {
-      const response = await fetch(`${baseURL}/live-session/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ slideshowId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create live session.");
-      }
-
-      navigate(`/session/${data.sessionId}`);
+      const sessionId = await createLiveSession(slideshowId, token);
+      navigate(`/session/${sessionId}`);
     } catch (error) {
       setAlert({
         type: "error",

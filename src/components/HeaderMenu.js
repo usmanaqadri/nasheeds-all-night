@@ -17,6 +17,7 @@ import {
 import {
   CastConnectedOutlined,
   ExpandMore,
+  HomeOutlined,
   LibraryAddOutlined,
   LoginOutlined,
   LogoutOutlined,
@@ -32,7 +33,7 @@ import { handleGoogleLogin } from "../utils/helperFunctions";
 const createActions = [
   { path: "/create/nasheed", label: "New Nasheed", Icon: LibraryAddOutlined },
   { path: "/create/slideshow", label: "New Slideshow", Icon: SlideshowOutlined },
-  { path: "/create/session", label: "New Session", Icon: CastConnectedOutlined },
+  { path: "/create/session", label: "Host a session", Icon: CastConnectedOutlined },
 ];
 
 export default function HeaderMenu({ isHome }) {
@@ -55,6 +56,11 @@ export default function HeaderMenu({ isHome }) {
     setAnchorEl(null);
     setJoinOpen(false);
     setSessionCode("");
+  };
+
+  const navigateFromMenu = (path) => {
+    closeMenu();
+    navigate(path);
   };
 
   const handleJoinFormKeyDown = (event) => {
@@ -113,7 +119,10 @@ export default function HeaderMenu({ isHome }) {
               minHeight: 48,
               "&:hover": { backgroundColor: isHome ? "#333" : "#f5f5f5" },
             },
-            "& .MuiListItemIcon-root": { color: "inherit" },
+            "& .MuiListItemIcon-root": {
+              color: "inherit",
+              "& .MuiSvgIcon-root": { fontSize: "2rem" },
+            },
             "& .MuiListItemText-primary": {
               fontSize: "1.6rem",
               fontWeight: 500,
@@ -144,11 +153,14 @@ export default function HeaderMenu({ isHome }) {
           </ListSubheader>
         )}
         {loggedIn && <Divider />}
-        {isHome && loggedIn && createActions.map(({ path, label, Icon }) => (
-          <MenuItem key={path} onClick={() => {
-            closeMenu();
-            navigate(path);
-          }}>
+        {!isHome && (
+          <MenuItem onClick={() => navigateFromMenu("/")}>
+            <ListItemIcon><HomeOutlined /></ListItemIcon>
+            <ListItemText primary="Home" />
+          </MenuItem>
+        )}
+        {loggedIn && createActions.map(({ path, label, Icon }) => (
+          <MenuItem key={path} onClick={() => navigateFromMenu(path)}>
             <ListItemIcon><Icon /></ListItemIcon>
             <ListItemText primary={label} />
           </MenuItem>
@@ -161,8 +173,8 @@ export default function HeaderMenu({ isHome }) {
           <ListItemIcon><MeetingRoomOutlined /></ListItemIcon>
           <ListItemText primary="Join live session" />
           <ExpandMore
-            fontSize="medium"
             sx={{
+              fontSize: "2rem",
               transform: joinOpen ? "rotate(180deg)" : "none",
               transition: "transform 180ms ease",
             }}

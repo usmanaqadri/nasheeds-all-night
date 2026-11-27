@@ -11,8 +11,9 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
+  CastConnectedOutlined,
   Close,
   PictureAsPdf,
   Tv,
@@ -29,6 +30,7 @@ import { generatePDF } from "../utils/generatePDF";
 import { nasheedText, SnackbarAlert } from "../utils/helperFunctions";
 import { useAuth } from "./AuthContext";
 import { FootnotePopper } from "./FootnotePopper";
+import { createLiveSession } from "../utils/liveSession";
 import { baseURL } from "../utils/constants";
 import { getNasheedSlides } from "../utils/nasheedSlides";
 import { sanitizeArabic } from "../utils/sanitizeArabic";
@@ -100,6 +102,7 @@ export default function MyModal({
   sessionMeta = null,
 }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isV2 = nasheed?.schemaVersion === 2;
   const isSlideshow = nasheed?.type === "slideshow";
   const slideshowSections = nasheed?.slides || [];
@@ -140,6 +143,7 @@ export default function MyModal({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showSessionExitDialog, setShowSessionExitDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [startingSession, setStartingSession] = useState(false);
   const currentIndex =
     typeof presentationIndex === "number" ? presentationIndex : counter;
   const slideStep = isSlideBased ? 1 : 2;
@@ -488,6 +492,10 @@ export default function MyModal({
     _id &&
     (user?.admin || nasheed.creatorId === user?.id);
 
+  const canStartSession =
+    isSlideshow && !isSessionMode && _id && token && user?.id &&
+    nasheed.creatorId === user.id;
+
   const getSlideshowSectionForVerse = (verseIndex) => {
     if (!isSlideshow || slideshowSections.length === 0) {
       return null;
@@ -540,6 +548,22 @@ export default function MyModal({
         )}
       </div>
     );
+  };
+
+  const handleStartSession = async (event) => {
+    event.stopPropagation();
+    if (startingSession) return;
+
+    setStartingSession(true);
+    try {
+      const sessionId = await createLiveSession(_id, token);
+      navigate(`/session/${sessionId}`);
+    } catch (error) {
+      setAlertMessage(error.message || "Failed to create live session.");
+      setShowAlert(true);
+    } finally {
+      setStartingSession(false);
+    }
   };
 
   const handleDeleteSlideshow = async () => {
@@ -1140,6 +1164,34 @@ export default function MyModal({
         {flashSide === "left" && <div className="flash-overlay left-flash" />}
         {flashSide === "right" && <div className="flash-overlay right-flash" />}
         <div className="modal-left-buttons">
+          {canStartSession && (
+            <Tooltip
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "12px",
+                    padding: "5px 10px",
+                  },
+                },
+              }}
+              title="Start live session">
+              <span onClick={(event) => event.stopPropagation()}>
+                <IconButton
+                  aria-label="Start live session"
+                  disabled={startingSession}
+                  onClick={handleStartSession}
+                  sx={buttonStyles}
+                >
+                  {startingSession ? (
+                    <CircularProgress size={20} sx={{ color: "white" }} />
+                  ) : (
+                    <CastConnectedOutlined fontSize="large" sx={{ color: "white" }} />
+                  )}
+                </IconButton>
+              </span>
+            </Tooltip>
+          )}
           <IconButton
             sx={buttonStyles}
             onClick={async (e) => {
@@ -1397,7 +1449,10 @@ export default function MyModal({
 
               {isSessionMode && (
                 <div className="modal-session-meta">
-                  Live session {sessionMeta?.sessionCode}
+                  <span>Live session</span>
+                  <strong className="modal-session-code">
+                    {sessionMeta?.sessionCode}
+                  </strong>
                 </div>
               )}
             </h1>

@@ -16,11 +16,14 @@ const Location = () => <output>{useLocation().pathname}</output>;
 
 const click = (element) => act(() => userEvent.click(element));
 
-function openMenu(auth) {
+function openMenu(auth, path = "/") {
   useAuth.mockReturnValue(auth);
   render(
-    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Header isHome />
+    <MemoryRouter
+      initialEntries={[path]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      <Header isHome={path === "/"} />
       <Location />
     </MemoryRouter>,
   );
@@ -61,10 +64,26 @@ test("the signed-in menu displays the account above creation actions and sign-ou
   expect(items.map((item) => item.textContent)).toEqual([
     "New Nasheed",
     "New Slideshow",
-    "New Session",
+    "Host a session",
     "Join live session",
     "Sign out",
   ]);
   expect(items[0]).toHaveFocus();
   expect(menu.firstElementChild).toHaveTextContent("Usman Qadri");
+});
+
+test("secondary pages put Home first and retain the creation actions", () => {
+  openMenu({ loggedIn: true, user: { name: "Usman Qadri" } }, "/create/nasheed");
+
+  const items = screen.getAllByRole("menuitem");
+  expect(items.map((item) => item.textContent)).toEqual([
+    "Home",
+    "New Nasheed",
+    "New Slideshow",
+    "Host a session",
+    "Join live session",
+    "Sign out",
+  ]);
+  click(items[0]);
+  expect(screen.getByText("/")).toBeInTheDocument();
 });
