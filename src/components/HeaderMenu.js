@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -28,6 +28,7 @@ import {
 import { useGoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import { baseURL } from "../utils/constants";
 import { handleGoogleLogin } from "../utils/helperFunctions";
 
 const createActions = [
@@ -42,6 +43,9 @@ export default function HeaderMenu({ isHome }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [joinOpen, setJoinOpen] = useState(false);
   const [sessionCode, setSessionCode] = useState("");
+  const [joinError, setJoinError] = useState("");
+  const [checkingCode, setCheckingCode] = useState(false);
+  const pendingJoin = useRef(null);
   const codeInput = useRef(null);
   const open = Boolean(anchorEl);
   const accountName = user?.name || user?.email || "Account";
@@ -52,7 +56,17 @@ export default function HeaderMenu({ isHome }) {
     onError: (err) => console.log("Login Failed:", err),
   });
 
+  useEffect(() => () => pendingJoin.current?.abort(), []);
+
+  const resetJoinValidation = () => {
+    pendingJoin.current?.abort();
+    pendingJoin.current = null;
+    setCheckingCode(false);
+    setJoinError("");
+  };
+
   const closeMenu = () => {
+    resetJoinValidation();
     setAnchorEl(null);
     setJoinOpen(false);
     setSessionCode("");
@@ -78,12 +92,53 @@ export default function HeaderMenu({ isHome }) {
     event.stopPropagation();
   };
 
-  const handleJoin = (event) => {
+  const handleJoin = async (event) => {
     event.preventDefault();
     const code = sessionCode.trim();
-    if (code) {
-      closeMenu();
-      navigate(`/session/${encodeURIComponent(code)}`);
+    if (!code || pendingJoin.current) return;
+
+    const controller = new AbortController();
+    pendingJoin.current = controller;
+    setCheckingCode(true);
+    setJoinError("");
+
+    try {
+      const response = await fetch(
+        `${baseURL}/live-session/session/${encodeURIComponent(code)}`,
+        { signal: controller.signal },
+      );
+
+      let errorMessage;
+      if (response.status === 404) {
+        errorMessage = "No session with that code.";
+      } else {
+        if (!response.ok) throw new Error("Session lookup failed.");
+
+        const { foundLiveSession } = await response.json();
+        if (!foundLiveSession) {
+          errorMessage = "No session with that code.";
+        } else if (!foundLiveSession.isActive) {
+          errorMessage = "This live session has ended.";
+        }
+      }
+
+      if (controller.signal.aborted) return;
+      if (errorMessage) {
+        setJoinError(errorMessage);
+        codeInput.current?.focus();
+      } else {
+        navigateFromMenu(`/session/${encodeURIComponent(code)}`);
+      }
+    } catch {
+      if (!controller.signal.aborted) {
+        setJoinError("Couldn’t check the code. Try again.");
+        codeInput.current?.focus();
+      }
+    } finally {
+      if (pendingJoin.current === controller) {
+        pendingJoin.current = null;
+        setCheckingCode(false);
+      }
     }
   };
 
@@ -168,7 +223,10 @@ export default function HeaderMenu({ isHome }) {
         <MenuItem
           aria-expanded={joinOpen}
           aria-controls={joinOpen ? "join-session-form" : undefined}
-          onClick={() => setJoinOpen(!joinOpen)}
+          onClick={() => {
+            if (joinOpen) resetJoinValidation();
+            setJoinOpen(!joinOpen);
+          }}
         >
           <ListItemIcon><MeetingRoomOutlined /></ListItemIcon>
           <ListItemText primary="Join live session" />
@@ -193,42 +251,66 @@ export default function HeaderMenu({ isHome }) {
             component="form"
             onSubmit={handleJoin}
             onKeyDown={handleJoinFormKeyDown}
-            sx={{ display: "flex", gap: 1, px: 2, pt: 0.5, pb: 1.5 }}
+            sx={{ px: 2, pt: 0.5, pb: 1.5 }}
           >
-            <TextField
-              inputRef={codeInput}
-              fullWidth
-              size="small"
-              autoComplete="off"
-              label="Session code"
-              value={sessionCode}
-              onChange={(event) => setSessionCode(event.target.value)}
-              sx={{
-                minWidth: 0,
-                "& .MuiInputBase-root, & .MuiInputLabel-root": {
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                id="join-session-code"
+                inputRef={codeInput}
+                error={Boolean(joinError)}
+                inputProps={{ "aria-describedby": joinError ? "join-session-error" : undefined }}
+                fullWidth
+                size="small"
+                autoComplete="off"
+                label="Session code"
+                value={sessionCode}
+                onChange={(event) => {
+                  resetJoinValidation();
+                  setSessionCode(event.target.value);
+                }}
+                sx={{
+                  minWidth: 0,
+                  "& .MuiInputBase-root, & .MuiInputLabel-root": {
+                    fontSize: "1.4rem",
+                    color: "inherit",
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: isHome && !joinError ? "#888" : undefined,
+                  },
+                  "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: isHome && !joinError ? "#bbb" : undefined,
+                  },
+                }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!sessionCode.trim() || checkingCode}
+                sx={{
                   fontSize: "1.4rem",
-                  color: "inherit",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: isHome ? "#888" : undefined,
-                },
-                "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: isHome ? "#bbb" : undefined,
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!sessionCode.trim()}
-              sx={{
-                fontSize: "1.4rem",
-                textTransform: "none",
-                "&.Mui-disabled": isHome ? { color: "#aaa", bgcolor: "#383838" } : {},
-              }}
-            >
-              Join
-            </Button>
+                  textTransform: "none",
+                  "@keyframes shakeJoinButton": {
+                    "25%, 75%": { transform: "translateX(-3px)" },
+                    "50%": { transform: "translateX(3px)" },
+                  },
+                  "@media (prefers-reduced-motion: no-preference)": {
+                    animation: joinError ? "shakeJoinButton 220ms ease-in-out" : "none",
+                  },
+                  "&.Mui-disabled": isHome ? { color: "#aaa", bgcolor: "#383838" } : {},
+                }}
+              >
+                Join
+              </Button>
+            </Box>
+            {joinError && (
+              <Typography
+                id="join-session-error"
+                role="alert"
+                sx={{ mt: 0.5, fontSize: "1.3rem", color: isHome ? "#ff8a80" : "error.main" }}
+              >
+                {joinError}
+              </Typography>
+            )}
           </Box>
         </Collapse>
         <Divider />

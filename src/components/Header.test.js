@@ -12,6 +12,11 @@ jest.mock("@react-oauth/google", () => ({
   useGoogleLogin: () => jest.fn(),
 }));
 
+const originalFetch = global.fetch;
+afterEach(() => {
+  global.fetch = originalFetch;
+});
+
 const Location = () => <output>{useLocation().pathname}</output>;
 
 const click = (element) => act(() => userEvent.click(element));
@@ -31,6 +36,10 @@ function openMenu(auth, path = "/") {
 }
 
 test("guests can expand the inline join form and submit a session code", async () => {
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ foundLiveSession: { isActive: true } }),
+  });
   openMenu({ loggedIn: false });
   expect(screen.getByRole("menuitem", { name: "Sign in" })).toBeInTheDocument();
   expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
@@ -48,7 +57,7 @@ test("guests can expand the inline join form and submit a session code", async (
   expect(joinButton).toHaveFocus();
   act(() => userEvent.keyboard("{Enter}"));
 
-  expect(screen.getByText("/session/ABC123")).toBeInTheDocument();
+  expect(await screen.findByText("/session/ABC123")).toBeInTheDocument();
 });
 
 test("the signed-in menu displays the account above creation actions and sign-out", () => {
@@ -86,4 +95,19 @@ test("secondary pages put Home first and retain the creation actions", () => {
   ]);
   click(items[0]);
   expect(screen.getByText("/")).toBeInTheDocument();
+});
+
+test("an incorrect code keeps the menu and join field open on the current page", async () => {
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404 });
+  openMenu({ loggedIn: false }, "/create/session");
+
+  click(screen.getByRole("menuitem", { name: "Join live session" }));
+  const input = screen.getByRole("textbox", { name: "Session code" });
+  fireEvent.change(input, { target: { value: "wrong" } });
+  click(screen.getByRole("button", { name: "Join" }));
+
+  expect(await screen.findByRole("alert")).toHaveTextContent("No session with that code.");
+  expect(screen.getByRole("menu")).toContainElement(input);
+  expect(input).toHaveValue("wrong");
+  expect(screen.getByText("/create/session")).toBeInTheDocument();
 });
